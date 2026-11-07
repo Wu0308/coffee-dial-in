@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>手沖參數調配器 | POUR-OVER DIAL-IN</title>
+  
+  <!-- 高質感 App 專屬圖示與 PWA 支援 -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#FAF9F7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="BrewCraft">
+  <meta name="description" content="專業手沖咖啡參數調配系統、分段注水指引與配方筆記庫">
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -102,7 +114,6 @@
       border-bottom-left-radius: 4px;
     }
 
-    /* Pulse animation for timer */
     @keyframes subtle-pulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.6; }
@@ -128,7 +139,12 @@
       </div>
       
       <!-- 快捷工具鍵 (保持簡潔極簡外觀) -->
-      <div class="flex items-center gap-2 text-xs">
+      <div class="flex items-center gap-2 text-xs flex-wrap">
+        <button onclick="openRecipeVaultModal()" class="px-3 py-1.5 rounded-lg bg-white border border-[#E6E0D8] text-[#685B52] hover:border-[#CFC2B7] hover:text-[#3D3028] transition flex items-center gap-1.5 shadow-sm">
+          <span>⭐</span>
+          <span>配方與筆記</span>
+          <span id="saved-recipes-badge" class="ml-0.5 px-1.5 py-0.2 rounded-full bg-[#ECE3DC] text-[#3D3028] text-[10px] font-bold">0</span>
+        </button>
         <button onclick="copyRecipe()" class="px-3 py-1.5 rounded-lg bg-white border border-[#E6E0D8] text-[#685B52] hover:border-[#CFC2B7] hover:text-[#3D3028] transition flex items-center gap-1.5 shadow-sm">
           <span>📋</span>
           <span id="copy-btn-text">複製配方</span>
@@ -187,10 +203,16 @@
           <strong id="timer-current-target" class="text-[#2C2521] font-semibold bg-[#FAF9F7] px-2.5 py-1 rounded-md border border-[#EDE8E2]">準備中</strong>
           <span id="timer-step-countdown" class="text-[#9B8D83] font-mono-num text-[11px]"></span>
         </div>
-        <div>
-          <span>目標累計注水：</span>
-          <strong id="timer-water-goal" class="text-[#654D3F] font-mono-num font-bold text-sm">0</strong>
-          <span class="text-[#8C7E75]">/ <span id="timer-total-water-goal">0</span>g</span>
+        <div class="flex items-center gap-3">
+          <div>
+            <span>目標累計注水：</span>
+            <strong id="timer-water-goal" class="text-[#654D3F] font-mono-num font-bold text-sm">0</strong>
+            <span class="text-[#8C7E75]">/ <span id="timer-total-water-goal">0</span>g</span>
+          </div>
+          <!-- 沖煮完成時快捷記錄筆記按鈕 -->
+          <button id="timer-log-btn" onclick="openBrewLogForm()" class="hidden px-2.5 py-1 rounded-lg bg-[#ECE3DC] hover:bg-[#dfd3cb] text-[#3D3028] font-medium text-[11px] transition shadow-xs">
+            📝 記錄這杯風味
+          </button>
         </div>
       </div>
     </section>
@@ -313,10 +335,15 @@
             </div>
           </div>
 
-          <!-- 重新計算按鈕 -->
-          <div class="pt-2">
+          <!-- 重新計算與一鍵收藏按鈕 -->
+          <div class="pt-2 space-y-2">
             <button onclick="recalculate()" class="w-full py-3 px-4 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white font-medium text-sm transition shadow-sm flex items-center justify-center gap-1.5 active:scale-[0.99]">
               <span>重新計算</span>
+            </button>
+            
+            <button onclick="quickSaveCurrentRecipeModal()" class="w-full py-2.5 px-3 rounded-xl bg-white border border-[#E6E0D8] hover:border-[#CFC2B7] text-[#685B52] hover:text-[#3D3028] text-xs font-medium transition flex items-center justify-center gap-1.5 shadow-2xs">
+              <span>⭐</span>
+              <span>收藏當前沖煮參數</span>
             </button>
           </div>
 
@@ -447,7 +474,124 @@
 
   </div>
 
-  <!-- JavaScript 核心調配邏輯、時間精準換算與 Web Audio 提示音模組 -->
+  <!-- ========================================== -->
+  <!-- 配方庫與歷史評分筆記 彈跳視窗 (遵照 Canva 原設計風格) -->
+  <!-- ========================================== -->
+  <div id="recipe-vault-modal" class="hidden fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="canva-card w-full max-w-xl max-h-[90vh] flex flex-col bg-white shadow-2xl overflow-hidden border border-[#EDE8E2]">
+      
+      <!-- 視窗標題 -->
+      <div class="p-4 sm:p-5 border-b border-[#F0EAE3] flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">⭐</span>
+          <h3 class="text-base font-bold text-[#2C2521]">我的手沖配方與歷史筆記</h3>
+        </div>
+        <button onclick="closeRecipeVaultModal()" class="w-8 h-8 rounded-full hover:bg-[#FAF9F7] flex items-center justify-center text-stone-400 hover:text-stone-700 text-lg transition">
+          ✕
+        </button>
+      </div>
+
+      <!-- 分頁切換鈕 (Canva 簡約風格) -->
+      <div class="flex border-b border-[#F0EAE3] bg-[#FAF9F7] px-4 pt-2 text-xs font-medium">
+        <button id="tab-btn-recipes" onclick="switchVaultTab('recipes')" class="px-4 py-2.5 border-b-2 border-[#654D3F] text-[#2C2521] font-semibold transition">
+          已收藏配方 (<span id="recipes-tab-count">0</span>)
+        </button>
+        <button id="tab-btn-logs" onclick="switchVaultTab('logs')" class="px-4 py-2.5 border-b-2 border-transparent text-[#8C7E75] hover:text-[#2C2521] transition">
+          沖煮評分與筆記 (<span id="logs-tab-count">0</span>)
+        </button>
+      </div>
+
+      <!-- 視窗主內容區 (可滾動) -->
+      <div class="p-4 sm:p-6 overflow-y-auto space-y-4 flex-1">
+        
+        <!-- 分頁 1: 收藏配方 -->
+        <div id="vault-tab-recipes" class="space-y-4">
+          <!-- 新增收藏表單 -->
+          <div class="p-3.5 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] space-y-3">
+            <div class="text-xs font-semibold text-[#2C2521] flex items-center justify-between">
+              <span>＋ 收藏當前沖煮設定</span>
+              <span class="text-[11px] font-normal text-[#8C7E75]" id="current-recipe-summary-pill">四六法 · 中焙 · 15g</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <input type="text" id="recipe-name-input" placeholder="配方名稱（如：衣索比亞 耶加雪菲）" 
+                     class="sm:col-span-2 bg-white border border-[#E6E0D8] rounded-xl px-3 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]">
+              <button onclick="saveCurrentRecipeFromInput()" class="py-2 px-3 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition">
+                儲存此配方
+              </button>
+            </div>
+          </div>
+
+          <!-- 已儲存配方列表 -->
+          <div id="saved-recipes-list" class="space-y-2.5">
+            <!-- 動態插入配方卡片 -->
+          </div>
+        </div>
+
+        <!-- 分頁 2: 沖煮評分與筆記 -->
+        <div id="vault-tab-logs" class="hidden space-y-4">
+          <!-- 新增沖煮筆記表單 -->
+          <div class="p-4 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] space-y-3">
+            <div class="text-xs font-semibold text-[#2C2521] flex items-center justify-between">
+              <span>📝 記錄剛剛這杯咖啡</span>
+              <span class="text-[11px] text-[#8C7E75]" id="log-current-spec-summary">四六法 · 15g · 92°C</span>
+            </div>
+
+            <!-- 星等評分 (1-5 星) -->
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-[#685B52]">風味評分：</span>
+              <div class="flex items-center gap-1 text-xl cursor-pointer" id="star-rating-container">
+                <span onclick="setLogRating(1)" class="star-item text-amber-500">★</span>
+                <span onclick="setLogRating(2)" class="star-item text-amber-500">★</span>
+                <span onclick="setLogRating(3)" class="star-item text-amber-500">★</span>
+                <span onclick="setLogRating(4)" class="star-item text-amber-500">★</span>
+                <span onclick="setLogRating(5)" class="star-item text-stone-300">★</span>
+              </div>
+              <span id="star-rating-label" class="text-xs font-semibold text-[#654D3F]">4.0 分</span>
+            </div>
+
+            <!-- 風味標籤快速點選 -->
+            <div>
+              <span class="text-[11px] text-[#8C7E75] block mb-1.5">感受到的風味特徵（可複選）：</span>
+              <div class="flex flex-wrap gap-1.5" id="flavor-tag-picker">
+                <button type="button" onclick="toggleLogTag(this, '明亮果酸')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]">🍋 明亮果酸</button>
+                <button type="button" onclick="toggleLogTag(this, '柑橘清香')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]">🌸 柑橘清香</button>
+                <button type="button" onclick="toggleLogTag(this, '焦糖甜感')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]">🍯 焦糖甜感</button>
+                <button type="button" onclick="toggleLogTag(this, '堅果可可')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]">🌰 堅果可可</button>
+                <button type="button" onclick="toggleLogTag(this, '厚實濃郁')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]">☕ 厚實濃郁</button>
+                <button type="button" onclick="toggleLogTag(this, '乾淨清爽')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]">🍃 乾淨清爽</button>
+              </div>
+            </div>
+
+            <!-- 自訂文字心得 -->
+            <div>
+              <textarea id="log-comment-input" rows="2" placeholder="備註心得（例：前段酸質明亮，尾韻甜感佳，下次研磨度可試著微調半格...）" 
+                        class="w-full bg-white border border-[#E6E0D8] rounded-xl p-2.5 text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]"></textarea>
+            </div>
+
+            <button onclick="saveBrewLogFromInput()" class="w-full py-2 px-3 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition">
+              儲存評分筆記
+            </button>
+          </div>
+
+          <!-- 歷史筆記列表 -->
+          <div id="brew-logs-list" class="space-y-2.5">
+            <!-- 動態插入歷史筆記 -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 視窗底端關閉 -->
+      <div class="p-3 border-t border-[#F0EAE3] bg-[#FAF9F7] text-right">
+        <button onclick="closeRecipeVaultModal()" class="px-4 py-1.5 rounded-lg bg-white border border-[#E6E0D8] hover:border-[#CFC2B7] text-xs text-[#685B52] transition">
+          關閉
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JavaScript 核心調配邏輯、時間精準換算、Web Audio 與 LocalStorage 筆記模組 -->
   <script>
     // 系統狀態
     const state = {
@@ -565,14 +709,12 @@
       }
     };
 
-    // 時間格式化輔助函數：秒數 -> mm:ss
     function formatTime(seconds) {
       const m = Math.floor(seconds / 60);
       const s = seconds % 60;
       return `${m}:${String(s).padStart(2, '0')}`;
     }
 
-    // 點擊手法
     function selectMethod(methodKey) {
       state.method = methodKey;
       document.querySelectorAll('[data-method]').forEach(btn => {
@@ -583,7 +725,6 @@
       if (timerRunning) resetTimer();
     }
 
-    // 點擊烘焙度
     function selectRoast(roastKey) {
       state.roast = roastKey;
       state.tempAdjust = 0;
@@ -594,7 +735,6 @@
       calculateAndRender();
     }
 
-    // 點擊風味偏好
     function selectFlavor(flavorKey) {
       state.flavor = flavorKey;
       document.querySelectorAll('[data-flavor]').forEach(btn => {
@@ -604,7 +744,6 @@
       calculateAndRender();
     }
 
-    // 粉量改變
     function onDoseChange(val) {
       let num = parseFloat(val);
       if (isNaN(num)) num = 15;
@@ -647,15 +786,10 @@
       resetTimer();
     }
 
-    // ==========================================
-    // 核心步驟生成：秒數精準計算 (各步秒數總和 == 預估總時間)
-    // ==========================================
     function generateSteps(method, dose, totalWater) {
       let rawSteps = [];
 
       if (method === 'four_six') {
-        // 粕谷哲 4:6 法：前 40% 水 (2注) + 後 60% 水 (3注)
-        // 總時長 165 秒 (2分45秒) = 45s + 40s + 30s + 25s + 25s
         const bloomWater = Math.round(totalWater * 0.20);
         const pour2 = Math.round(totalWater * 0.20);
         const remaining = totalWater - bloomWater - pour2;
@@ -671,7 +805,6 @@
           { name: '第四段', amount: pour5, durationSec: 25, note: '收尾注至目標水量，落乾移開濾杯，於 2:45 完成' }
         ];
       } else if (method === 'single_pour') {
-        // 一刀流：悶蒸 35s + 連續細水流 65s + 滴濾收尾 20s = 120 秒 (2分00秒)
         const bloomWater = Math.round(dose * 2.5);
         const mainPour = totalWater - bloomWater;
         rawSteps = [
@@ -680,7 +813,6 @@
           { name: '滴濾收尾', amount: 0, durationSec: 20, note: '靜置等待水層平穩濾乾，移開濾杯' }
         ];
       } else if (method === 'three_stage') {
-        // 經典三段式：悶蒸 40s + 第一段 50s + 第二段 50s = 140 秒 (2分20秒)
         const bloomWater = Math.round(dose * 2.2);
         const rest = totalWater - bloomWater;
         const pour1 = Math.round(rest * 0.55);
@@ -691,7 +823,6 @@
           { name: '第二段注水', amount: pour2, durationSec: 50, note: '中心維持平穩水柱補足水量，滴濾完畢移開' }
         ];
       } else if (method === 'hoffmann') {
-        // Hoffmann 法：悶蒸+輕搖 45s + 大水流 35s + 補水 35s + 輕晃平整滴落 50s = 165 秒 (2分45秒)
         const bloomWater = Math.round(dose * 3.0);
         const pour1 = Math.round((totalWater * 0.6) - bloomWater);
         const pour2 = totalWater - bloomWater - pour1;
@@ -702,7 +833,6 @@
           { name: '粉床平整滴濾', amount: 0, durationSec: 50, note: '讓咖啡液自然滴盡，粉床收杯平整如鏡' }
         ];
       } else if (method === 'matsuya') {
-        // 松屋流：點滴 30s + 加蓋深悶蒸 180s + 核心濃縮 45s + Bypass熱水 15s = 270 秒 (4分30秒)
         const bloomWater = Math.round(dose * 2.0);
         const extractWater = Math.round(totalWater * 0.55);
         const bypassWater = totalWater - bloomWater - extractWater;
@@ -713,7 +843,6 @@
           { name: '熱水稀釋 (Bypass)', amount: bypassWater, durationSec: 15, note: '移開濾杯，向分享壺直接加入純淨熱水' }
         ];
       } else if (method === 'immersion') {
-        // 浸泡法 (Switch/聰明濾杯)：開閥浸透 35s + 關閥浸泡 85s + 開閥落水 30s = 150 秒 (2分30秒)
         const bloomWater = Math.round(totalWater * 0.4);
         const remaining = totalWater - bloomWater;
         rawSteps = [
@@ -723,7 +852,6 @@
         ];
       }
 
-      // 動態組裝累計水量、起始秒數、結束秒數與時間區間字串
       let curCumulativeWater = 0;
       let curStartSec = 0;
 
@@ -748,9 +876,6 @@
       return steps;
     }
 
-    // ==========================================
-    // 畫面計算與渲染模組
-    // ==========================================
     let currentStepsCache = [];
     let totalBrewSeconds = 165;
 
@@ -759,25 +884,20 @@
       const methodConf = METHOD_CONFIGS[state.method];
       const flavorConf = FLAVOR_CONFIGS[state.flavor];
 
-      // 1. 水溫計算
       let finalTemp = roastConf.baseTemp + flavorConf.tempDelta + state.tempAdjust;
       if (finalTemp > 97) finalTemp = 97;
       if (finalTemp < 80) finalTemp = 80;
 
-      // 2. 粉水比計算
       let baseRatio = roastConf.baseRatio + flavorConf.ratioDelta;
       let finalRatioVal = baseRatio * methodConf.ratioMultiplier;
       finalRatioVal = Math.round(finalRatioVal * 10) / 10;
       let ratioStr = `1:${finalRatioVal}`;
 
-      // 3. 總水量計算
       let totalWater = Math.round(state.dose * finalRatioVal);
 
-      // 4. 研磨度文字
       let finalGrind = methodConf.grindModifier || roastConf.grind;
       let grindNote = methodConf.grindNote || roastConf.grindNote;
 
-      // 渲染四大指標卡片
       document.getElementById('param-temp').textContent = `${finalTemp}°C`;
       document.getElementById('param-temp-note').textContent = state.tempAdjust !== 0 ? `基準 ${roastConf.baseTemp}°C (微調 ${state.tempAdjust > 0 ? '+' : ''}${state.tempAdjust}°C)` : `${roastConf.name}標準水溫`;
 
@@ -790,23 +910,25 @@
       document.getElementById('param-water').textContent = `${totalWater}g`;
       document.getElementById('param-water-note').textContent = `依 ${state.dose}g 粉計算`;
 
-      // 渲染步驟與計算精準總秒數
       const steps = generateSteps(state.method, state.dose, totalWater);
       currentStepsCache = steps;
 
-      // 總秒數由所有步驟 durationSec 直接加總，保證 100% 精準對齊！
       totalBrewSeconds = steps.reduce((sum, s) => sum + s.durationSec, 0);
 
-      // 渲染方法標題與總時間
       document.getElementById('guide-method-name').textContent = methodConf.name;
       document.getElementById('total-time-estimate').textContent = `約 ${formatTime(totalBrewSeconds)}`;
       document.getElementById('total-seconds-count').textContent = `共 ${totalBrewSeconds} 秒 (各步秒數加總)`;
       document.getElementById('flavor-adjustment-tip').textContent = flavorConf.note;
 
-      // 計時器區塊更新
       document.getElementById('timer-total-water-goal').textContent = totalWater;
 
-      // 渲染步驟表格
+      // 更新配方摘要小標籤
+      const currentSummaryText = `${methodConf.name.split(' ')[0]} · ${roastConf.name} · ${state.dose}g (${finalTemp}°C)`;
+      const summaryPill = document.getElementById('current-recipe-summary-pill');
+      if (summaryPill) summaryPill.textContent = currentSummaryText;
+      const logSummaryPill = document.getElementById('log-current-spec-summary');
+      if (logSummaryPill) logSummaryPill.textContent = currentSummaryText;
+
       const tbody = document.getElementById('steps-tbody');
       tbody.innerHTML = '';
 
@@ -834,7 +956,6 @@
     let audioCtx = null;
     let audioEnabled = true;
 
-    // 初始化或解鎖 AudioContext (配合瀏覽器使用者手勢規範)
     function initAudioContext() {
       if (!audioCtx) {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -847,16 +968,14 @@
       }
     }
 
-    // 合成平滑乾淨的提示音波形
     function playSynthesizedTone(freq, type, duration, startTime, gainVal = 0.18) {
       if (!audioEnabled || !audioCtx) return;
       try {
         const osc = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
-        osc.type = type; // 'sine' 或 'triangle'
+        osc.type = type;
         osc.frequency.setValueAtTime(freq, startTime);
 
-        // 平滑包絡線 (防爆音)
         gainNode.gain.setValueAtTime(0.0001, startTime);
         gainNode.gain.exponentialRampToValueAtTime(gainVal, startTime + 0.02);
         gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
@@ -870,38 +989,34 @@
       }
     }
 
-    // 1. 換段提示音：清脆雙音和弦 (A5 -> E6)
     function playStepChangeSound() {
       if (!audioEnabled) return;
       initAudioContext();
       if (!audioCtx) return;
       const now = audioCtx.currentTime;
-      playSynthesizedTone(880, 'sine', 0.12, now, 0.22);           // 880 Hz
-      playSynthesizedTone(1318.5, 'sine', 0.25, now + 0.10, 0.25); // 1318.5 Hz
+      playSynthesizedTone(880, 'sine', 0.12, now, 0.22);
+      playSynthesizedTone(1318.5, 'sine', 0.25, now + 0.10, 0.25);
     }
 
-    // 2. 換段前 3 秒微提示音：短促輕快嗶聲
     function playCountdownTick() {
       if (!audioEnabled) return;
       initAudioContext();
       if (!audioCtx) return;
       const now = audioCtx.currentTime;
-      playSynthesizedTone(659.25, 'sine', 0.06, now, 0.14); // E5
+      playSynthesizedTone(659.25, 'sine', 0.06, now, 0.14);
     }
 
-    // 3. 沖煮完成提示音：C大調經典四音上行琶音
     function playCompleteSound() {
       if (!audioEnabled) return;
       initAudioContext();
       if (!audioCtx) return;
       const now = audioCtx.currentTime;
-      playSynthesizedTone(523.25, 'triangle', 0.18, now, 0.22);        // C5
-      playSynthesizedTone(659.25, 'triangle', 0.18, now + 0.12, 0.22); // E5
-      playSynthesizedTone(783.99, 'triangle', 0.22, now + 0.24, 0.24); // G5
-      playSynthesizedTone(1046.5, 'sine', 0.50, now + 0.36, 0.28);     // C6
+      playSynthesizedTone(523.25, 'triangle', 0.18, now, 0.22);
+      playSynthesizedTone(659.25, 'triangle', 0.18, now + 0.12, 0.22);
+      playSynthesizedTone(783.99, 'triangle', 0.22, now + 0.24, 0.24);
+      playSynthesizedTone(1046.5, 'sine', 0.50, now + 0.36, 0.28);
     }
 
-    // 切換聲音開關
     function toggleAudio() {
       audioEnabled = !audioEnabled;
       initAudioContext();
@@ -911,7 +1026,7 @@
       if (audioEnabled) {
         audioIcon.textContent = '🔊';
         audioText.textContent = '提示音開啟';
-        playStepChangeSound(); // 播放一下讓使用者確認聲音正常
+        playStepChangeSound();
       } else {
         audioIcon.textContent = '🔇';
         audioText.textContent = '靜音模式';
@@ -919,7 +1034,28 @@
     }
 
     // ==========================================
-    // 沖煮計時器模組 (含換段自動響鈴與視覺聯動)
+    // Screen Wake Lock API (防手機螢幕休眠)
+    // ==========================================
+    let wakeLockSentinel = null;
+    async function requestScreenWakeLock() {
+      if ('wakeLock' in navigator) {
+        try {
+          wakeLockSentinel = await navigator.wakeLock.request('screen');
+        } catch (err) {
+          console.log('Screen Wake Lock error:', err);
+        }
+      }
+    }
+    function releaseScreenWakeLock() {
+      if (wakeLockSentinel) {
+        wakeLockSentinel.release().then(() => {
+          wakeLockSentinel = null;
+        }).catch(() => {});
+      }
+    }
+
+    // ==========================================
+    // 沖煮計時器模組
     // ==========================================
     let timerRunning = false;
     let timerSeconds = 0;
@@ -937,20 +1073,19 @@
     function toggleTimer() {
       initAudioContext();
       if (timerRunning) {
-        // 暫停
         clearInterval(timerInterval);
         timerRunning = false;
+        releaseScreenWakeLock();
         document.getElementById('timer-run-text').textContent = '繼續沖煮';
         document.getElementById('timer-run-btn').className = 'px-4 py-2 rounded-xl bg-amber-700 hover:bg-amber-600 text-white text-xs font-semibold transition flex items-center gap-1.5';
         document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
       } else {
-        // 開始或繼續
         timerRunning = true;
+        requestScreenWakeLock();
         document.getElementById('timer-run-text').textContent = '暫停計時';
         document.getElementById('timer-run-btn').className = 'px-4 py-2 rounded-xl bg-[#8C7E75] hover:bg-[#786A61] text-white text-xs font-semibold transition flex items-center gap-1.5';
         document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-subtle-pulse';
 
-        // 第一次啟動播放開場提示音
         if (timerSeconds === 0) {
           playStepChangeSound();
         }
@@ -965,6 +1100,7 @@
       timerRunning = false;
       timerSeconds = 0;
       currentActiveStepIndex = -1;
+      releaseScreenWakeLock();
 
       document.getElementById('timer-digits').textContent = '00:00';
       document.getElementById('timer-run-text').textContent = '開始沖煮';
@@ -975,6 +1111,7 @@
       document.getElementById('timer-step-countdown').textContent = '';
       document.getElementById('timer-water-goal').textContent = '0';
       document.getElementById('timer-step-desc').textContent = '點擊「開始沖煮」，系統將隨秒數自動換段並發出提示音';
+      document.getElementById('timer-log-btn').classList.add('hidden');
 
       document.querySelectorAll('#steps-tbody tr').forEach(tr => tr.classList.remove('step-row-active'));
     }
@@ -988,11 +1125,11 @@
     function updateTimerStepHighlight() {
       if (!currentStepsCache || currentStepsCache.length === 0) return;
 
-      // 1. 判斷是否已達或超過總時間
       if (timerSeconds >= totalBrewSeconds) {
         if (currentActiveStepIndex !== 999) {
           currentActiveStepIndex = 999;
-          playCompleteSound(); // 沖煮完成大合音
+          playCompleteSound();
+          releaseScreenWakeLock();
         }
         document.getElementById('timer-status-title').textContent = '✨ 沖煮完成！請享用咖啡 ☕';
         document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
@@ -1000,6 +1137,7 @@
         document.getElementById('timer-step-countdown').textContent = '請移開濾杯享用';
         document.getElementById('timer-water-goal').textContent = currentStepsCache[currentStepsCache.length - 1].cumulative;
         document.getElementById('timer-step-desc').textContent = `已達到預估總時間 ${formatTime(totalBrewSeconds)}，請靜待濾乾後品嚐。`;
+        document.getElementById('timer-log-btn').classList.remove('hidden');
 
         document.querySelectorAll('#steps-tbody tr').forEach((tr, idx) => {
           tr.classList.toggle('step-row-active', idx === currentStepsCache.length - 1);
@@ -1007,32 +1145,27 @@
         return;
       }
 
-      // 2. 尋找當前秒數所對應的步驟索引
       let activeIndex = currentStepsCache.findIndex(st => timerSeconds >= st.startSec && timerSeconds < st.endSec);
       if (activeIndex === -1) activeIndex = 0;
 
       const activeStep = currentStepsCache[activeIndex];
 
-      // 3. 換段事件偵測與提示音觸發
       if (activeIndex !== currentActiveStepIndex) {
         currentActiveStepIndex = activeIndex;
-        playStepChangeSound(); // 換段發出雙音提示！
+        playStepChangeSound();
       } else {
-        // 換段前 3 秒、2 秒、1 秒發出短促預備提示
         const remainingInStep = activeStep.endSec - timerSeconds;
         if (remainingInStep >= 1 && remainingInStep <= 3) {
           playCountdownTick();
         }
       }
 
-      // 4. 更新計時器面板資訊
       const remainingSec = activeStep.endSec - timerSeconds;
       document.getElementById('timer-current-target').textContent = `${activeStep.name} (目標累計 ${activeStep.cumulative}g)`;
       document.getElementById('timer-step-countdown').textContent = `(本段剩餘 ${remainingSec} 秒)`;
       document.getElementById('timer-water-goal').textContent = activeStep.cumulative;
       document.getElementById('timer-step-desc').textContent = `${activeStep.name}：${activeStep.note}`;
 
-      // 5. 高亮表格當前列
       document.querySelectorAll('#steps-tbody tr').forEach((tr, idx) => {
         tr.classList.toggle('step-row-active', idx === activeIndex);
       });
@@ -1081,9 +1214,299 @@
       });
     }
 
+    // ==========================================
+    // 一鍵收藏配方、歷史筆記與評分 (LocalStorage 儲存庫)
+    // ==========================================
+    const STORAGE_KEY_RECIPES = 'brewcraft_saved_recipes_v1';
+    const STORAGE_KEY_LOGS = 'brewcraft_brew_logs_v1';
+
+    let currentLogRating = 4;
+    let currentLogTags = [];
+
+    function getSavedRecipes() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY_RECIPES)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function getBrewLogs() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY_LOGS)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function updateVaultBadges() {
+      const recipes = getSavedRecipes();
+      const logs = getBrewLogs();
+      const totalCount = recipes.length;
+      document.getElementById('saved-recipes-badge').textContent = totalCount;
+      document.getElementById('recipes-tab-count').textContent = recipes.length;
+      document.getElementById('logs-tab-count').textContent = logs.length;
+    }
+
+    function openRecipeVaultModal() {
+      document.getElementById('recipe-vault-modal').classList.remove('hidden');
+      renderSavedRecipesList();
+      renderBrewLogsList();
+      updateVaultBadges();
+    }
+
+    function closeRecipeVaultModal() {
+      document.getElementById('recipe-vault-modal').classList.add('hidden');
+    }
+
+    function switchVaultTab(tab) {
+      const isRecipes = tab === 'recipes';
+      document.getElementById('vault-tab-recipes').classList.toggle('hidden', !isRecipes);
+      document.getElementById('vault-tab-logs').classList.toggle('hidden', isRecipes);
+
+      const btnRecipes = document.getElementById('tab-btn-recipes');
+      const btnLogs = document.getElementById('tab-btn-logs');
+      if (isRecipes) {
+        btnRecipes.className = 'px-4 py-2.5 border-b-2 border-[#654D3F] text-[#2C2521] font-semibold transition';
+        btnLogs.className = 'px-4 py-2.5 border-b-2 border-transparent text-[#8C7E75] hover:text-[#2C2521] transition';
+      } else {
+        btnLogs.className = 'px-4 py-2.5 border-b-2 border-[#654D3F] text-[#2C2521] font-semibold transition';
+        btnRecipes.className = 'px-4 py-2.5 border-b-2 border-transparent text-[#8C7E75] hover:text-[#2C2521] transition';
+      }
+    }
+
+    // 快捷彈窗收藏
+    function quickSaveCurrentRecipeModal() {
+      openRecipeVaultModal();
+      switchVaultTab('recipes');
+      const input = document.getElementById('recipe-name-input');
+      if (!input.value) {
+        const roastName = ROAST_CONFIGS[state.roast].name;
+        const methodName = METHOD_CONFIGS[state.method].name.split(' ')[0];
+        input.value = `特調 ${methodName} · ${roastName} (${state.dose}g)`;
+      }
+      input.focus();
+    }
+
+    function saveCurrentRecipeFromInput() {
+      const input = document.getElementById('recipe-name-input');
+      const name = input.value.trim() || `配方 ${new Date().toLocaleDateString()}`;
+      
+      const newRecipe = {
+        id: 'rec_' + Date.now(),
+        name: name,
+        createdAt: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        params: {
+          method: state.method,
+          roast: state.roast,
+          dose: state.dose,
+          flavor: state.flavor,
+          tempAdjust: state.tempAdjust,
+          tempDisplay: document.getElementById('param-temp').textContent,
+          ratioDisplay: document.getElementById('param-ratio').textContent,
+          waterDisplay: document.getElementById('param-water').textContent,
+          grindDisplay: document.getElementById('param-grind').textContent,
+        }
+      };
+
+      const list = getSavedRecipes();
+      list.unshift(newRecipe);
+      localStorage.setItem(STORAGE_KEY_RECIPES, JSON.stringify(list));
+
+      input.value = '';
+      renderSavedRecipesList();
+      updateVaultBadges();
+    }
+
+    function applyRecipe(id) {
+      const list = getSavedRecipes();
+      const rec = list.find(r => r.id === id);
+      if (!rec) return;
+
+      selectMethod(rec.params.method);
+      selectRoast(rec.params.roast);
+      selectFlavor(rec.params.flavor);
+      state.tempAdjust = rec.params.tempAdjust || 0;
+      onDoseChange(rec.params.dose);
+
+      closeRecipeVaultModal();
+    }
+
+    function deleteRecipe(id) {
+      if (!confirm('確定要刪除這筆收藏配方嗎？')) return;
+      let list = getSavedRecipes();
+      list = list.filter(r => r.id !== id);
+      localStorage.setItem(STORAGE_KEY_RECIPES, JSON.stringify(list));
+      renderSavedRecipesList();
+      updateVaultBadges();
+    }
+
+    function renderSavedRecipesList() {
+      const listContainer = document.getElementById('saved-recipes-list');
+      const list = getSavedRecipes();
+
+      if (list.length === 0) {
+        listContainer.innerHTML = `
+          <div class="py-8 text-center text-xs text-[#9B8D83] border border-dashed border-[#EDE8E2] rounded-xl">
+            尚未收藏任何配方。調整參數後點擊上方「儲存此配方」即可收藏！
+          </div>
+        `;
+        return;
+      }
+
+      listContainer.innerHTML = list.map(rec => `
+        <div class="p-3.5 rounded-xl bg-white border border-[#EDE8E2] hover:border-[#D8CCC4] transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-[#2C2521]">${rec.name}</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#ECE3DC] text-[#3D3028] font-medium">${METHOD_CONFIGS[rec.params.method].name.split(' ')[0]}</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#F5EFEB] text-[#685B52]">${ROAST_CONFIGS[rec.params.roast].name}</span>
+            </div>
+            <div class="text-[11px] text-[#8C7E75] font-mono-num flex items-center gap-3">
+              <span>粉量: <strong>${rec.params.dose}g</strong></span>
+              <span>水溫: <strong>${rec.params.tempDisplay}</strong></span>
+              <span>粉水比: <strong>${rec.params.ratioDisplay}</strong></span>
+              <span>水量: <strong>${rec.params.waterDisplay}</strong></span>
+            </div>
+            <div class="text-[10px] text-[#9B8D83]">收藏於 ${rec.createdAt}</div>
+          </div>
+          <div class="flex items-center gap-2 self-end sm:self-center">
+            <button onclick="applyRecipe('${rec.id}')" class="px-3 py-1.5 rounded-lg bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-medium transition shadow-2xs">
+              套用配方
+            </button>
+            <button onclick="deleteRecipe('${rec.id}')" class="px-2 py-1.5 rounded-lg text-stone-400 hover:text-red-600 text-xs transition" title="刪除">
+              🗑️
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 評分與筆記邏輯
+    function openBrewLogForm() {
+      openRecipeVaultModal();
+      switchVaultTab('logs');
+    }
+
+    function setLogRating(rating) {
+      currentLogRating = rating;
+      const stars = document.querySelectorAll('#star-rating-container .star-item');
+      stars.forEach((star, idx) => {
+        star.className = idx < rating ? 'star-item text-amber-500' : 'star-item text-stone-300';
+      });
+      document.getElementById('star-rating-label').textContent = `${rating}.0 分`;
+    }
+
+    function toggleLogTag(btn, tag) {
+      if (currentLogTags.includes(tag)) {
+        currentLogTags = currentLogTags.filter(t => t !== tag);
+        btn.classList.remove('bg-[#ECE3DC]', 'text-[#3D3028]', 'border-[#CFC2B7]', 'font-semibold');
+        btn.classList.add('bg-white', 'text-[#685B52]', 'border-[#E6E0D8]');
+      } else {
+        currentLogTags.push(tag);
+        btn.classList.add('bg-[#ECE3DC]', 'text-[#3D3028]', 'border-[#CFC2B7]', 'font-semibold');
+        btn.classList.remove('bg-white', 'text-[#685B52]', 'border-[#E6E0D8]');
+      }
+    }
+
+    function saveBrewLogFromInput() {
+      const commentInput = document.getElementById('log-comment-input');
+      const comment = commentInput.value.trim();
+
+      const newLog = {
+        id: 'log_' + Date.now(),
+        createdAt: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        rating: currentLogRating,
+        tags: [...currentLogTags],
+        comment: comment || '（未填寫文字筆記）',
+        snapshot: {
+          method: METHOD_CONFIGS[state.method].name,
+          roast: ROAST_CONFIGS[state.roast].name,
+          dose: state.dose,
+          water: document.getElementById('param-water').textContent,
+          temp: document.getElementById('param-temp').textContent,
+          ratio: document.getElementById('param-ratio').textContent,
+          grind: document.getElementById('param-grind').textContent,
+        }
+      };
+
+      const list = getBrewLogs();
+      list.unshift(newLog);
+      localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(list));
+
+      // 重設表單
+      commentInput.value = '';
+      currentLogTags = [];
+      document.querySelectorAll('#flavor-tag-picker .log-tag-btn').forEach(btn => {
+        btn.classList.remove('bg-[#ECE3DC]', 'text-[#3D3028]', 'border-[#CFC2B7]', 'font-semibold');
+        btn.classList.add('bg-white', 'text-[#685B52]', 'border-[#E6E0D8]');
+      });
+      setLogRating(4);
+
+      renderBrewLogsList();
+      updateVaultBadges();
+    }
+
+    function deleteBrewLog(id) {
+      if (!confirm('確定要刪除這筆歷史筆記嗎？')) return;
+      let list = getBrewLogs();
+      list = list.filter(l => l.id !== id);
+      localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(list));
+      renderBrewLogsList();
+      updateVaultBadges();
+    }
+
+    function renderBrewLogsList() {
+      const listContainer = document.getElementById('brew-logs-list');
+      const list = getBrewLogs();
+
+      if (list.length === 0) {
+        listContainer.innerHTML = `
+          <div class="py-8 text-center text-xs text-[#9B8D83] border border-dashed border-[#EDE8E2] rounded-xl">
+            尚無沖煮筆記。沖煮完畢後記錄風味與星等，建立您的專屬手沖資料庫！
+          </div>
+        `;
+        return;
+      }
+
+      listContainer.innerHTML = list.map(log => `
+        <div class="p-3.5 rounded-xl bg-white border border-[#EDE8E2] space-y-2 shadow-2xs">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-amber-500 font-bold text-sm">${'★'.repeat(log.rating)}${'☆'.repeat(5 - log.rating)}</span>
+              <span class="text-xs font-semibold text-[#2C2521]">${log.rating}.0 分</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] text-[#9B8D83]">${log.createdAt}</span>
+              <button onclick="deleteBrewLog('${log.id}')" class="text-stone-300 hover:text-red-500 text-xs transition" title="刪除筆記">🗑️</button>
+            </div>
+          </div>
+
+          <div class="text-[11px] text-[#685B52] bg-[#FAF9F7] px-2.5 py-1.5 rounded-lg border border-[#EDE8E2] flex flex-wrap gap-x-3 gap-y-1 font-mono-num">
+            <span>手法: <strong>${log.snapshot.method.split(' ')[0]}</strong></span>
+            <span>烘焙: <strong>${log.snapshot.roast}</strong></span>
+            <span>粉量: <strong>${log.snapshot.dose}g</strong></span>
+            <span>水溫: <strong>${log.snapshot.temp}</strong></span>
+            <span>粉水比: <strong>${log.snapshot.ratio}</strong></span>
+          </div>
+
+          ${log.tags && log.tags.length > 0 ? `
+            <div class="flex flex-wrap gap-1">
+              ${log.tags.map(t => `<span class="px-2 py-0.5 rounded-md bg-[#ECE3DC] text-[#3D3028] text-[10px] font-medium">${t}</span>`).join('')}
+            </div>
+          ` : ''}
+
+          <div class="text-xs text-[#2C2521] leading-relaxed pt-0.5">
+            ${log.comment}
+          </div>
+        </div>
+      `).join('');
+    }
+
     // 初始化頁面
     window.addEventListener('DOMContentLoaded', () => {
       calculateAndRender();
+      updateVaultBadges();
     });
   </script>
 </body>

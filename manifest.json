@@ -1,0 +1,29 @@
+{
+  "name": "BrewCraft 手沖參數調配器",
+  "short_name": "BrewCraft",
+  "description": "專業手沖咖啡參數調配系統與即時注水指引計時器",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#FAF9F7",
+  "theme_color": "#654D3F",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
