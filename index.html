@@ -121,6 +121,188 @@
     .animate-subtle-pulse {
       animation: subtle-pulse 1.5s infinite ease-in-out;
     }
+
+    /* ======================================================== */
+    /* 步驟微動畫 (Brew Step Motion Cues - SVG & CSS Keyframes) */
+    /* ======================================================== */
+    @keyframes kettleSpiral {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(6px, -2px); }
+      50% { transform: translate(0px, 3px); }
+      75% { transform: translate(-6px, -2px); }
+      100% { transform: translate(0, 0); }
+    }
+    .anim-kettle-spiral {
+      animation: kettleSpiral 3.2s infinite ease-in-out;
+      transform-origin: 50px 10px;
+    }
+
+    @keyframes ripplePulse {
+      0% { transform: scale(0.6); opacity: 0; }
+      40% { opacity: 0.85; }
+      100% { transform: scale(1.35); opacity: 0; }
+    }
+    .anim-ripple-slow {
+      transform-origin: 80px 39px;
+      animation: ripplePulse 2.2s infinite ease-out;
+    }
+    .anim-ripple-fast {
+      transform-origin: 80px 39px;
+      animation: ripplePulse 1.8s infinite ease-out 0.6s;
+    }
+
+    @keyframes waterPulse {
+      0%, 100% { opacity: 0.9; stroke-width: 2.2; }
+      50% { opacity: 1; stroke-width: 2.8; }
+    }
+    .anim-water-pulse {
+      animation: waterPulse 1.4s infinite ease-in-out;
+    }
+
+    @keyframes streamDown {
+      0% { stroke-dashoffset: 0; }
+      100% { stroke-dashoffset: -12; }
+    }
+    .anim-stream-down {
+      animation: streamDown 0.8s infinite linear;
+    }
+    .anim-stream-down-fast {
+      animation: streamDown 0.4s infinite linear;
+    }
+
+    @keyframes steadyShine {
+      0%, 100% { opacity: 0.8; stroke-width: 1.5; }
+      50% { opacity: 1; stroke-width: 2.0; }
+    }
+    .anim-steady-shine {
+      animation: steadyShine 1.5s infinite ease-in-out;
+    }
+
+    @keyframes centerDotPulse {
+      0%, 100% { transform: scale(0.8); opacity: 0.7; }
+      50% { transform: scale(1.3); opacity: 1; }
+    }
+    .anim-center-dot-pulse {
+      transform-origin: 80px 39px;
+      animation: centerDotPulse 1.2s infinite ease-in-out;
+    }
+
+    @keyframes dripperSwirl {
+      0%, 100% { transform: rotate(0deg) translate(0, 0); }
+      25% { transform: rotate(2.5deg) translate(3px, -1px); }
+      50% { transform: rotate(0deg) translate(0px, 2px); }
+      75% { transform: rotate(-2.5deg) translate(-3px, -1px); }
+    }
+    .anim-dripper-swirl {
+      animation: dripperSwirl 2s infinite ease-in-out;
+    }
+
+    @keyframes liquidVortex {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .anim-liquid-vortex {
+      animation: liquidVortex 2.5s infinite linear;
+    }
+
+    @keyframes vigorousWave {
+      0%, 100% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 1; }
+    }
+    .anim-vigorous-wave {
+      transform-origin: 80px 39px;
+      animation: vigorousWave 0.8s infinite ease-in-out;
+    }
+
+    @keyframes heavyStream {
+      0%, 100% { stroke-width: 4.2; opacity: 0.9; }
+      50% { stroke-width: 5.2; opacity: 1; }
+    }
+    .anim-heavy-stream {
+      animation: heavyStream 0.7s infinite ease-in-out;
+    }
+
+    @keyframes bubblePop {
+      0% { transform: translateY(0) scale(0.6); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateY(-4px) scale(1.2); opacity: 0; }
+    }
+    .anim-bubble-1 {
+      animation: bubblePop 1.2s infinite ease-in-out;
+    }
+    .anim-bubble-2 {
+      animation: bubblePop 1.5s infinite ease-in-out 0.5s;
+    }
+
+    @keyframes dripFall {
+      0% { transform: translateY(-10px) scale(0.4); opacity: 0; }
+      25% { transform: translateY(0px) scale(1); opacity: 1; }
+      65% { transform: translateY(14px) scale(0.9, 1.4); opacity: 1; }
+      85% { transform: translateY(16px) scale(1.4, 0.4); opacity: 0.9; }
+      100% { transform: translateY(16px) scale(1.8, 0.1); opacity: 0; }
+    }
+    .anim-drip-fall {
+      transform-origin: 80px 24px;
+      animation: dripFall 1.6s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+    }
+    .anim-drip-fall-slow {
+      transform-origin: 80px 82px;
+      animation: dripFall 2.2s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+    }
+
+    @keyframes dripSplash {
+      0% { transform: scale(0.5); opacity: 0; }
+      50% { opacity: 0.9; }
+      100% { transform: scale(2.0); opacity: 0; }
+    }
+    .anim-drip-splash {
+      transform-origin: 80px 39px;
+      animation: dripSplash 1.6s infinite ease-out 0.8s;
+    }
+
+    @keyframes steamRise {
+      0% { transform: translateY(0) scaleX(0.9); opacity: 0; }
+      40% { opacity: 0.8; }
+      100% { transform: translateY(-10px) scaleX(1.15); opacity: 0; }
+    }
+    .anim-steam-1 {
+      animation: steamRise 2.4s infinite ease-out;
+    }
+    .anim-steam-2 {
+      animation: steamRise 2.8s infinite ease-out 0.8s;
+    }
+    .anim-steam-3 {
+      animation: steamRise 2.2s infinite ease-out 1.4s;
+    }
+
+    @keyframes streamRush {
+      0%, 100% { opacity: 0.88; transform: scaleX(0.95); }
+      50% { opacity: 1; transform: scaleX(1.1); }
+    }
+    .anim-stream-rush {
+      transform-origin: 80px 88px;
+      animation: streamRush 0.5s infinite ease-in-out;
+    }
+
+    @keyframes bypassStream {
+      0%, 100% { opacity: 0.85; stroke-width: 3.0; }
+      50% { opacity: 1; stroke-width: 3.8; }
+    }
+    .anim-bypass-stream {
+      animation: bypassStream 1.1s infinite ease-in-out;
+    }
+
+    @keyframes sparkleTwinkle {
+      0%, 100% { transform: scale(0.7) rotate(-10deg); opacity: 0.4; }
+      50% { transform: scale(1.2) rotate(15deg); opacity: 1; }
+    }
+    .anim-sparkle-1 {
+      animation: sparkleTwinkle 1.8s infinite ease-in-out;
+    }
+    .anim-sparkle-2 {
+      animation: sparkleTwinkle 2.0s infinite ease-in-out 0.7s;
+    }
+
   </style>
 </head>
 <body class="min-h-screen py-8 px-4 sm:px-6 lg:px-8 selection:bg-[#ECE3DC] selection:text-[#3D3028]">
@@ -213,6 +395,50 @@
           <button id="timer-log-btn" onclick="openBrewLogFormForCurrentMethod()" class="hidden px-2.5 py-1 rounded-lg bg-[#ECE3DC] hover:bg-[#dfd3cb] text-[#3D3028] font-medium text-[11px] transition shadow-xs">
             📝 評分這杯手法
           </button>
+        </div>
+      </div>
+    
+      <!-- 步驟微動畫提示專區 (依不同手法與當前動作即時切換) -->
+      <div id="timer-animation-cue" class="mt-4 pt-3.5 border-t border-[#F0EAE3] flex flex-col sm:flex-row items-center gap-4 bg-[#FAF9F7] p-3.5 rounded-2xl border border-[#EDE8E2]">
+        <!-- 左側：SVG 微動畫畫布容器 (支援 60fps 平滑向量動態) -->
+        <div class="relative w-full sm:w-44 h-32 flex-shrink-0 bg-white rounded-xl border border-[#EAE4DC] flex items-center justify-center overflow-hidden shadow-2xs p-1">
+          <div id="step-anim-viewport" class="w-full h-full flex items-center justify-center">
+            <!-- 動態注入對應的 SVG 動畫 -->
+          </div>
+          <!-- 動畫狀態標籤 -->
+          <span id="step-anim-tag" class="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded-full bg-[#ECE3DC]/95 text-[10px] font-bold text-[#654D3F] border border-[#DDD3CA] shadow-2xs backdrop-blur-xs">
+            準備就緒
+          </span>
+        </div>
+
+        <!-- 右側：動作步驟指引與手法要訣 -->
+        <div class="flex-1 w-full text-left space-y-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span id="step-anim-icon" class="text-sm">💧</span>
+              <h4 id="step-anim-action-title" class="text-sm sm:text-base font-bold text-[#2C2521]">
+                準備開始沖煮
+              </h4>
+            </div>
+            <span id="step-anim-step-badge" class="text-[11px] font-mono-num font-semibold text-[#8C7E75] bg-white px-2 py-0.5 rounded-md border border-[#EAE4DC]">
+              Step 0 / 0
+            </span>
+          </div>
+
+          <p id="step-anim-desc" class="text-xs text-[#685B52] leading-relaxed">
+            請確認濾紙已貼合、咖啡粉已整平，點擊上方「開始沖煮」開始注水計時。
+          </p>
+
+          <!-- 本段注水倒數進度條 -->
+          <div class="pt-1">
+            <div class="flex justify-between text-[10px] text-[#9B8D83] font-mono-num mb-1">
+              <span id="step-anim-target-note">注水目標：--</span>
+              <span id="step-anim-countdown-text">剩餘 -- 秒</span>
+            </div>
+            <div class="w-full bg-[#EAE4DC] h-2 rounded-full overflow-hidden">
+              <div id="step-anim-progress-bar" class="bg-[#654D3F] h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -835,19 +1061,83 @@
         const pour5 = totalWater - (bloomWater + pour2 + pour3 + pour4);
 
         rawSteps = [
-          { name: '悶蒸', amount: bloomWater, durationSec: 45, note: '由中心向外輕柔繞圈，確保浸潤並排氣至 45 秒' },
-          { name: '第一段', amount: pour2, durationSec: 40, note: '穩定繞圈注水，調整酸甜明亮度，落水至 1:25' },
-          { name: '第二段', amount: pour3, durationSec: 30, note: '後60%第一注，維持細水流繞圈，落水至 1:55' },
-          { name: '第三段', amount: pour4, durationSec: 25, note: '提升萃取醇厚度，等水落乾再注，落水至 2:20' },
-          { name: '第四段', amount: pour5, durationSec: 25, note: '收尾注至目標水量，落乾移開濾杯，於 2:45 完成' }
+          {
+            name: '悶蒸',
+            amount: bloomWater,
+            durationSec: 45,
+            note: '由中心向外輕柔繞圈，確保浸潤並排氣至 45 秒',
+            animType: 'spiral',
+            actionTitle: '螺旋繞圈注水 (悶蒸)',
+            actionTip: '細水流從中心向外繞 2-3 圈注滿悶蒸水量，使全粉床均勻浸潤，隨後靜待水分完全排乾並充分排氣至 45 秒。'
+          },
+          {
+            name: '第一段',
+            amount: pour2,
+            durationSec: 40,
+            note: '穩定繞圈注水，調整酸甜明亮度，落水至 1:25',
+            animType: 'spiral',
+            actionTitle: '穩定繞圈注水 (酸甜平衡)',
+            actionTip: '維持平穩水流由內向外均勻螺旋繞圈，激發咖啡明亮果酸與甜感，等待水層完全排乾至 1:25。'
+          },
+          {
+            name: '第二段',
+            amount: pour3,
+            durationSec: 30,
+            note: '後60%第一注，維持細水流繞圈，落水至 1:55',
+            animType: 'spiral',
+            actionTitle: '後段細水流繞圈',
+            actionTip: '後60%第一注，維持細柔水流緩慢繞圈，提升整體萃取乾淨度，等待水落乾至 1:55。'
+          },
+          {
+            name: '第三段',
+            amount: pour4,
+            durationSec: 25,
+            note: '提升萃取醇厚度，等水落乾再注，落水至 2:20',
+            animType: 'spiral',
+            actionTitle: '提升醇厚度注水',
+            actionTip: '均勻繞圈注水，等水完全落乾後再進行最後一注，落水至 2:20。'
+          },
+          {
+            name: '第四段',
+            amount: pour5,
+            durationSec: 25,
+            note: '收尾注至目標水量，落乾移開濾杯，於 2:45 完成',
+            animType: 'drain_rest',
+            actionTitle: '收尾注水與自然滴濾',
+            actionTip: '注足最後目標水量，讓咖啡液自然滴盡，落乾後立即移開濾杯，於 2:45 完成。'
+          }
         ];
       } else if (method === 'single_pour') {
         const bloomWater = Math.round(dose * 2.5);
         const mainPour = totalWater - bloomWater;
         rawSteps = [
-          { name: '悶蒸', amount: bloomWater, durationSec: 35, note: '中心點向外微幅潤濕，排氣膨脹至 35 秒' },
-          { name: '持續注水', amount: mainPour, durationSec: 65, note: '極細穩定水流不中斷，中心小範圍繞圈注滿' },
-          { name: '滴濾收尾', amount: 0, durationSec: 20, note: '靜置等待水層平穩濾乾，移開濾杯' }
+          {
+            name: '悶蒸',
+            amount: bloomWater,
+            durationSec: 35,
+            note: '中心點向外微幅潤濕，排氣膨脹至 35 秒',
+            animType: 'steady_center',
+            actionTitle: '中心微幅潤濕 (悶蒸)',
+            actionTip: '壺嘴放低，由中心向外輕柔濕潤粉層，靜置排氣膨脹至 35 秒。'
+          },
+          {
+            name: '持續注水',
+            amount: mainPour,
+            durationSec: 65,
+            note: '極細穩定水流不中斷，中心小範圍繞圈注滿',
+            animType: 'steady_center',
+            actionTitle: '垂直極細注水不中斷',
+            actionTip: '極低水柱衝擊，中心硬幣範圍緩慢持續注水，水流垂直穩定、不中斷、不沖濾紙邊緣。'
+          },
+          {
+            name: '滴濾收尾',
+            amount: 0,
+            durationSec: 20,
+            note: '靜置等待水層平穩濾乾，移開濾杯',
+            animType: 'drain_rest',
+            actionTitle: '靜待均勻滴濾',
+            actionTip: '停止注水，靜置等待水層平穩濾乾，粉床收杯平整如鏡，移開濾杯。'
+          }
         ];
       } else if (method === 'three_stage') {
         const bloomWater = Math.round(dose * 2.2);
@@ -855,37 +1145,149 @@
         const pour1 = Math.round(rest * 0.55);
         const pour2 = totalWater - bloomWater - pour1;
         rawSteps = [
-          { name: '悶蒸', amount: bloomWater, durationSec: 40, note: '浸濕全部粉床，釋放二氧化碳至 40 秒' },
-          { name: '第一段注水', amount: pour1, durationSec: 50, note: '由內向外穩定均勻繞圈，帶出果香酸甜' },
-          { name: '第二段注水', amount: pour2, durationSec: 50, note: '中心維持平穩水柱補足水量，滴濾完畢移開' }
+          {
+            name: '悶蒸',
+            amount: bloomWater,
+            durationSec: 40,
+            note: '浸濕全部粉床，釋放二氧化碳至 40 秒',
+            animType: 'spiral',
+            actionTitle: '全粉床均勻浸潤',
+            actionTip: '由內向外均勻繞圈浸濕全部咖啡粉，讓新鮮二氧化碳充分釋放至 40 秒。'
+          },
+          {
+            name: '第一段注水',
+            amount: pour1,
+            durationSec: 50,
+            note: '由內向外穩定均勻繞圈，帶出果香酸甜',
+            animType: 'spiral',
+            actionTitle: '由內向外中等水流繞圈',
+            actionTip: '維持中等平穩水柱由內向外穩定繞圈，保持水層高度，帶出優雅花果香與酸甜層次。'
+          },
+          {
+            name: '第二段注水',
+            amount: pour2,
+            durationSec: 50,
+            note: '中心維持平穩水柱補足水量，滴濾完畢移開',
+            animType: 'steady_center',
+            actionTitle: '中心平穩水柱補足',
+            actionTip: '回到中心維持細穩水流補足剩餘水量，水位落乾即移開濾杯。'
+          }
         ];
       } else if (method === 'hoffmann') {
         const bloomWater = Math.round(dose * 3.0);
         const pour1 = Math.round((totalWater * 0.6) - bloomWater);
         const pour2 = totalWater - bloomWater - pour1;
         rawSteps = [
-          { name: '悶蒸 + 輕搖 (Swirl)', amount: bloomWater, durationSec: 45, note: '注水後輕搖濾杯消除乾粉結塊，浸潤至 45 秒' },
-          { name: '第一段大水流', amount: pour1, durationSec: 35, note: '較大水流衝擊攪拌，注入至 60% 總水量' },
-          { name: '第二段細水流', amount: pour2, durationSec: 35, note: '輕柔補至目標總水量，完成後順勢輕微晃動' },
-          { name: '粉床平整滴濾', amount: 0, durationSec: 50, note: '讓咖啡液自然滴盡，粉床收杯平整如鏡' }
+          {
+            name: '悶蒸 + 輕搖 (Swirl)',
+            amount: bloomWater,
+            durationSec: 45,
+            note: '注水後輕搖濾杯消除乾粉結塊，浸潤至 45 秒',
+            animType: 'swirl',
+            actionTitle: '注水後輕搖濾杯 (Swirl)',
+            actionTip: '迅速注入悶蒸水後，雙手拿起濾杯輕柔旋轉搖晃 2-3 圈，消除乾粉結塊，浸潤至 45 秒。'
+          },
+          {
+            name: '第一段大水流',
+            amount: pour1,
+            durationSec: 35,
+            note: '較大水流衝擊攪拌，注入至 60% 總水量',
+            animType: 'vigorous_pour',
+            actionTitle: '大水流攪拌衝擊',
+            actionTip: '加大注水流量在 30 秒內注入至 60% 總水量，利用水流重力形成充分紊流攪拌萃取。'
+          },
+          {
+            name: '第二段細水流',
+            amount: pour2,
+            durationSec: 35,
+            note: '輕柔補至目標總水量，完成後順勢輕微晃動',
+            animType: 'steady_center',
+            actionTitle: '溫柔細水流補水',
+            actionTip: '降低水柱衝擊，輕柔平穩補至目標總水量，完成後順勢輕微晃動一次。'
+          },
+          {
+            name: '粉床平整滴濾',
+            amount: 0,
+            durationSec: 50,
+            note: '讓咖啡液自然滴盡，粉床收杯平整如鏡',
+            animType: 'drain_rest',
+            actionTitle: '平整自然滴濾收杯',
+            actionTip: '讓咖啡液自然滴盡，粉渣平整沈降，移開濾杯享用。'
+          }
         ];
       } else if (method === 'matsuya') {
         const bloomWater = Math.round(dose * 2.0);
         const extractWater = Math.round(totalWater * 0.55);
         const bypassWater = totalWater - bloomWater - extractWater;
         rawSteps = [
-          { name: '中心點滴潤濕', amount: bloomWater, durationSec: 30, note: '細小點滴僅潤濕中心粉芯' },
-          { name: '加蓋深悶蒸', amount: 0, durationSec: 180, note: '蓋上悶蒸蓋深層悶蒸 3 分鐘，排淨氣體' },
-          { name: '核心萃取注水', amount: extractWater, durationSec: 45, note: '大水流僅在中心硬幣大小區域注水' },
-          { name: '熱水稀釋 (Bypass)', amount: bypassWater, durationSec: 15, note: '移開濾杯，向分享壺直接加入純淨熱水' }
+          {
+            name: '中心點滴潤濕',
+            amount: bloomWater,
+            durationSec: 30,
+            note: '細小點滴僅潤濕中心粉芯',
+            animType: 'drip_slow',
+            actionTitle: '中心點滴滴水 (Drop by Drop)',
+            actionTip: '手沖壺極輕微傾斜，一滴一滴如點滴般僅滴在中心粉芯，不可形成連續水柱，讓水自然向下浸潤。'
+          },
+          {
+            name: '加蓋深悶蒸',
+            amount: 0,
+            durationSec: 180,
+            note: '蓋上悶蒸蓋深層悶蒸 3 分鐘，排淨氣體',
+            animType: 'steam_cover',
+            actionTitle: '蓋上悶蒸蓋靜置 3 分鐘',
+            actionTip: '蓋上專用悶蒸蓋鎖住熱氣與蒸氣，讓咖啡粉內部深層膨脹排氣整整 180 秒。'
+          },
+          {
+            name: '核心萃取注水',
+            amount: extractWater,
+            durationSec: 45,
+            note: '大水流僅在中心硬幣大小區域注水',
+            animType: 'steady_center',
+            actionTitle: '中心 50 圓大水流萃取',
+            actionTip: '大水流僅在中心 50 圓硬幣大小範圍穩定注水，迅速萃取出中段濃厚精華。'
+          },
+          {
+            name: '熱水稀釋 (Bypass)',
+            amount: bypassWater,
+            durationSec: 15,
+            note: '移開濾杯，向分享壺直接加入純淨熱水',
+            animType: 'bypass_pot',
+            actionTitle: '移開濾杯直接加熱水 (Bypass)',
+            actionTip: '立刻移開濾杯避免萃出尾段苦澀雜味，直接向分享壺加入純熱水稀釋至目標總克數！'
+          }
         ];
       } else if (method === 'immersion') {
         const bloomWater = Math.round(totalWater * 0.4);
         const remaining = totalWater - bloomWater;
         rawSteps = [
-          { name: '開閥初浸透', amount: bloomWater, durationSec: 35, note: '開閥注水滴出底層明亮酸甜，35 秒時關閉止水閥' },
-          { name: '關閥全浸泡', amount: remaining, durationSec: 85, note: '一口氣注滿全部熱水，關閥均勻浸泡萃取至 2:00' },
-          { name: '開閥釋放滴濾', amount: 0, durationSec: 30, note: '按下開關，重力自然過濾落水，於 2:30 完成' }
+          {
+            name: '開閥初浸透',
+            amount: bloomWater,
+            durationSec: 35,
+            note: '開閥注水滴出底層明亮酸甜，35 秒時關閉止水閥',
+            animType: 'switch_open',
+            actionTitle: '開閥注水過濾 (閥門開啟)',
+            actionTip: '保持開閥狀態注入底層熱水，先萃取出前段明亮果酸與花香，35 秒時撥起閥門開關。'
+          },
+          {
+            name: '關閥全浸泡',
+            amount: remaining,
+            durationSec: 85,
+            note: '一口氣注滿全部熱水，關閥均勻浸泡萃取至 2:00',
+            animType: 'switch_closed',
+            actionTitle: '關閉止水閥全浸泡 (閥門關閉)',
+            actionTip: '撥起開關關閉閥門，一口氣注入全部剩餘熱水，粉粒完全浸泡均勻萃取至 2:00。'
+          },
+          {
+            name: '開閥釋放滴濾',
+            amount: 0,
+            durationSec: 30,
+            note: '按下開關，重力自然過濾落水，於 2:30 完成',
+            animType: 'switch_open',
+            actionTitle: '按下開關釋放咖啡液 (開閥落水)',
+            actionTip: '按下 Switch 開關，重力讓濃郁咖啡液瞬間過濾釋放至分享壺！'
+          }
         ];
       }
 
@@ -906,7 +1308,10 @@
           startSec: start,
           endSec: end,
           timeRangeStr: `${formatTime(start)} - ${formatTime(end)}`,
-          note: step.note
+          note: step.note,
+          animType: step.animType || 'spiral',
+          actionTitle: step.actionTitle || step.name,
+          actionTip: step.actionTip || step.note
         };
       });
 
@@ -958,6 +1363,7 @@
       document.getElementById('flavor-adjustment-tip').textContent = flavorConf.note;
 
       document.getElementById('timer-total-water-goal').textContent = totalWater;
+      if (!timerRunning && timerSeconds === 0) resetStepAnimationCue();
 
       const rateParamsElem = document.getElementById('rate-form-current-params');
       if (rateParamsElem) {
@@ -1147,6 +1553,7 @@
       document.getElementById('timer-water-goal').textContent = '0';
       document.getElementById('timer-step-desc').textContent = '點擊「開始沖煮」，系統將隨秒數自動換段並發出提示音';
       document.getElementById('timer-log-btn').classList.add('hidden');
+      resetStepAnimationCue();
 
       document.querySelectorAll('#steps-tbody tr').forEach(tr => tr.classList.remove('step-row-active'));
     }
@@ -1173,6 +1580,17 @@
         document.getElementById('timer-water-goal').textContent = currentStepsCache[currentStepsCache.length - 1].cumulative;
         document.getElementById('timer-step-desc').textContent = `已達到預估總時間 ${formatTime(totalBrewSeconds)}，請靜待濾乾後品嚐。`;
         document.getElementById('timer-log-btn').classList.remove('hidden');
+        renderAnimationCue(
+          'finish',
+          '沖煮完成',
+          '✨ 咖啡萃取完成！請享用 ☕',
+          '已達到預估總時間 ' + formatTime(totalBrewSeconds) + '，請移開濾杯，輕輕搖勻分享壺後倒入杯中享用！',
+          currentStepsCache.length,
+          currentStepsCache.length,
+          0,
+          0,
+          currentStepsCache[currentStepsCache.length - 1].cumulative
+        );
 
         document.querySelectorAll('#steps-tbody tr').forEach((tr, idx) => {
           tr.classList.toggle('step-row-active', idx === currentStepsCache.length - 1);
@@ -1200,6 +1618,17 @@
       document.getElementById('timer-step-countdown').textContent = `(本段剩餘 ${remainingSec} 秒)`;
       document.getElementById('timer-water-goal').textContent = activeStep.cumulative;
       document.getElementById('timer-step-desc').textContent = `${activeStep.name}：${activeStep.note}`;
+      renderAnimationCue(
+        activeStep.animType || 'spiral',
+        activeStep.name,
+        activeStep.actionTitle || activeStep.name,
+        activeStep.actionTip || activeStep.note,
+        activeIndex + 1,
+        currentStepsCache.length,
+        remainingSec,
+        activeStep.durationSec,
+        activeStep.cumulative
+      );
 
       document.querySelectorAll('#steps-tbody tr').forEach((tr, idx) => {
         tr.classList.toggle('step-row-active', idx === activeIndex);
@@ -1209,6 +1638,309 @@
     // ==========================================
     // 複製配方文字
     // ==========================================
+    
+    // ========================================================
+    // 步驟動態向量微動畫庫 (SVG Brew Animations)
+    // ========================================================
+    const STEP_ANIMATION_SVGS = {
+      idle: `
+        <svg viewBox="0 0 160 120" class="w-full h-full">
+          <path d="M56 50 L104 50 L98 96 C98 104 92 108 80 108 C68 108 62 104 62 96 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="2"/>
+          <path d="M102 58 C114 58 116 82 100 86" fill="none" stroke="#CFC2B7" stroke-width="3" stroke-linecap="round"/>
+          <ellipse cx="80" cy="108" rx="42" ry="5" fill="#EDE8E2" stroke="#D8CCC4" stroke-width="1.5"/>
+          <ellipse cx="80" cy="52" rx="21" ry="3.5" fill="#654D3F"/>
+          <path d="M74 44 Q70 30 76 18" fill="none" stroke="#8C7E75" stroke-width="1.8" stroke-linecap="round" class="anim-steam-1"/>
+          <path d="M80 42 Q86 28 80 14" fill="none" stroke="#8C7E75" stroke-width="2" stroke-linecap="round" class="anim-steam-2"/>
+          <path d="M86 44 Q82 30 88 18" fill="none" stroke="#8C7E75" stroke-width="1.8" stroke-linecap="round" class="anim-steam-3"/>
+          <text x="80" y="116" text-anchor="middle" font-size="9" font-weight="600" fill="#9B8D83">BrewCraft Ready</text>
+        </svg>
+      `,
+
+      spiral: `
+        <svg viewBox="0 0 160 120" class="w-full h-full">
+          <defs>
+            <radialGradient id="spiralCoffeeGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#8C5D3D"/>
+              <stop offset="100%" stop-color="#5A3A25"/>
+            </radialGradient>
+          </defs>
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M55 102 C65 99 95 99 105 102 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.75"/>
+          <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+          <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
+          <ellipse cx="80" cy="34" rx="30" ry="5" fill="#EDE8E2" stroke="#CFC2B7" stroke-width="1.5"/>
+          <ellipse cx="80" cy="39" rx="24" ry="4.5" fill="url(#spiralCoffeeGrad)"/>
+          <ellipse cx="80" cy="39" rx="8" ry="2" fill="none" stroke="#7EA8BE" stroke-width="1.5" class="anim-ripple-slow"/>
+          <ellipse cx="80" cy="39" rx="16" ry="3.5" fill="none" stroke="#7EA8BE" stroke-width="1.2" class="anim-ripple-fast"/>
+          <line x1="80" y1="72" x2="80" y2="98" stroke="#B87B52" stroke-width="1.5" stroke-dasharray="3 3" class="anim-stream-down"/>
+          <g class="anim-kettle-spiral">
+            <path d="M74 16 Q 77 26 79 37" fill="none" stroke="#7EA8BE" stroke-width="2.2" stroke-linecap="round" class="anim-water-pulse"/>
+            <path d="M44 8 C54 8 68 10 74 16 L76 14 C70 9 54 6 44 6 Z" fill="#654D3F"/>
+          </g>
+        </svg>
+      `,
+
+      steady_center: `
+        <svg viewBox="0 0 160 120" class="w-full h-full">
+          <defs>
+            <radialGradient id="centerCoffeeGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#8C5D3D"/>
+              <stop offset="100%" stop-color="#5A3A25"/>
+            </radialGradient>
+          </defs>
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M55 100 C65 98 95 98 105 100 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.75"/>
+          <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+          <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
+          <ellipse cx="80" cy="34" rx="30" ry="5" fill="#EDE8E2" stroke="#CFC2B7" stroke-width="1.5"/>
+          <ellipse cx="80" cy="39" rx="24" ry="4.5" fill="url(#centerCoffeeGrad)"/>
+          <circle cx="80" cy="39" r="3" fill="none" stroke="#7EA8BE" stroke-width="1.5" class="anim-center-dot-pulse"/>
+          <line x1="80" y1="72" x2="80" y2="98" stroke="#B87B52" stroke-width="1.5" stroke-dasharray="2 2" class="anim-stream-down"/>
+          <line x1="80" y1="14" x2="80" y2="38" stroke="#7EA8BE" stroke-width="1.6" stroke-linecap="round" class="anim-steady-shine"/>
+          <path d="M50 8 C60 8 74 9 79 14 L81 12 C75 7 60 6 50 6 Z" fill="#654D3F"/>
+        </svg>
+      `,
+
+      swirl: `
+        <svg viewBox="0 0 160 120" class="w-full h-full">
+          <defs>
+            <radialGradient id="swirlGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#9E6746"/>
+              <stop offset="70%" stop-color="#73472B"/>
+              <stop offset="100%" stop-color="#4A2C18"/>
+            </radialGradient>
+          </defs>
+          <g class="anim-dripper-swirl" style="transform-origin: 80px 110px;">
+            <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+            <path d="M56 103 C66 100 94 100 104 103 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.75"/>
+            <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+            <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
+            <ellipse cx="80" cy="34" rx="30" ry="5" fill="#EDE8E2" stroke="#CFC2B7" stroke-width="1.5"/>
+            <ellipse cx="80" cy="39" rx="24" ry="4.5" fill="url(#swirlGrad)"/>
+            <g class="anim-liquid-vortex" style="transform-origin: 80px 39px;">
+              <path d="M74 38 Q80 34 86 38" stroke="#D8CCC4" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+              <path d="M77 41 Q82 43 84 39" stroke="#D8CCC4" stroke-width="1.0" fill="none" stroke-linecap="round"/>
+            </g>
+          </g>
+          <path d="M40 32 C34 40 36 50 44 56" fill="none" stroke="#654D3F" stroke-width="2" stroke-dasharray="3 2" stroke-linecap="round"/>
+          <polygon points="43,58 48,54 44,52" fill="#654D3F"/>
+          <path d="M120 32 C126 40 124 50 116 56" fill="none" stroke="#654D3F" stroke-width="2" stroke-dasharray="3 2" stroke-linecap="round"/>
+          <polygon points="117,58 112,54 116,52" fill="#654D3F"/>
+          <text x="80" y="16" text-anchor="middle" font-size="9" font-weight="bold" fill="#654D3F">雙手拿起輕搖 Swirl ↻</text>
+        </svg>
+      `,
+
+      vigorous_pour: `
+        <svg viewBox="0 0 160 120" class="w-full h-full">
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M55 98 C65 96 95 96 105 98 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.75"/>
+          <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+          <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
+          <ellipse cx="80" cy="34" rx="30" ry="5" fill="#EDE8E2" stroke="#CFC2B7" stroke-width="1.5"/>
+          <ellipse cx="80" cy="39" rx="24" ry="4.5" fill="#7A4E33"/>
+          <ellipse cx="80" cy="39" rx="14" ry="3" fill="none" stroke="#7EA8BE" stroke-width="2" class="anim-vigorous-wave"/>
+          <circle cx="76" cy="38" r="1.8" fill="#FAF9F7" class="anim-bubble-1"/>
+          <circle cx="84" cy="37" r="1.5" fill="#FAF9F7" class="anim-bubble-2"/>
+          <path d="M72 14 Q76 26 79 38" fill="none" stroke="#7EA8BE" stroke-width="4.5" stroke-linecap="round" class="anim-heavy-stream"/>
+          <path d="M42 6 C52 6 66 8 72 14 L74 11 C68 6 52 4 42 4 Z" fill="#654D3F"/>
+          <line x1="80" y1="72" x2="80" y2="98" stroke="#B87B52" stroke-width="2.2" stroke-dasharray="4 2" class="anim-stream-down-fast"/>
+        </svg>
+      `,
+
+      drip_slow: `
+        <svg viewBox="0 0 160 120" class="w-full h-full">
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M58 106 C66 104 94 104 102 106 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.75"/>
+          <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+          <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
+          <ellipse cx="80" cy="34" rx="30" ry="5" fill="#EDE8E2" stroke="#CFC2B7" stroke-width="1.5"/>
+          <ellipse cx="80" cy="39" rx="24" ry="4.5" fill="#5A3A25"/>
+          <g class="anim-drip-fall">
+            <ellipse cx="80" cy="24" rx="1.8" ry="2.8" fill="#7EA8BE"/>
+          </g>
+          <circle cx="80" cy="39" r="2" fill="none" stroke="#7EA8BE" stroke-width="1.2" class="anim-drip-splash"/>
+          <path d="M54 10 C62 10 74 11 79 16 L81 14 C76 9 62 8 54 8 Z" fill="#654D3F"/>
+          <circle cx="79.5" cy="16" r="1.5" fill="#7EA8BE"/>
+        </svg>
+      `,
+
+      steam_cover: `
+        <svg viewBox="0 0 160 120" class="w-full h-full">
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+          <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
+          <path d="M48 34 C48 20 112 20 112 34 Z" fill="#EDE8E2" stroke="#654D3F" stroke-width="1.8"/>
+          <circle cx="80" cy="18" r="3.5" fill="#654D3F"/>
+          <path d="M70 14 Q74 6 68 0" fill="none" stroke="#B3A69C" stroke-width="1.5" stroke-linecap="round" class="anim-steam-1"/>
+          <path d="M80 12 Q85 4 79 -2" fill="none" stroke="#B3A69C" stroke-width="1.8" stroke-linecap="round" class="anim-steam-2"/>
+          <path d="M90 14 Q86 6 92 0" fill="none" stroke="#B3A69C" stroke-width="1.5" stroke-linecap="round" class="anim-steam-3"/>
+          <text x="80" y="58" text-anchor="middle" font-size="9" font-weight="bold" fill="#654D3F">加蓋聚溫深悶蒸 ♨</text>
+        </svg>
+      `,
+
+      switch_closed: `
+        <svg viewBox="0 0 160 120" class="w-full h-full">
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+          <path d="M48 28 L112 28 L92 68 L68 68 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
+          <polygon points="54,34 106,34 90,66 70,66" fill="#8C5D3D" opacity="0.9"/>
+          <ellipse cx="80" cy="34" rx="26" ry="4" fill="#A26D4F"/>
+          <circle cx="72" cy="34" r="1.5" fill="#FAF9F7" class="anim-bubble-1"/>
+          <circle cx="86" cy="33" r="1.2" fill="#FAF9F7" class="anim-bubble-2"/>
+          <rect x="74" y="68" width="12" height="6" rx="2" fill="#D97706"/>
+          <circle cx="80" cy="71" r="2" fill="#FFFFFF"/>
+          <line x1="86" y1="71" x2="96" y2="65" stroke="#D97706" stroke-width="2.5" stroke-linecap="round"/>
+          <text x="80" y="18" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#D97706">🔒 止水閥關閉 · 全浸泡中</text>
+        </svg>
+      `,
+
+      switch_open: `
+        <svg viewBox="0 0 160 120" class="w-full h-full">
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M56 100 C66 97 94 97 104 100 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52"/>
+          <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+          <path d="M48 28 L112 28 L92 68 L68 68 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
+          <ellipse cx="80" cy="52" rx="16" ry="3" fill="#7A4E33"/>
+          <rect x="74" y="68" width="12" height="6" rx="2" fill="#059669"/>
+          <line x1="86" y1="71" x2="98" y2="74" stroke="#059669" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M77 74 L77 102 L83 102 L83 74 Z" fill="#B87B52" class="anim-stream-rush"/>
+          <text x="80" y="18" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#059669">⚡ 按下開關 · 快速釋放過濾</text>
+        </svg>
+      `,
+
+      bypass_pot: `
+        <svg viewBox="0 0 160 120" class="w-full h-full">
+          <g opacity="0.25" transform="translate(-30, -10) scale(0.8)">
+            <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
+          </g>
+          <path d="M60 60 L100 60 L110 106 C110 110 104 112 98 112 L62 112 C56 112 50 110 50 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M54 94 C64 91 96 91 106 94 L108 106 C108 109 102 111 97 111 L63 111 C58 111 52 109 52 106 Z" fill="#C99066" opacity="0.85"/>
+          <path d="M106 72 C116 72 118 92 108 98" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+          <path d="M74 24 Q 78 42 80 62" fill="none" stroke="#7EA8BE" stroke-width="3.2" stroke-linecap="round" class="anim-bypass-stream"/>
+          <ellipse cx="80" cy="62" rx="10" ry="2.5" fill="none" stroke="#7EA8BE" stroke-width="1.5" class="anim-ripple-slow"/>
+          <path d="M44 14 C54 14 68 17 74 24 L76 21 C70 15 54 12 44 12 Z" fill="#654D3F"/>
+          <text x="80" y="14" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#654D3F">純熱水直接稀釋 Bypass</text>
+        </svg>
+      `,
+
+      drain_rest: `
+        <svg viewBox="0 0 160 120" class="w-full h-full">
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M54 96 C64 93 96 93 106 96 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52"/>
+          <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+          <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
+          <ellipse cx="80" cy="34" rx="30" ry="5" fill="#EDE8E2" stroke="#CFC2B7" stroke-width="1.5"/>
+          <ellipse cx="80" cy="46" rx="19" ry="3.5" fill="#5A3A25"/>
+          <g class="anim-drip-fall-slow">
+            <ellipse cx="80" cy="82" rx="1.5" ry="2.2" fill="#B87B52"/>
+          </g>
+          <circle cx="80" cy="96" r="2" fill="none" stroke="#B87B52" stroke-width="1" class="anim-drip-splash"/>
+          <text x="80" y="20" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#8C7E75">靜待咖啡液滴淨落乾 ⏳</text>
+        </svg>
+      `,
+
+      finish: `
+        <svg viewBox="0 0 160 120" class="w-full h-full">
+          <path d="M56 50 L104 50 L98 96 C98 104 92 108 80 108 C68 108 62 104 62 96 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="2"/>
+          <path d="M102 58 C114 58 116 82 100 86" fill="none" stroke="#CFC2B7" stroke-width="3" stroke-linecap="round"/>
+          <ellipse cx="80" cy="108" rx="42" ry="5" fill="#EDE8E2" stroke="#D8CCC4" stroke-width="1.5"/>
+          <ellipse cx="80" cy="52" rx="21" ry="3.5" fill="#73472B"/>
+          <path d="M74 44 Q70 30 76 18" fill="none" stroke="#654D3F" stroke-width="1.8" stroke-linecap="round" class="anim-steam-1"/>
+          <path d="M80 42 Q86 28 80 14" fill="none" stroke="#654D3F" stroke-width="2" stroke-linecap="round" class="anim-steam-2"/>
+          <path d="M86 44 Q82 30 88 18" fill="none" stroke="#654D3F" stroke-width="1.8" stroke-linecap="round" class="anim-steam-3"/>
+          <text x="46" y="36" font-size="13" class="anim-sparkle-1">✨</text>
+          <text x="110" y="40" font-size="13" class="anim-sparkle-2">✨</text>
+          <text x="80" y="116" text-anchor="middle" font-size="9" font-weight="bold" fill="#654D3F">風味圓滿萃取 · 請享用</text>
+        </svg>
+      `
+    };
+
+    let currentRenderedAnimType = null;
+
+    function renderAnimationCue(animType, tagText, actionTitle, actionTip, stepIdx, totalSteps, countdownSec, totalStepSec, targetWater) {
+      const viewport = document.getElementById('step-anim-viewport');
+      const tag = document.getElementById('step-anim-tag');
+      const title = document.getElementById('step-anim-action-title');
+      const desc = document.getElementById('step-anim-desc');
+      const badge = document.getElementById('step-anim-step-badge');
+      const targetNote = document.getElementById('step-anim-target-note');
+      const countdownText = document.getElementById('step-anim-countdown-text');
+      const progressBar = document.getElementById('step-anim-progress-bar');
+      const icon = document.getElementById('step-anim-icon');
+
+      if (!viewport) return;
+
+      // Update SVG only if animType changed
+      if (currentRenderedAnimType !== animType) {
+        currentRenderedAnimType = animType;
+        viewport.innerHTML = STEP_ANIMATION_SVGS[animType] || STEP_ANIMATION_SVGS['spiral'];
+      }
+
+      // Update Text Content
+      if (tag) tag.textContent = tagText || '沖煮動作';
+      if (title) title.textContent = actionTitle || '注水指引';
+      if (desc) desc.textContent = actionTip || '保持平穩手沖水流';
+      if (badge) badge.textContent = stepIdx > 0 ? `Step ${stepIdx} / ${totalSteps}` : '準備就緒';
+      
+      if (targetNote) {
+        if (stepIdx > 0 && targetWater > 0) {
+          targetNote.textContent = `累計目標注水：${targetWater}g`;
+        } else {
+          targetNote.textContent = '注水目標：--';
+        }
+      }
+
+      if (countdownText) {
+        if (countdownSec > 0) {
+          countdownText.textContent = `本段剩餘 ${countdownSec} 秒`;
+        } else if (stepIdx > 0 && countdownSec === 0) {
+          countdownText.textContent = '本段時間到';
+        } else {
+          countdownText.textContent = '等待開始';
+        }
+      }
+
+      // Update progress bar
+      if (progressBar) {
+        if (totalStepSec > 0 && countdownSec >= 0) {
+          const percent = Math.min(Math.max(Math.round(((totalStepSec - countdownSec) / totalStepSec) * 100), 0), 100);
+          progressBar.style.width = `${percent}%`;
+        } else if (animType === 'finish') {
+          progressBar.style.width = '100%';
+        } else {
+          progressBar.style.width = '0%';
+        }
+      }
+
+      // Update Icon
+      if (icon) {
+        if (animType === 'swirl') icon.textContent = '🔄';
+        else if (animType === 'drip_slow') icon.textContent = '💧';
+        else if (animType === 'steam_cover') icon.textContent = '♨️';
+        else if (animType === 'switch_closed') icon.textContent = '🔒';
+        else if (animType === 'switch_open') icon.textContent = '⚡';
+        else if (animType === 'bypass_pot') icon.textContent = '🫗';
+        else if (animType === 'drain_rest') icon.textContent = '⏳';
+        else if (animType === 'finish') icon.textContent = '☕';
+        else icon.textContent = '🌊';
+      }
+    }
+
+    function resetStepAnimationCue() {
+      currentRenderedAnimType = null;
+      renderAnimationCue(
+        'idle',
+        '準備就緒',
+        '準備開始沖煮',
+        '請確認濾紙已貼合、咖啡粉已整平，點擊上方「開始沖煮」開始注水計時。',
+        0,
+        currentStepsCache ? currentStepsCache.length : 0,
+        0,
+        0,
+        0
+      );
+    }
+
     function copyRecipe() {
       const roastConf = ROAST_CONFIGS[state.roast];
       const methodConf = METHOD_CONFIGS[state.method];
