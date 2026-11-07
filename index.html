@@ -142,8 +142,8 @@
       <div class="flex items-center gap-2 text-xs flex-wrap">
         <button onclick="openRecipeVaultModal()" class="px-3 py-1.5 rounded-lg bg-white border border-[#E6E0D8] text-[#685B52] hover:border-[#CFC2B7] hover:text-[#3D3028] transition flex items-center gap-1.5 shadow-sm">
           <span>⭐</span>
-          <span>配方與筆記</span>
-          <span id="saved-recipes-badge" class="ml-0.5 px-1.5 py-0.2 rounded-full bg-[#ECE3DC] text-[#3D3028] text-[10px] font-bold">0</span>
+          <span>咖啡豆評分庫</span>
+          <span id="saved-beans-badge" class="ml-0.5 px-1.5 py-0.2 rounded-full bg-[#ECE3DC] text-[#3D3028] text-[10px] font-bold">1</span>
         </button>
         <button onclick="copyRecipe()" class="px-3 py-1.5 rounded-lg bg-white border border-[#E6E0D8] text-[#685B52] hover:border-[#CFC2B7] hover:text-[#3D3028] transition flex items-center gap-1.5 shadow-sm">
           <span>📋</span>
@@ -210,8 +210,8 @@
             <span class="text-[#8C7E75]">/ <span id="timer-total-water-goal">0</span>g</span>
           </div>
           <!-- 沖煮完成時快捷記錄筆記按鈕 -->
-          <button id="timer-log-btn" onclick="openBrewLogForm()" class="hidden px-2.5 py-1 rounded-lg bg-[#ECE3DC] hover:bg-[#dfd3cb] text-[#3D3028] font-medium text-[11px] transition shadow-xs">
-            📝 記錄這杯風味
+          <button id="timer-log-btn" onclick="openBrewLogFormForCurrentMethod()" class="hidden px-2.5 py-1 rounded-lg bg-[#ECE3DC] hover:bg-[#dfd3cb] text-[#3D3028] font-medium text-[11px] transition shadow-xs">
+            📝 評分這杯手法
           </button>
         </div>
       </div>
@@ -341,9 +341,9 @@
               <span>重新計算</span>
             </button>
             
-            <button onclick="quickSaveCurrentRecipeModal()" class="w-full py-2.5 px-3 rounded-xl bg-white border border-[#E6E0D8] hover:border-[#CFC2B7] text-[#685B52] hover:text-[#3D3028] text-xs font-medium transition flex items-center justify-center gap-1.5 shadow-2xs">
+            <button onclick="openRatingModalForCurrentBrew()" class="w-full py-2.5 px-3 rounded-xl bg-white border border-[#E6E0D8] hover:border-[#CFC2B7] text-[#685B52] hover:text-[#3D3028] text-xs font-medium transition flex items-center justify-center gap-1.5 shadow-2xs">
               <span>⭐</span>
-              <span>收藏當前沖煮參數</span>
+              <span>評分此手法至特定咖啡豆</span>
             </button>
           </div>
 
@@ -475,16 +475,16 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- 配方庫與歷史評分筆記 彈跳視窗 (遵照 Canva 原設計風格) -->
+  <!-- 咖啡豆評分庫 彈跳視窗 (遵照 Canva 原設計風格) -->
   <!-- ========================================== -->
   <div id="recipe-vault-modal" class="hidden fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4">
-    <div class="canva-card w-full max-w-xl max-h-[90vh] flex flex-col bg-white shadow-2xl overflow-hidden border border-[#EDE8E2]">
+    <div class="canva-card w-full max-w-2xl max-h-[92vh] flex flex-col bg-white shadow-2xl overflow-hidden border border-[#EDE8E2]">
       
       <!-- 視窗標題 -->
       <div class="p-4 sm:p-5 border-b border-[#F0EAE3] flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <span class="text-lg">⭐</span>
-          <h3 class="text-base font-bold text-[#2C2521]">我的手沖配方與歷史筆記</h3>
+          <span class="text-lg">☕</span>
+          <h3 class="text-base font-bold text-[#2C2521]">咖啡豆與多手法風味評分庫</h3>
         </div>
         <button onclick="closeRecipeVaultModal()" class="w-8 h-8 rounded-full hover:bg-[#FAF9F7] flex items-center justify-center text-stone-400 hover:text-stone-700 text-lg transition">
           ✕
@@ -493,65 +493,100 @@
 
       <!-- 分頁切換鈕 (Canva 簡約風格) -->
       <div class="flex border-b border-[#F0EAE3] bg-[#FAF9F7] px-4 pt-2 text-xs font-medium">
-        <button id="tab-btn-recipes" onclick="switchVaultTab('recipes')" class="px-4 py-2.5 border-b-2 border-[#654D3F] text-[#2C2521] font-semibold transition">
-          已收藏配方 (<span id="recipes-tab-count">0</span>)
+        <button id="tab-btn-beans" onclick="switchVaultTab('beans')" class="px-4 py-2.5 border-b-2 border-[#654D3F] text-[#2C2521] font-semibold transition">
+          咖啡豆名錄 (<span id="beans-tab-count">1</span>)
         </button>
-        <button id="tab-btn-logs" onclick="switchVaultTab('logs')" class="px-4 py-2.5 border-b-2 border-transparent text-[#8C7E75] hover:text-[#2C2521] transition">
-          沖煮評分與筆記 (<span id="logs-tab-count">0</span>)
+        <button id="tab-btn-rate" onclick="switchVaultTab('rate')" class="px-4 py-2.5 border-b-2 border-transparent text-[#8C7E75] hover:text-[#2C2521] transition">
+          ＋ 評分此杯手法
         </button>
       </div>
 
       <!-- 視窗主內容區 (可滾動) -->
-      <div class="p-4 sm:p-6 overflow-y-auto space-y-4 flex-1">
+      <div class="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1">
         
-        <!-- 分頁 1: 收藏配方 -->
-        <div id="vault-tab-recipes" class="space-y-4">
-          <!-- 新增收藏表單 -->
-          <div class="p-3.5 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] space-y-3">
+        <!-- 分頁 1: 咖啡豆列表（核心：每顆豆子內部評分不同沖煮法） -->
+        <div id="vault-tab-beans" class="space-y-4">
+          
+          <!-- 建立新咖啡豆名稱卡片 -->
+          <div class="p-4 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] space-y-3">
             <div class="text-xs font-semibold text-[#2C2521] flex items-center justify-between">
-              <span>＋ 收藏當前沖煮設定</span>
-              <span class="text-[11px] font-normal text-[#8C7E75]" id="current-recipe-summary-pill">四六法 · 中焙 · 15g</span>
+              <span>＋ 建立新咖啡豆名稱專區</span>
+              <span class="text-[11px] text-[#8C7E75]">建立後即可在該豆子底下評分不同沖煮法</span>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <input type="text" id="recipe-name-input" placeholder="配方名稱（如：衣索比亞 耶加雪菲）" 
-                     class="sm:col-span-2 bg-white border border-[#E6E0D8] rounded-xl px-3 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]">
-              <button onclick="saveCurrentRecipeFromInput()" class="py-2 px-3 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition">
-                儲存此配方
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+              <input type="text" id="new-bean-name-input" placeholder="咖啡名稱（例：耶加雪菲 粉紅炸彈、藝伎...）" 
+                     class="sm:col-span-7 bg-white border border-[#E6E0D8] rounded-xl px-3 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]">
+              <input type="text" id="new-bean-note-input" placeholder="產區/處理法（例：水洗 / 淺焙）" 
+                     class="sm:col-span-3 bg-white border border-[#E6E0D8] rounded-xl px-3 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]">
+              <button onclick="createNewBeanFromInput()" class="sm:col-span-2 py-2 px-3 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition whitespace-nowrap">
+                建立咖啡
               </button>
             </div>
           </div>
 
-          <!-- 已儲存配方列表 -->
-          <div id="saved-recipes-list" class="space-y-2.5">
-            <!-- 動態插入配方卡片 -->
+          <!-- 咖啡豆列表 (動態渲染每支咖啡豆以及該豆底下不同沖煮手法的評分) -->
+          <div id="beans-list-container" class="space-y-4">
+            <!-- 動態插入咖啡豆及其手法評分 -->
           </div>
+
         </div>
 
-        <!-- 分頁 2: 沖煮評分與筆記 -->
-        <div id="vault-tab-logs" class="hidden space-y-4">
-          <!-- 新增沖煮筆記表單 -->
-          <div class="p-4 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] space-y-3">
-            <div class="text-xs font-semibold text-[#2C2521] flex items-center justify-between">
-              <span>📝 記錄剛剛這杯咖啡</span>
-              <span class="text-[11px] text-[#8C7E75]" id="log-current-spec-summary">四六法 · 15g · 92°C</span>
+        <!-- 分頁 2: 評分表單 (為指定咖啡豆評分不同沖煮法) -->
+        <div id="vault-tab-rate" class="hidden space-y-4">
+          
+          <div class="p-4 sm:p-5 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="text-xs font-bold text-[#654D3F]">
+                📝 沖煮手法評分與風味記錄
+              </div>
+              <div class="text-[11px] text-[#8C7E75] font-mono-num" id="rate-form-current-params">
+                15g · 92°C · 1:15 · 225g
+              </div>
+            </div>
+
+            <!-- 選擇要評分的咖啡豆 -->
+            <div>
+              <label class="text-xs font-semibold text-[#2C2521] block mb-1.5">
+                選擇對應的咖啡豆：
+              </label>
+              <div class="flex gap-2">
+                <select id="rate-target-bean-select" class="flex-1 bg-white border border-[#E6E0D8] rounded-xl px-3 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]">
+                  <!-- 動態載入咖啡豆選單 -->
+                </select>
+              </div>
+            </div>
+
+            <!-- 沖煮手法確認 -->
+            <div>
+              <label class="text-xs font-semibold text-[#2C2521] block mb-1.5">
+                評分的沖煮手法：
+              </label>
+              <select id="rate-target-method-select" class="w-full bg-white border border-[#E6E0D8] rounded-xl px-3 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]">
+                <option value="four_six">四六法 (粕谷哲)</option>
+                <option value="single_pour">一刀流 (極致純淨)</option>
+                <option value="three_stage">經典三段式</option>
+                <option value="hoffmann">James Hoffmann 旋轉攪拌法</option>
+                <option value="matsuya">松屋流 (點滴深悶蒸)</option>
+                <option value="immersion">浸泡法 (Switch / 聰明濾杯)</option>
+              </select>
             </div>
 
             <!-- 星等評分 (1-5 星) -->
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-[#685B52]">風味評分：</span>
-              <div class="flex items-center gap-1 text-xl cursor-pointer" id="star-rating-container">
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-semibold text-[#2C2521]">此手法風味表現評分：</span>
+              <div class="flex items-center gap-1 text-2xl cursor-pointer" id="star-rating-container">
                 <span onclick="setLogRating(1)" class="star-item text-amber-500">★</span>
                 <span onclick="setLogRating(2)" class="star-item text-amber-500">★</span>
                 <span onclick="setLogRating(3)" class="star-item text-amber-500">★</span>
                 <span onclick="setLogRating(4)" class="star-item text-amber-500">★</span>
                 <span onclick="setLogRating(5)" class="star-item text-stone-300">★</span>
               </div>
-              <span id="star-rating-label" class="text-xs font-semibold text-[#654D3F]">4.0 分</span>
+              <span id="star-rating-label" class="text-xs font-bold text-[#654D3F]">4.0 分</span>
             </div>
 
             <!-- 風味標籤快速點選 -->
             <div>
-              <span class="text-[11px] text-[#8C7E75] block mb-1.5">感受到的風味特徵（可複選）：</span>
+              <span class="text-[11px] text-[#8C7E75] block mb-1.5">此手法呈現之主要風味（可複選）：</span>
               <div class="flex flex-wrap gap-1.5" id="flavor-tag-picker">
                 <button type="button" onclick="toggleLogTag(this, '明亮果酸')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]">🍋 明亮果酸</button>
                 <button type="button" onclick="toggleLogTag(this, '柑橘清香')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]">🌸 柑橘清香</button>
@@ -564,19 +599,21 @@
 
             <!-- 自訂文字心得 -->
             <div>
-              <textarea id="log-comment-input" rows="2" placeholder="備註心得（例：前段酸質明亮，尾韻甜感佳，下次研磨度可試著微調半格...）" 
+              <textarea id="rate-comment-input" rows="2.5" placeholder="此手法的風味口感簡記（例：前段酸甜對比強烈，果香非常炸裂，甜感表現優於一刀流...）" 
                         class="w-full bg-white border border-[#E6E0D8] rounded-xl p-2.5 text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]"></textarea>
             </div>
 
-            <button onclick="saveBrewLogFromInput()" class="w-full py-2 px-3 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition">
-              儲存評分筆記
-            </button>
+            <div class="flex gap-2">
+              <button onclick="submitMethodRating()" class="flex-1 py-2.5 px-4 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition">
+                儲存評分至此咖啡豆
+              </button>
+              <button onclick="switchVaultTab('beans')" class="py-2.5 px-4 rounded-xl bg-white border border-[#E6E0D8] text-xs text-[#685B52] transition">
+                取消
+              </button>
+            </div>
+
           </div>
 
-          <!-- 歷史筆記列表 -->
-          <div id="brew-logs-list" class="space-y-2.5">
-            <!-- 動態插入歷史筆記 -->
-          </div>
         </div>
 
       </div>
@@ -591,7 +628,7 @@
     </div>
   </div>
 
-  <!-- JavaScript 核心調配邏輯、時間精準換算、Web Audio 與 LocalStorage 筆記模組 -->
+  <!-- JavaScript 核心調配邏輯、時間精準換算、Web Audio 與 咖啡豆多手法評分模組 -->
   <script>
     // 系統狀態
     const state = {
@@ -922,12 +959,10 @@
 
       document.getElementById('timer-total-water-goal').textContent = totalWater;
 
-      // 更新配方摘要小標籤
-      const currentSummaryText = `${methodConf.name.split(' ')[0]} · ${roastConf.name} · ${state.dose}g (${finalTemp}°C)`;
-      const summaryPill = document.getElementById('current-recipe-summary-pill');
-      if (summaryPill) summaryPill.textContent = currentSummaryText;
-      const logSummaryPill = document.getElementById('log-current-spec-summary');
-      if (logSummaryPill) logSummaryPill.textContent = currentSummaryText;
+      const rateParamsElem = document.getElementById('rate-form-current-params');
+      if (rateParamsElem) {
+        rateParamsElem.textContent = `${state.dose}g · ${finalTemp}°C · ${ratioStr} · ${totalWater}g`;
+      }
 
       const tbody = document.getElementById('steps-tbody');
       tbody.innerHTML = '';
@@ -1034,7 +1069,7 @@
     }
 
     // ==========================================
-    // Screen Wake Lock API (防手機螢幕休眠)
+    // Screen Wake Lock API
     // ==========================================
     let wakeLockSentinel = null;
     async function requestScreenWakeLock() {
@@ -1215,43 +1250,88 @@
     }
 
     // ==========================================
-    // 一鍵收藏配方、歷史筆記與評分 (LocalStorage 儲存庫)
+    // 咖啡豆與多手法風味評分庫 (Beans & Multi-Method Ratings)
     // ==========================================
-    const STORAGE_KEY_RECIPES = 'brewcraft_saved_recipes_v1';
-    const STORAGE_KEY_LOGS = 'brewcraft_brew_logs_v1';
+    const STORAGE_KEY_BEANS = 'brewcraft_coffee_beans_v2';
+
+    // 預載範例資料：耶加雪菲 粉紅炸彈
+    const DEFAULT_BEANS_DATA = [
+      {
+        id: 'bean_default_pink_bomb',
+        name: '耶加雪菲 粉紅炸彈',
+        origin: '衣索比亞 · 日曬處理 · 淺焙',
+        createdAt: '2026/11/08',
+        methodRatings: [
+          {
+            id: 'rate_sample_1',
+            methodKey: 'four_six',
+            methodName: '四六法 (粕谷哲)',
+            rating: 4.5,
+            date: '2026/11/08 10:20',
+            params: {
+              dose: 15,
+              temp: '92°C',
+              ratio: '1:15',
+              water: '225g',
+              grind: '偏粗研磨'
+            },
+            tags: ['🍋 明亮果酸', '🌸 柑橘清香', '🍯 焦糖甜感'],
+            comment: '前段果酸炸裂，帶有濃郁草莓與柑橘甜感，層次非常分明！'
+          },
+          {
+            id: 'rate_sample_2',
+            methodKey: 'single_pour',
+            methodName: '一刀流 (極致純淨)',
+            rating: 4.0,
+            date: '2026/11/08 14:30',
+            params: {
+              dose: 15,
+              temp: '92°C',
+              ratio: '1:14.7',
+              water: '220g',
+              grind: '中細研磨'
+            },
+            tags: ['🌸 柑橘清香', '🍃 乾淨清爽'],
+            comment: '花香清雅純淨無雜質，但尾韻焦糖甜度略微少於四六法。'
+          }
+        ]
+      }
+    ];
 
     let currentLogRating = 4;
     let currentLogTags = [];
 
-    function getSavedRecipes() {
+    function getSavedBeans() {
       try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY_RECIPES)) || [];
+        const stored = localStorage.getItem(STORAGE_KEY_BEANS);
+        if (!stored) {
+          // 初始化預載範例咖啡豆
+          localStorage.setItem(STORAGE_KEY_BEANS, JSON.stringify(DEFAULT_BEANS_DATA));
+          return DEFAULT_BEANS_DATA;
+        }
+        return JSON.parse(stored) || [];
       } catch (e) {
-        return [];
+        return DEFAULT_BEANS_DATA;
       }
     }
 
-    function getBrewLogs() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY_LOGS)) || [];
-      } catch (e) {
-        return [];
-      }
+    function saveBeansToStorage(beans) {
+      localStorage.setItem(STORAGE_KEY_BEANS, JSON.stringify(beans));
+      renderBeansList();
+      populateBeanDropdown();
+      updateVaultBadges();
     }
 
     function updateVaultBadges() {
-      const recipes = getSavedRecipes();
-      const logs = getBrewLogs();
-      const totalCount = recipes.length;
-      document.getElementById('saved-recipes-badge').textContent = totalCount;
-      document.getElementById('recipes-tab-count').textContent = recipes.length;
-      document.getElementById('logs-tab-count').textContent = logs.length;
+      const beans = getSavedBeans();
+      document.getElementById('saved-beans-badge').textContent = beans.length;
+      document.getElementById('beans-tab-count').textContent = beans.length;
     }
 
     function openRecipeVaultModal() {
       document.getElementById('recipe-vault-modal').classList.remove('hidden');
-      renderSavedRecipesList();
-      renderBrewLogsList();
+      renderBeansList();
+      populateBeanDropdown();
       updateVaultBadges();
     }
 
@@ -1260,134 +1340,213 @@
     }
 
     function switchVaultTab(tab) {
-      const isRecipes = tab === 'recipes';
-      document.getElementById('vault-tab-recipes').classList.toggle('hidden', !isRecipes);
-      document.getElementById('vault-tab-logs').classList.toggle('hidden', isRecipes);
+      const isBeans = tab === 'beans';
+      document.getElementById('vault-tab-beans').classList.toggle('hidden', !isBeans);
+      document.getElementById('vault-tab-rate').classList.toggle('hidden', isBeans);
 
-      const btnRecipes = document.getElementById('tab-btn-recipes');
-      const btnLogs = document.getElementById('tab-btn-logs');
-      if (isRecipes) {
-        btnRecipes.className = 'px-4 py-2.5 border-b-2 border-[#654D3F] text-[#2C2521] font-semibold transition';
-        btnLogs.className = 'px-4 py-2.5 border-b-2 border-transparent text-[#8C7E75] hover:text-[#2C2521] transition';
+      const btnBeans = document.getElementById('tab-btn-beans');
+      const btnRate = document.getElementById('tab-btn-rate');
+      if (isBeans) {
+        btnBeans.className = 'px-4 py-2.5 border-b-2 border-[#654D3F] text-[#2C2521] font-semibold transition';
+        btnRate.className = 'px-4 py-2.5 border-b-2 border-transparent text-[#8C7E75] hover:text-[#2C2521] transition';
       } else {
-        btnLogs.className = 'px-4 py-2.5 border-b-2 border-[#654D3F] text-[#2C2521] font-semibold transition';
-        btnRecipes.className = 'px-4 py-2.5 border-b-2 border-transparent text-[#8C7E75] hover:text-[#2C2521] transition';
+        btnRate.className = 'px-4 py-2.5 border-b-2 border-[#654D3F] text-[#2C2521] font-semibold transition';
+        btnBeans.className = 'px-4 py-2.5 border-b-2 border-transparent text-[#8C7E75] hover:text-[#2C2521] transition';
       }
     }
 
-    // 快捷彈窗收藏
-    function quickSaveCurrentRecipeModal() {
-      openRecipeVaultModal();
-      switchVaultTab('recipes');
-      const input = document.getElementById('recipe-name-input');
-      if (!input.value) {
-        const roastName = ROAST_CONFIGS[state.roast].name;
-        const methodName = METHOD_CONFIGS[state.method].name.split(' ')[0];
-        input.value = `特調 ${methodName} · ${roastName} (${state.dose}g)`;
+    // 建立新咖啡豆
+    function createNewBeanFromInput() {
+      const nameInput = document.getElementById('new-bean-name-input');
+      const noteInput = document.getElementById('new-bean-note-input');
+      const name = nameInput.value.trim();
+      if (!name) {
+        alert('請輸入咖啡名稱（例如：耶加雪菲 粉紅炸彈）');
+        nameInput.focus();
+        return;
       }
-      input.focus();
-    }
 
-    function saveCurrentRecipeFromInput() {
-      const input = document.getElementById('recipe-name-input');
-      const name = input.value.trim() || `配方 ${new Date().toLocaleDateString()}`;
-      
-      const newRecipe = {
-        id: 'rec_' + Date.now(),
+      const note = noteInput.value.trim() || '自訂精品咖啡豆';
+
+      const newBean = {
+        id: 'bean_' + Date.now(),
         name: name,
-        createdAt: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        params: {
-          method: state.method,
-          roast: state.roast,
-          dose: state.dose,
-          flavor: state.flavor,
-          tempAdjust: state.tempAdjust,
-          tempDisplay: document.getElementById('param-temp').textContent,
-          ratioDisplay: document.getElementById('param-ratio').textContent,
-          waterDisplay: document.getElementById('param-water').textContent,
-          grindDisplay: document.getElementById('param-grind').textContent,
-        }
+        origin: note,
+        createdAt: new Date().toLocaleDateString(),
+        methodRatings: []
       };
 
-      const list = getSavedRecipes();
-      list.unshift(newRecipe);
-      localStorage.setItem(STORAGE_KEY_RECIPES, JSON.stringify(list));
+      const beans = getSavedBeans();
+      beans.unshift(newBean);
+      saveBeansToStorage(beans);
 
-      input.value = '';
-      renderSavedRecipesList();
-      updateVaultBadges();
+      nameInput.value = '';
+      noteInput.value = '';
     }
 
-    function applyRecipe(id) {
-      const list = getSavedRecipes();
-      const rec = list.find(r => r.id === id);
-      if (!rec) return;
-
-      selectMethod(rec.params.method);
-      selectRoast(rec.params.roast);
-      selectFlavor(rec.params.flavor);
-      state.tempAdjust = rec.params.tempAdjust || 0;
-      onDoseChange(rec.params.dose);
-
-      closeRecipeVaultModal();
+    function deleteBean(beanId) {
+      if (!confirm('確定要刪除這支咖啡豆及其所有手法的評分紀錄嗎？')) return;
+      let beans = getSavedBeans();
+      beans = beans.filter(b => b.id !== beanId);
+      saveBeansToStorage(beans);
     }
 
-    function deleteRecipe(id) {
-      if (!confirm('確定要刪除這筆收藏配方嗎？')) return;
-      let list = getSavedRecipes();
-      list = list.filter(r => r.id !== id);
-      localStorage.setItem(STORAGE_KEY_RECIPES, JSON.stringify(list));
-      renderSavedRecipesList();
-      updateVaultBadges();
-    }
+    // 渲染咖啡豆與多手法評分清單
+    function renderBeansList() {
+      const container = document.getElementById('beans-list-container');
+      const beans = getSavedBeans();
 
-    function renderSavedRecipesList() {
-      const listContainer = document.getElementById('saved-recipes-list');
-      const list = getSavedRecipes();
-
-      if (list.length === 0) {
-        listContainer.innerHTML = `
+      if (beans.length === 0) {
+        container.innerHTML = `
           <div class="py-8 text-center text-xs text-[#9B8D83] border border-dashed border-[#EDE8E2] rounded-xl">
-            尚未收藏任何配方。調整參數後點擊上方「儲存此配方」即可收藏！
+            目前尚未建立任何咖啡豆。請在上方輸入咖啡名稱（如：耶加雪菲 粉紅炸彈）建立第一支專屬咖啡豆！
           </div>
         `;
         return;
       }
 
-      listContainer.innerHTML = list.map(rec => `
-        <div class="p-3.5 rounded-xl bg-white border border-[#EDE8E2] hover:border-[#D8CCC4] transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
-          <div class="space-y-1">
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-semibold text-[#2C2521]">${rec.name}</span>
-              <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#ECE3DC] text-[#3D3028] font-medium">${METHOD_CONFIGS[rec.params.method].name.split(' ')[0]}</span>
-              <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#F5EFEB] text-[#685B52]">${ROAST_CONFIGS[rec.params.roast].name}</span>
+      container.innerHTML = beans.map(bean => {
+        const ratingsCount = bean.methodRatings ? bean.methodRatings.length : 0;
+        let avgRating = 0;
+        if (ratingsCount > 0) {
+          avgRating = (bean.methodRatings.reduce((sum, r) => sum + r.rating, 0) / ratingsCount).toFixed(1);
+        }
+
+        return `
+          <div class="p-4 rounded-xl bg-white border border-[#EDE8E2] space-y-3.5 shadow-2xs">
+            
+            <!-- 咖啡豆頭部資訊 -->
+            <div class="flex items-start justify-between gap-3 pb-2.5 border-b border-[#F5EFEB]">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-base">☕</span>
+                  <h4 class="text-sm font-bold text-[#2C2521]">${bean.name}</h4>
+                  ${ratingsCount > 0 ? `
+                    <span class="px-2 py-0.5 rounded-full bg-[#ECE3DC] text-[#3D3028] text-[10px] font-bold">
+                      ★ 平均 ${avgRating}
+                    </span>
+                  ` : ''}
+                </div>
+                <div class="text-[11px] text-[#8C7E75] mt-0.5">
+                  ${bean.origin} · 已評分 ${ratingsCount} 種沖煮手法
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button onclick="openRateModalForSpecificBean('${bean.id}')" class="px-2.5 py-1.5 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] hover:border-[#CFC2B7] text-[#654D3F] text-xs font-semibold transition flex items-center gap-1 shadow-2xs">
+                  <span>＋</span>
+                  <span>評分手法</span>
+                </button>
+                <button onclick="deleteBean('${bean.id}')" class="text-stone-300 hover:text-red-500 text-xs transition p-1" title="刪除咖啡豆">
+                  🗑️
+                </button>
+              </div>
             </div>
-            <div class="text-[11px] text-[#8C7E75] font-mono-num flex items-center gap-3">
-              <span>粉量: <strong>${rec.params.dose}g</strong></span>
-              <span>水溫: <strong>${rec.params.tempDisplay}</strong></span>
-              <span>粉水比: <strong>${rec.params.ratioDisplay}</strong></span>
-              <span>水量: <strong>${rec.params.waterDisplay}</strong></span>
+
+            <!-- 此咖啡豆內部的手法評分列表 -->
+            <div class="space-y-2">
+              ${ratingsCount === 0 ? `
+                <div class="py-3 text-center text-[11px] text-[#9B8D83] bg-[#FAF9F7] rounded-lg border border-dashed border-[#EDE8E2]">
+                  尚未針對此豆評分任何手法。點擊右上角「＋ 評分手法」記錄！
+                </div>
+              ` : bean.methodRatings.map(rate => `
+                <div class="p-3 rounded-lg bg-[#FAF9F7] border border-[#EDE8E2] space-y-2">
+                  
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="px-2.5 py-0.5 rounded-md bg-[#ECE3DC] text-[#3D3028] text-xs font-bold">
+                        ${rate.methodName}
+                      </span>
+                      <span class="text-amber-500 font-bold text-xs">${'★'.repeat(Math.round(rate.rating))}</span>
+                      <span class="text-xs font-bold text-[#2C2521]">${rate.rating}.0 分</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                      <span class="text-[10px] text-[#9B8D83]">${rate.date}</span>
+                      <button onclick="deleteMethodRating('${bean.id}', '${rate.id}')" class="text-stone-300 hover:text-red-500 text-xs transition" title="刪除評分">🗑️</button>
+                    </div>
+                  </div>
+
+                  <!-- 當時參數快照 -->
+                  <div class="text-[11px] text-[#685B52] font-mono-num flex items-center justify-between flex-wrap gap-2 pt-0.5">
+                    <div class="flex gap-2.5">
+                      <span>粉量: <strong>${rate.params.dose}g</strong></span>
+                      <span>水溫: <strong>${rate.params.temp}</strong></span>
+                      <span>比例: <strong>${rate.params.ratio}</strong></span>
+                      <span>總水: <strong>${rate.params.water}</strong></span>
+                    </div>
+                    <button onclick="applyMethodRatingParams('${rate.methodKey}', ${rate.params.dose})" class="text-[11px] text-[#654D3F] hover:underline font-semibold">
+                      套用此參數 ▶
+                    </button>
+                  </div>
+
+                  <!-- 風味標籤 -->
+                  ${rate.tags && rate.tags.length > 0 ? `
+                    <div class="flex flex-wrap gap-1">
+                      ${rate.tags.map(t => `<span class="px-2 py-0.5 rounded-md bg-white border border-[#E6E0D8] text-[#685B52] text-[10px]">${t}</span>`).join('')}
+                    </div>
+                  ` : ''}
+
+                  <!-- 心得備註 -->
+                  ${rate.comment ? `
+                    <div class="text-xs text-[#2C2521] leading-relaxed border-t border-[#F0EAE3] pt-1.5 mt-1">
+                      ${rate.comment}
+                    </div>
+                  ` : ''}
+
+                </div>
+              `).join('')}
             </div>
-            <div class="text-[10px] text-[#9B8D83]">收藏於 ${rec.createdAt}</div>
+
           </div>
-          <div class="flex items-center gap-2 self-end sm:self-center">
-            <button onclick="applyRecipe('${rec.id}')" class="px-3 py-1.5 rounded-lg bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-medium transition shadow-2xs">
-              套用配方
-            </button>
-            <button onclick="deleteRecipe('${rec.id}')" class="px-2 py-1.5 rounded-lg text-stone-400 hover:text-red-600 text-xs transition" title="刪除">
-              🗑️
-            </button>
-          </div>
-        </div>
+        `;
+      }).join('');
+    }
+
+    // 填充咖啡豆下拉選單
+    function populateBeanDropdown(selectedBeanId = null) {
+      const select = document.getElementById('rate-target-bean-select');
+      const beans = getSavedBeans();
+
+      if (beans.length === 0) {
+        select.innerHTML = `<option value="">尚未建立咖啡豆（請先至第一頁建立）</option>`;
+        return;
+      }
+
+      select.innerHTML = beans.map(b => `
+        <option value="${b.id}" ${b.id === selectedBeanId ? 'selected' : ''}>
+          ${b.name} (${b.origin || '無備註'})
+        </option>
       `).join('');
     }
 
-    // 評分與筆記邏輯
-    function openBrewLogForm() {
+    // 開啟評分特定咖啡豆表單
+    function openRateModalForSpecificBean(beanId) {
       openRecipeVaultModal();
-      switchVaultTab('logs');
+      populateBeanDropdown(beanId);
+      document.getElementById('rate-target-method-select').value = state.method;
+      switchVaultTab('rate');
     }
 
+    // 從首頁點擊「評分此手法至特定咖啡豆」或沖煮完成時
+    function openRatingModalForCurrentBrew() {
+      openRecipeVaultModal();
+      populateBeanDropdown();
+      document.getElementById('rate-target-method-select').value = state.method;
+      switchVaultTab('rate');
+    }
+
+    function openBrewLogFormForCurrentMethod() {
+      openRatingModalForCurrentBrew();
+    }
+
+    function applyMethodRatingParams(methodKey, doseVal) {
+      selectMethod(methodKey);
+      if (doseVal) onDoseChange(doseVal);
+      closeRecipeVaultModal();
+    }
+
+    // 評分星等與標籤互動
     function setLogRating(rating) {
       currentLogRating = rating;
       const stars = document.querySelectorAll('#star-rating-container .star-item');
@@ -1409,32 +1568,51 @@
       }
     }
 
-    function saveBrewLogFromInput() {
-      const commentInput = document.getElementById('log-comment-input');
+    // 儲存手法評分到指定咖啡豆
+    function submitMethodRating() {
+      const beanSelect = document.getElementById('rate-target-bean-select');
+      const beanId = beanSelect.value;
+      if (!beanId) {
+        alert('請先選擇或建立要評分的咖啡豆！');
+        return;
+      }
+
+      const methodSelect = document.getElementById('rate-target-method-select');
+      const methodKey = methodSelect.value;
+      const methodName = METHOD_CONFIGS[methodKey].name;
+
+      const commentInput = document.getElementById('rate-comment-input');
       const comment = commentInput.value.trim();
 
-      const newLog = {
-        id: 'log_' + Date.now(),
-        createdAt: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      const newRating = {
+        id: 'rate_' + Date.now(),
+        methodKey: methodKey,
+        methodName: methodName,
         rating: currentLogRating,
-        tags: [...currentLogTags],
-        comment: comment || '（未填寫文字筆記）',
-        snapshot: {
-          method: METHOD_CONFIGS[state.method].name,
-          roast: ROAST_CONFIGS[state.roast].name,
+        date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        params: {
           dose: state.dose,
-          water: document.getElementById('param-water').textContent,
           temp: document.getElementById('param-temp').textContent,
           ratio: document.getElementById('param-ratio').textContent,
+          water: document.getElementById('param-water').textContent,
           grind: document.getElementById('param-grind').textContent,
-        }
+        },
+        tags: [...currentLogTags],
+        comment: comment || '（未填寫文字心得）'
       };
 
-      const list = getBrewLogs();
-      list.unshift(newLog);
-      localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(list));
+      const beans = getSavedBeans();
+      const targetBean = beans.find(b => b.id === beanId);
+      if (!targetBean) {
+        alert('找不到該咖啡豆');
+        return;
+      }
 
-      // 重設表單
+      if (!targetBean.methodRatings) targetBean.methodRatings = [];
+      targetBean.methodRatings.unshift(newRating);
+      saveBeansToStorage(beans);
+
+      // 清空表單
       commentInput.value = '';
       currentLogTags = [];
       document.querySelectorAll('#flavor-tag-picker .log-tag-btn').forEach(btn => {
@@ -1443,64 +1621,18 @@
       });
       setLogRating(4);
 
-      renderBrewLogsList();
-      updateVaultBadges();
+      // 切換回咖啡豆列表查看
+      switchVaultTab('beans');
     }
 
-    function deleteBrewLog(id) {
-      if (!confirm('確定要刪除這筆歷史筆記嗎？')) return;
-      let list = getBrewLogs();
-      list = list.filter(l => l.id !== id);
-      localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(list));
-      renderBrewLogsList();
-      updateVaultBadges();
-    }
-
-    function renderBrewLogsList() {
-      const listContainer = document.getElementById('brew-logs-list');
-      const list = getBrewLogs();
-
-      if (list.length === 0) {
-        listContainer.innerHTML = `
-          <div class="py-8 text-center text-xs text-[#9B8D83] border border-dashed border-[#EDE8E2] rounded-xl">
-            尚無沖煮筆記。沖煮完畢後記錄風味與星等，建立您的專屬手沖資料庫！
-          </div>
-        `;
-        return;
+    function deleteMethodRating(beanId, ratingId) {
+      if (!confirm('確定要刪除這筆手法評分嗎？')) return;
+      const beans = getSavedBeans();
+      const bean = beans.find(b => b.id === beanId);
+      if (bean && bean.methodRatings) {
+        bean.methodRatings = bean.methodRatings.filter(r => r.id !== ratingId);
+        saveBeansToStorage(beans);
       }
-
-      listContainer.innerHTML = list.map(log => `
-        <div class="p-3.5 rounded-xl bg-white border border-[#EDE8E2] space-y-2 shadow-2xs">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="text-amber-500 font-bold text-sm">${'★'.repeat(log.rating)}${'☆'.repeat(5 - log.rating)}</span>
-              <span class="text-xs font-semibold text-[#2C2521]">${log.rating}.0 分</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-[10px] text-[#9B8D83]">${log.createdAt}</span>
-              <button onclick="deleteBrewLog('${log.id}')" class="text-stone-300 hover:text-red-500 text-xs transition" title="刪除筆記">🗑️</button>
-            </div>
-          </div>
-
-          <div class="text-[11px] text-[#685B52] bg-[#FAF9F7] px-2.5 py-1.5 rounded-lg border border-[#EDE8E2] flex flex-wrap gap-x-3 gap-y-1 font-mono-num">
-            <span>手法: <strong>${log.snapshot.method.split(' ')[0]}</strong></span>
-            <span>烘焙: <strong>${log.snapshot.roast}</strong></span>
-            <span>粉量: <strong>${log.snapshot.dose}g</strong></span>
-            <span>水溫: <strong>${log.snapshot.temp}</strong></span>
-            <span>粉水比: <strong>${log.snapshot.ratio}</strong></span>
-          </div>
-
-          ${log.tags && log.tags.length > 0 ? `
-            <div class="flex flex-wrap gap-1">
-              ${log.tags.map(t => `<span class="px-2 py-0.5 rounded-md bg-[#ECE3DC] text-[#3D3028] text-[10px] font-medium">${t}</span>`).join('')}
-            </div>
-          ` : ''}
-
-          <div class="text-xs text-[#2C2521] leading-relaxed pt-0.5">
-            ${log.comment}
-          </div>
-        </div>
-      `).join('');
     }
 
     // 初始化頁面
