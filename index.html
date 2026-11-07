@@ -303,6 +303,53 @@
       animation: sparkleTwinkle 2.0s infinite ease-in-out 0.7s;
     }
 
+
+    /* 悶蒸專屬動畫：粉層漢堡包隆起排氣與氣泡逸出 (Coffee Bloom Burger) */
+    @keyframes bloomRise {
+      0% {
+        transform: scale(0.92, 0.6) translateY(5px);
+        filter: brightness(0.9);
+      }
+      35% {
+        transform: scale(1.03, 1.18) translateY(-2px);
+        filter: brightness(1.05);
+      }
+      65% {
+        transform: scale(1.0, 1.08) translateY(-1px);
+      }
+      100% {
+        transform: scale(0.92, 0.6) translateY(5px);
+        filter: brightness(0.9);
+      }
+    }
+    .anim-bloom-dome {
+      transform-origin: 80px 43px;
+      animation: bloomRise 4.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes bloomBubble {
+      0% { transform: translateY(0) scale(0.3); opacity: 0; }
+      35% { transform: translateY(-3px) scale(1); opacity: 0.9; }
+      70% { transform: translateY(-7px) scale(1.2); opacity: 0.5; }
+      100% { transform: translateY(-10px) scale(0); opacity: 0; }
+    }
+    .anim-bloom-bubble-1 {
+      transform-origin: 72px 35px;
+      animation: bloomBubble 2.4s infinite ease-out 0.2s;
+    }
+    .anim-bloom-bubble-2 {
+      transform-origin: 81px 32px;
+      animation: bloomBubble 2.8s infinite ease-out 1.0s;
+    }
+    .anim-bloom-bubble-3 {
+      transform-origin: 90px 36px;
+      animation: bloomBubble 2.2s infinite ease-out 1.6s;
+    }
+    .anim-bloom-bubble-4 {
+      transform-origin: 77px 39px;
+      animation: bloomBubble 3.0s infinite ease-out 0.7s;
+    }
+
   </style>
 </head>
 <body class="min-h-screen py-8 px-4 sm:px-6 lg:px-8 selection:bg-[#ECE3DC] selection:text-[#3D3028]">
@@ -1066,9 +1113,9 @@
             amount: bloomWater,
             durationSec: 45,
             note: '由中心向外輕柔繞圈，確保浸潤並排氣至 45 秒',
-            animType: 'spiral',
-            actionTitle: '螺旋繞圈注水 (悶蒸)',
-            actionTip: '細水流從中心向外繞 2-3 圈注滿悶蒸水量，使全粉床均勻浸潤，隨後靜待水分完全排乾並充分排氣至 45 秒。'
+            animType: 'bloom',
+            actionTitle: '溫潤注水 · 均勻排氣膨脹 (悶蒸)',
+            actionTip: '細水流從中心向外繞 2-3 圈注滿悶蒸水，使全粉床均勻浸透，觀察咖啡粉如漢堡般隆起排氣至 45 秒。'
           },
           {
             name: '第一段',
@@ -1116,9 +1163,9 @@
             amount: bloomWater,
             durationSec: 35,
             note: '中心點向外微幅潤濕，排氣膨脹至 35 秒',
-            animType: 'steady_center',
-            actionTitle: '中心微幅潤濕 (悶蒸)',
-            actionTip: '壺嘴放低，由中心向外輕柔濕潤粉層，靜置排氣膨脹至 35 秒。'
+            animType: 'bloom',
+            actionTitle: '中心微潤 · 均勻排氣膨脹 (悶蒸)',
+            actionTip: '低水柱輕柔潤濕中心粉層，讓新鮮二氧化碳自然釋放膨脹成飽滿漢堡，靜置至 35 秒。'
           },
           {
             name: '持續注水',
@@ -1150,9 +1197,9 @@
             amount: bloomWater,
             durationSec: 40,
             note: '浸濕全部粉床，釋放二氧化碳至 40 秒',
-            animType: 'spiral',
-            actionTitle: '全粉床均勻浸潤',
-            actionTip: '由內向外均勻繞圈浸濕全部咖啡粉，讓新鮮二氧化碳充分釋放至 40 秒。'
+            animType: 'bloom',
+            actionTitle: '全粉床浸潤 · 漢堡膨脹 (悶蒸)',
+            actionTip: '均勻繞圈潤濕全部咖啡粉，新鮮二氧化碳受熱膨脹排氣，粉層飽滿隆起，等待至 40 秒。'
           },
           {
             name: '第一段注水',
@@ -1183,9 +1230,9 @@
             amount: bloomWater,
             durationSec: 45,
             note: '注水後輕搖濾杯消除乾粉結塊，浸潤至 45 秒',
-            animType: 'swirl',
-            actionTitle: '注水後輕搖濾杯 (Swirl)',
-            actionTip: '迅速注入悶蒸水後，雙手拿起濾杯輕柔旋轉搖晃 2-3 圈，消除乾粉結塊，浸潤至 45 秒。'
+            animType: 'bloom',
+            actionTitle: '悶蒸注水 + 均勻排氣膨脹 (Swirl)',
+            actionTip: '迅速注入悶蒸水並雙手輕搖濾杯 2-3 圈消除乾粉結塊，隨後靜待咖啡粉均勻膨脹排氣至 45 秒。'
           },
           {
             name: '第一段大水流',
@@ -1234,9 +1281,9 @@
             amount: 0,
             durationSec: 180,
             note: '蓋上悶蒸蓋深層悶蒸 3 分鐘，排淨氣體',
-            animType: 'steam_cover',
-            actionTitle: '蓋上悶蒸蓋靜置 3 分鐘',
-            actionTip: '蓋上專用悶蒸蓋鎖住熱氣與蒸氣，讓咖啡粉內部深層膨脹排氣整整 180 秒。'
+            animType: 'bloom',
+            actionTitle: '深層悶蒸膨脹 (加蓋 3 分鐘)',
+            actionTip: '加蓋鎖住熱氣與蒸氣，讓咖啡粉內部深層均勻膨脹排氣整整 180 秒，徹底釋放醇厚精華。'
           },
           {
             name: '核心萃取注水',
@@ -1266,9 +1313,9 @@
             amount: bloomWater,
             durationSec: 35,
             note: '開閥注水滴出底層明亮酸甜，35 秒時關閉止水閥',
-            animType: 'switch_open',
-            actionTitle: '開閥注水過濾 (閥門開啟)',
-            actionTip: '保持開閥狀態注入底層熱水，先萃取出前段明亮果酸與花香，35 秒時撥起閥門開關。'
+            animType: 'bloom',
+            actionTitle: '開閥初浸透排氣 (初悶蒸)',
+            actionTip: '注入初段熱水潤濕粉層，釋放花果酸香並充分排氣膨脹，35 秒時撥起止水閥門。'
           },
           {
             name: '關閥全浸泡',
@@ -1643,6 +1690,53 @@
     // 步驟動態向量微動畫庫 (SVG Brew Animations)
     // ========================================================
     const STEP_ANIMATION_SVGS = {
+
+      bloom: `
+        <svg viewBox="0 0 160 120" class="w-full h-full">
+          <defs>
+            <radialGradient id="bloomBurgerGrad" cx="50%" cy="38%" r="55%">
+              <stop offset="0%" stop-color="#8A5636"/>
+              <stop offset="55%" stop-color="#5E3821"/>
+              <stop offset="100%" stop-color="#3A2012"/>
+            </radialGradient>
+          </defs>
+          <!-- 下壺 Glass Server -->
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M58 106 C66 104 94 104 102 106 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.75"/>
+          <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+
+          <!-- 濾杯 V60 Cone -->
+          <path d="M50 36 L110 36 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
+          <ellipse cx="80" cy="36" rx="30" ry="5" fill="#EDE8E2" stroke="#CFC2B7" stroke-width="1.5"/>
+          <ellipse cx="80" cy="43" rx="24" ry="4" fill="#3A2012" opacity="0.5"/>
+
+          <!-- 咖啡粉層動態漢堡包膨脹 (Blooming Burger Dome) -->
+          <g class="anim-bloom-dome">
+            <path d="M53 43 C53 43 65 29 80 29 C95 29 107 43 107 43 C107 43 95 49 80 49 C65 49 53 43 53 43 Z" fill="url(#bloomBurgerGrad)" stroke="#4A2C18" stroke-width="0.8"/>
+            <path d="M64 39 Q 74 34 84 37" fill="none" stroke="#A66D46" stroke-width="1.2" opacity="0.7" stroke-linecap="round"/>
+            <path d="M76 43 Q 86 41 94 43" fill="none" stroke="#A66D46" stroke-width="1" opacity="0.6" stroke-linecap="round"/>
+            
+            <!-- CO2 釋放氣泡 -->
+            <circle cx="72" cy="35" r="1.8" fill="#FAF9F7" class="anim-bloom-bubble-1"/>
+            <circle cx="81" cy="32" r="2.2" fill="#FAF9F7" class="anim-bloom-bubble-2"/>
+            <circle cx="90" cy="36" r="1.5" fill="#FAF9F7" class="anim-bloom-bubble-3"/>
+            <circle cx="77" cy="39" r="1.2" fill="#FAF9F7" class="anim-bloom-bubble-4"/>
+          </g>
+
+          <!-- 裊裊上升芳香蒸氣 (Aromatic Steam) -->
+          <path d="M71 27 Q 66 17 73 8" fill="none" stroke="#8C7E75" stroke-width="1.6" stroke-linecap="round" class="anim-steam-1"/>
+          <path d="M80 25 Q 86 15 80 6" fill="none" stroke="#8C7E75" stroke-width="1.8" stroke-linecap="round" class="anim-steam-2"/>
+          <path d="M89 27 Q 84 17 91 8" fill="none" stroke="#8C7E75" stroke-width="1.6" stroke-linecap="round" class="anim-steam-3"/>
+
+          <!-- 底部緩慢精華滴落 (Slow drop) -->
+          <g class="anim-drip-fall-slow">
+            <ellipse cx="80" cy="82" rx="1.5" ry="2.2" fill="#B87B52"/>
+          </g>
+          <circle cx="80" cy="98" r="1.8" fill="none" stroke="#B87B52" stroke-width="1" class="anim-drip-splash"/>
+
+          <text x="80" y="16" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#654D3F">咖啡粉層膨脹排氣 · 漢堡包 ♨</text>
+        </svg>
+      `,
       idle: `
         <svg viewBox="0 0 160 120" class="w-full h-full">
           <path d="M56 50 L104 50 L98 96 C98 104 92 108 80 108 C68 108 62 104 62 96 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="2"/>
@@ -1914,7 +2008,8 @@
 
       // Update Icon
       if (icon) {
-        if (animType === 'swirl') icon.textContent = '🔄';
+        if (animType === 'bloom') icon.textContent = '♨️';
+      else if (animType === 'swirl') icon.textContent = '🔄';
         else if (animType === 'drip_slow') icon.textContent = '💧';
         else if (animType === 'steam_cover') icon.textContent = '♨️';
         else if (animType === 'switch_closed') icon.textContent = '🔒';
