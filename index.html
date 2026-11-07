@@ -350,6 +350,12 @@
       animation: bloomBubble 3.0s infinite ease-out 0.7s;
     }
 
+
+    /* 計時暫停時，微動畫平滑定格 */
+    .timer-paused svg * {
+      animation-play-state: paused !important;
+    }
+
   </style>
 </head>
 <body class="min-h-screen py-8 px-4 sm:px-6 lg:px-8 selection:bg-[#ECE3DC] selection:text-[#3D3028]">
@@ -750,7 +756,7 @@
   <!-- ========================================== -->
   <!-- 咖啡豆評分庫 彈跳視窗 (遵照 Canva 原設計風格) -->
   <!-- ========================================== -->
-  <div id="recipe-vault-modal" class="hidden fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4">
+  <div id="recipe-vault-modal" onclick="if(event.target === this) closeRecipeVaultModal()" class="hidden fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4">
     <div class="canva-card w-full max-w-2xl max-h-[92vh] flex flex-col bg-white shadow-2xl overflow-hidden border border-[#EDE8E2]">
       
       <!-- 視窗標題 -->
@@ -872,7 +878,7 @@
 
             <!-- 自訂文字心得 -->
             <div>
-              <textarea id="rate-comment-input" rows="2.5" placeholder="此手法的風味口感簡記（例：前段酸甜對比強烈，果香非常炸裂，甜感表現優於一刀流...）" 
+              <textarea id="rate-comment-input" rows="2.5" class="w-full bg-white border border-[#E6E0D8] rounded-xl p-3 text-base sm:text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]" placeholder="此手法的風味口感簡記（例：前段酸甜對比強烈，果香非常炸裂，甜感表現優於一刀流...）" 
                         class="w-full bg-white border border-[#E6E0D8] rounded-xl p-2.5 text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]"></textarea>
             </div>
 
@@ -951,6 +957,18 @@
       }
     };
 
+
+    // 安全轉譯跳脫函數 (防止特殊字元破壞排版與 XSS)
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     // 手法定義與名稱
     const METHOD_CONFIGS = {
       four_six: {
@@ -1019,6 +1037,13 @@
       }
     };
 
+    
+    function formatTimerDigits(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
     function formatTime(seconds) {
       const m = Math.floor(seconds / 60);
       const s = seconds % 60;
@@ -1054,16 +1079,31 @@
       calculateAndRender();
     }
 
-    function onDoseChange(val) {
+        function onDoseInput(val) {
       let num = parseFloat(val);
-      if (isNaN(num)) num = 15;
+      if (!isNaN(num) && num >= 5 && num <= 60) {
+        state.dose = num;
+        document.getElementById('dose-range').value = Math.min(Math.max(num, 10), 35);
+        calculateAndRender();
+        if (timerRunning) resetTimer();
+      }
+    }
+
+    function onDoseCommit(val) {
+      let num = parseFloat(val);
+      if (isNaN(num)) num = 15.0;
       if (num < 5) num = 5;
       if (num > 60) num = 60;
+      num = Math.round(num * 10) / 10;
       state.dose = num;
       document.getElementById('dose-input').value = num;
       document.getElementById('dose-range').value = Math.min(Math.max(num, 10), 35);
       calculateAndRender();
       if (timerRunning) resetTimer();
+    }
+
+    function onDoseChange(val) {
+      onDoseCommit(val);
     }
 
     function stepDose(delta) {
@@ -1542,11 +1582,12 @@
       }
     }
 
-    // ==========================================
-    // 沖煮計時器模組
+        // ==========================================
+    // 沖煮計時器模組 (高精度時間戳記防漂移版)
     // ==========================================
     let timerRunning = false;
     let timerSeconds = 0;
+    let timerStartTime = 0;
     let timerInterval = null;
     let currentActiveStepIndex = -1;
 
@@ -1555,11 +1596,15 @@
       section.classList.toggle('hidden');
       if (!section.classList.contains('hidden')) {
         initAudioContext();
+        if (timerSeconds === 0) resetStepAnimationCue();
       }
     }
 
     function toggleTimer() {
       initAudioContext();
+      const viewport = document.getElementById('step-anim-viewport');
+      const tag = document.getElementById('step-anim-tag');
+
       if (timerRunning) {
         clearInterval(timerInterval);
         timerRunning = false;
@@ -1567,18 +1612,28 @@
         document.getElementById('timer-run-text').textContent = '繼續沖煮';
         document.getElementById('timer-run-btn').className = 'px-4 py-2 rounded-xl bg-amber-700 hover:bg-amber-600 text-white text-xs font-semibold transition flex items-center gap-1.5';
         document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
+        
+        // 暫停時，微動畫平滑定格
+        if (viewport) viewport.classList.add('timer-paused');
+        if (tag) tag.textContent = '計時暫停';
       } else {
         timerRunning = true;
         requestScreenWakeLock();
+        
+        // 依據當前累積秒數計算真實起點時間戳記，杜絕手機分頁背景限流漂移
+        timerStartTime = Date.now() - (timerSeconds * 1000);
+
         document.getElementById('timer-run-text').textContent = '暫停計時';
         document.getElementById('timer-run-btn').className = 'px-4 py-2 rounded-xl bg-[#8C7E75] hover:bg-[#786A61] text-white text-xs font-semibold transition flex items-center gap-1.5';
         document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-subtle-pulse';
+
+        if (viewport) viewport.classList.remove('timer-paused');
 
         if (timerSeconds === 0) {
           playStepChangeSound();
         }
 
-        timerInterval = setInterval(onTimerTick, 1000);
+        timerInterval = setInterval(onTimerTick, 500); // 500ms 檢查頻率，更加平滑準確
         updateTimerStepHighlight();
       }
     }
@@ -1587,8 +1642,12 @@
       clearInterval(timerInterval);
       timerRunning = false;
       timerSeconds = 0;
+      timerStartTime = 0;
       currentActiveStepIndex = -1;
       releaseScreenWakeLock();
+
+      const viewport = document.getElementById('step-anim-viewport');
+      if (viewport) viewport.classList.remove('timer-paused');
 
       document.getElementById('timer-digits').textContent = '00:00';
       document.getElementById('timer-run-text').textContent = '開始沖煮';
@@ -1606,32 +1665,52 @@
     }
 
     function onTimerTick() {
-      timerSeconds++;
-      document.getElementById('timer-digits').textContent = formatTime(timerSeconds);
-      updateTimerStepHighlight();
+      if (!timerRunning) return;
+      // 根據真實時間戳記校準，即便手機休眠切回也毫秒不差
+      const exactSeconds = Math.floor((Date.now() - timerStartTime) / 1000);
+      if (exactSeconds !== timerSeconds) {
+        timerSeconds = exactSeconds;
+        document.getElementById('timer-digits').textContent = formatTimerDigits(timerSeconds);
+        updateTimerStepHighlight();
+      }
     }
+
+    // 手機分頁喚醒時即時校準秒數
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && timerRunning) {
+        const exactSeconds = Math.floor((Date.now() - timerStartTime) / 1000);
+        timerSeconds = exactSeconds;
+        document.getElementById('timer-digits').textContent = formatTimerDigits(timerSeconds);
+        updateTimerStepHighlight();
+      }
+    });
 
     function updateTimerStepHighlight() {
       if (!currentStepsCache || currentStepsCache.length === 0) return;
 
+      // 當秒數超過預估總時間時，依照需求：計時器繼續計時（因咖啡可能尚未完全滴漏完畢）
       if (timerSeconds >= totalBrewSeconds) {
         if (currentActiveStepIndex !== 999) {
           currentActiveStepIndex = 999;
           playCompleteSound();
-          releaseScreenWakeLock();
         }
-        document.getElementById('timer-status-title').textContent = '✨ 沖煮完成！請享用咖啡 ☕';
+
+        const overtimeSec = timerSeconds - totalBrewSeconds;
+        document.getElementById('timer-status-title').textContent = overtimeSec === 0 
+          ? '✨ 達到預估總時間 · 靜待完全滴乾 ☕' 
+          : `☕ 萃取完成 · 滴漏等待中 (+ ${overtimeSec} 秒)`;
         document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
-        document.getElementById('timer-current-target').textContent = '沖煮完成';
-        document.getElementById('timer-step-countdown').textContent = '請移開濾杯享用';
+        document.getElementById('timer-current-target').textContent = `滴濾收尾 (目標 ${currentStepsCache[currentStepsCache.length - 1].cumulative}g)`;
+        document.getElementById('timer-step-countdown').textContent = overtimeSec > 0 ? `(超時 +${overtimeSec} 秒，滴盡移開濾杯)` : '(滴淨即可移開濾杯)';
         document.getElementById('timer-water-goal').textContent = currentStepsCache[currentStepsCache.length - 1].cumulative;
-        document.getElementById('timer-step-desc').textContent = `已達到預估總時間 ${formatTime(totalBrewSeconds)}，請靜待濾乾後品嚐。`;
+        document.getElementById('timer-step-desc').textContent = `已達預估時間 ${formatTime(totalBrewSeconds)}。請靜待分享壺完全滴濾完畢後，移開濾杯並點擊評分記錄！`;
         document.getElementById('timer-log-btn').classList.remove('hidden');
+
         renderAnimationCue(
-          'finish',
-          '沖煮完成',
-          '✨ 咖啡萃取完成！請享用 ☕',
-          '已達到預估總時間 ' + formatTime(totalBrewSeconds) + '，請移開濾杯，輕輕搖勻分享壺後倒入杯中享用！',
+          'drain_rest',
+          '滴濾收尾',
+          `滴濾收尾等待中 (+${overtimeSec}s)`,
+          '請觀察濾杯水位平整滴乾，完全落盡後即可移開濾杯，品嚐美味咖啡。',
           currentStepsCache.length,
           currentStepsCache.length,
           0,
@@ -1665,6 +1744,7 @@
       document.getElementById('timer-step-countdown').textContent = `(本段剩餘 ${remainingSec} 秒)`;
       document.getElementById('timer-water-goal').textContent = activeStep.cumulative;
       document.getElementById('timer-step-desc').textContent = `${activeStep.name}：${activeStep.note}`;
+
       renderAnimationCue(
         activeStep.animType || 'spiral',
         activeStep.name,
@@ -2162,6 +2242,14 @@
       updateVaultBadges();
     }
 
+    
+    // 監聽 Escape 鍵關閉彈跳視窗
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeRecipeVaultModal();
+      }
+    });
+
     function closeRecipeVaultModal() {
       document.getElementById('recipe-vault-modal').classList.add('hidden');
     }
@@ -2225,7 +2313,7 @@
 
       if (beans.length === 0) {
         container.innerHTML = `
-          <div class="py-8 text-center text-xs text-[#9B8D83] border border-dashed border-[#EDE8E2] rounded-xl">
+          <div class="p-8 text-center text-xs text-[#9B8D83] bg-[#FAF9F7] rounded-xl border border-dashed border-[#EDE8E2]">
             目前尚未建立任何咖啡豆。請在上方輸入咖啡名稱（如：耶加雪菲 粉紅炸彈）建立第一支專屬咖啡豆！
           </div>
         `;
@@ -2236,93 +2324,103 @@
         const ratingsCount = bean.methodRatings ? bean.methodRatings.length : 0;
         let avgRating = 0;
         if (ratingsCount > 0) {
-          avgRating = (bean.methodRatings.reduce((sum, r) => sum + r.rating, 0) / ratingsCount).toFixed(1);
+          avgRating = (bean.methodRatings.reduce((sum, r) => sum + (r.rating || 0), 0) / ratingsCount).toFixed(1);
         }
 
+        const escapedBeanName = escapeHtml(bean.name);
+        const escapedBeanOrigin = escapeHtml(bean.origin || '自訂精品咖啡豆');
+
         return `
-          <div class="p-4 rounded-xl bg-white border border-[#EDE8E2] space-y-3.5 shadow-2xs">
+          <div class="canva-card p-4 sm:p-5 bg-white space-y-3.5 border border-[#EDE8E2]">
             
             <!-- 咖啡豆頭部資訊 -->
-            <div class="flex items-start justify-between gap-3 pb-2.5 border-b border-[#F5EFEB]">
+            <div class="flex items-start justify-between gap-3 border-b border-[#F0EAE3] pb-3">
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="text-base">☕</span>
-                  <h4 class="text-sm font-bold text-[#2C2521]">${bean.name}</h4>
+                  <span class="text-sm">🫘</span>
+                  <h4 class="text-sm font-bold text-[#2C2521]">${escapedBeanName}</h4>
                   ${ratingsCount > 0 ? `
-                    <span class="px-2 py-0.5 rounded-full bg-[#ECE3DC] text-[#3D3028] text-[10px] font-bold">
-                      ★ 平均 ${avgRating}
+                    <span class="px-2 py-0.5 rounded-full bg-[#FAF9F7] border border-[#E6E0D8] text-[11px] font-bold text-amber-600 flex items-center gap-0.5 font-mono-num">
+                      ★ ${avgRating}
                     </span>
                   ` : ''}
                 </div>
-                <div class="text-[11px] text-[#8C7E75] mt-0.5">
-                  ${bean.origin} · 已評分 ${ratingsCount} 種沖煮手法
+                <div class="text-xs text-[#8C7E75] mt-1">
+                  ${escapedBeanOrigin} · 已評分 ${ratingsCount} 種沖煮手法
                 </div>
               </div>
 
-              <div class="flex items-center gap-2">
+              <!-- 評分新手沖手法按鈕 -->
+              <div class="flex items-center gap-1.5">
                 <button onclick="openRateModalForSpecificBean('${bean.id}')" class="px-2.5 py-1.5 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] hover:border-[#CFC2B7] text-[#654D3F] text-xs font-semibold transition flex items-center gap-1 shadow-2xs">
                   <span>＋</span>
-                  <span>評分手法</span>
+                  <span>評分新手沖法</span>
                 </button>
-                <button onclick="deleteBean('${bean.id}')" class="text-stone-300 hover:text-red-500 text-xs transition p-1" title="刪除咖啡豆">
-                  🗑️
-                </button>
+                <button onclick="deleteBean('${bean.id}')" class="text-stone-300 hover:text-red-500 text-xs transition p-1" title="刪除咖啡豆">✕</button>
               </div>
             </div>
 
             <!-- 此咖啡豆內部的手法評分列表 -->
-            <div class="space-y-2">
+            <div class="space-y-2.5">
               ${ratingsCount === 0 ? `
-                <div class="py-3 text-center text-[11px] text-[#9B8D83] bg-[#FAF9F7] rounded-lg border border-dashed border-[#EDE8E2]">
-                  尚未針對此豆評分任何手法。點擊右上角「＋ 評分手法」記錄！
+                <div class="p-3 rounded-lg bg-[#FAF9F7] text-[11px] text-[#9B8D83] text-center">
+                  這支咖啡豆尚未記錄任何沖煮法評分。點擊上方「+ 評分新手沖法」為它記錄第一杯風味！
                 </div>
-              ` : bean.methodRatings.map(rate => `
-                <div class="p-3 rounded-lg bg-[#FAF9F7] border border-[#EDE8E2] space-y-2">
-                  
-                  <div class="flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-2 flex-wrap">
-                      <span class="px-2.5 py-0.5 rounded-md bg-[#ECE3DC] text-[#3D3028] text-xs font-bold">
-                        ${rate.methodName}
-                      </span>
-                      <span class="text-amber-500 font-bold text-xs">${'★'.repeat(Math.round(rate.rating))}</span>
-                      <span class="text-xs font-bold text-[#2C2521]">${rate.rating}.0 分</span>
-                    </div>
+              ` : bean.methodRatings.map(rate => {
+                const dose = (rate.params && rate.params.dose) !== undefined ? rate.params.dose : 15;
+                const temp = (rate.params && rate.params.temp) || '92°C';
+                const ratio = (rate.params && rate.params.ratio) || '1:15';
+                const water = (rate.params && rate.params.water) || '225g';
+                const safeRating = Math.min(Math.max(Math.round(rate.rating || 5), 1), 5);
+
+                return `
+                  <div class="p-3 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] space-y-2">
                     
-                    <div class="flex items-center gap-2">
-                      <span class="text-[10px] text-[#9B8D83]">${rate.date}</span>
-                      <button onclick="deleteMethodRating('${bean.id}', '${rate.id}')" class="text-stone-300 hover:text-red-500 text-xs transition" title="刪除評分">🗑️</button>
+                    <div class="flex items-center justify-between gap-2">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="px-2.5 py-0.5 rounded-md bg-[#ECE3DC] text-[#3D3028] text-xs font-bold">
+                          ${escapeHtml(rate.methodName)}
+                        </span>
+                        <span class="text-amber-500 font-bold text-xs">${'★'.repeat(safeRating)}</span>
+                        <span class="text-xs font-bold text-[#2C2521]">${rate.rating}.0 分</span>
+                      </div>
+                      
+                      <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-[#9B8D83]">${escapeHtml(rate.date)}</span>
+                        <button onclick="deleteMethodRating('${bean.id}', '${rate.id}')" class="text-stone-300 hover:text-red-500 text-xs transition" title="刪除評分">🗑️</button>
+                      </div>
                     </div>
+
+                    <!-- 當時參數快照 -->
+                    <div class="text-[11px] text-[#685B52] font-mono-num flex items-center justify-between flex-wrap gap-2 pt-0.5">
+                      <div class="flex gap-2.5">
+                        <span>粉量: <strong>${dose}g</strong></span>
+                        <span>水溫: <strong>${escapeHtml(temp)}</strong></span>
+                        <span>比例: <strong>${escapeHtml(ratio)}</strong></span>
+                        <span>總水: <strong>${escapeHtml(water)}</strong></span>
+                      </div>
+                      <button onclick="applyMethodRatingParams('${escapeHtml(rate.methodKey)}', ${dose})" class="text-[11px] text-[#654D3F] hover:underline font-semibold">
+                        套用此參數 ▶
+                      </button>
+                    </div>
+
+                    <!-- 風味標籤 -->
+                    ${rate.tags && rate.tags.length > 0 ? `
+                      <div class="flex flex-wrap gap-1">
+                        ${rate.tags.map(t => `<span class="px-2 py-0.5 rounded-md bg-white border border-[#E6E0D8] text-[#685B52] text-[10px]">${escapeHtml(t)}</span>`).join('')}
+                      </div>
+                    ` : ''}
+
+                    <!-- 心得備註 -->
+                    ${rate.comment ? `
+                      <div class="text-xs text-[#2C2521] leading-relaxed border-t border-[#F0EAE3] pt-1.5 mt-1">
+                        ${escapeHtml(rate.comment)}
+                      </div>
+                    ` : ''}
+
                   </div>
-
-                  <!-- 當時參數快照 -->
-                  <div class="text-[11px] text-[#685B52] font-mono-num flex items-center justify-between flex-wrap gap-2 pt-0.5">
-                    <div class="flex gap-2.5">
-                      <span>粉量: <strong>${rate.params.dose}g</strong></span>
-                      <span>水溫: <strong>${rate.params.temp}</strong></span>
-                      <span>比例: <strong>${rate.params.ratio}</strong></span>
-                      <span>總水: <strong>${rate.params.water}</strong></span>
-                    </div>
-                    <button onclick="applyMethodRatingParams('${rate.methodKey}', ${rate.params.dose})" class="text-[11px] text-[#654D3F] hover:underline font-semibold">
-                      套用此參數 ▶
-                    </button>
-                  </div>
-
-                  <!-- 風味標籤 -->
-                  ${rate.tags && rate.tags.length > 0 ? `
-                    <div class="flex flex-wrap gap-1">
-                      ${rate.tags.map(t => `<span class="px-2 py-0.5 rounded-md bg-white border border-[#E6E0D8] text-[#685B52] text-[10px]">${t}</span>`).join('')}
-                    </div>
-                  ` : ''}
-
-                  <!-- 心得備註 -->
-                  ${rate.comment ? `
-                    <div class="text-xs text-[#2C2521] leading-relaxed border-t border-[#F0EAE3] pt-1.5 mt-1">
-                      ${rate.comment}
-                    </div>
-                  ` : ''}
-
-                </div>
-              `).join('')}
+                `;
+              }).join('')}
             </div>
 
           </div>
