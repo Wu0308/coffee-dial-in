@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>手沖參數調配器 | POUR-OVER DIAL-IN</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');
+
+    :root {
+      --bg-page: #FAF9F7;
+      --card-bg: #FFFFFF;
+      --border-color: #EDE8E2;
+      --border-btn: #E6E0D8;
+      --btn-active-bg: #ECE3DC;
+      --btn-active-border: #CFC2B7;
+      --btn-active-text: #3D3028;
+      --primary-brown: #654D3F;
+      --primary-brown-hover: #523D32;
+      --text-main: #2C2521;
+      --text-sub: #8C7E75;
+      --text-muted: #9B8D83;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #FAF9F7;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #D8CCC4;
+      border-radius: 3px;
+    }
+
+    /* Custom range input slider */
+    input[type=range] {
+      accent-color: #654D3F;
+    }
+
+    /* Button styles matching Canva web UI */
+    .canva-btn {
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-btn);
+      color: #685B52;
+      transition: all 0.18s ease;
+      cursor: pointer;
+    }
+    .canva-btn:hover {
+      border-color: #CFC2B7;
+      background-color: #FDFCFB;
+      color: #3D3028;
+    }
+    .canva-btn.active {
+      background-color: var(--btn-active-bg);
+      border-color: var(--btn-active-border);
+      color: var(--btn-active-text);
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(61, 48, 40, 0.05);
+    }
+
+    /* Card styling */
+    .canva-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(44, 37, 33, 0.03);
+    }
+
+    /* Step active highlight during timer */
+    .step-row-active {
+      background-color: #F5EFEB !important;
+      position: relative;
+    }
+    .step-row-active td {
+      color: #2C2521 !important;
+    }
+    .step-row-active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background-color: #654D3F;
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+
+    /* Pulse animation for timer */
+    @keyframes subtle-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .animate-subtle-pulse {
+      animation: subtle-pulse 1.5s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen py-8 px-4 sm:px-6 lg:px-8 selection:bg-[#ECE3DC] selection:text-[#3D3028]">
+
+  <div class="max-w-6xl mx-auto">
+
+    <!-- 頂部 Header (完全對齊 Canva 網頁版型) -->
+    <header class="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+      <div>
+        <div class="text-[11px] font-semibold tracking-[0.16em] uppercase text-[#9B8D83] mb-1">
+          POUR-OVER DIAL-IN
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-[#2C2521] flex items-center gap-2">
+          手沖參數調配器
+        </h1>
+      </div>
+      
+      <!-- 快捷工具鍵 (保持簡潔極簡外觀) -->
+      <div class="flex items-center gap-2 text-xs">
+        <button onclick="copyRecipe()" class="px-3 py-1.5 rounded-lg bg-white border border-[#E6E0D8] text-[#685B52] hover:border-[#CFC2B7] hover:text-[#3D3028] transition flex items-center gap-1.5 shadow-sm">
+          <span>📋</span>
+          <span id="copy-btn-text">複製配方</span>
+        </button>
+        <button onclick="toggleTimerSection()" id="timer-toggle-btn" class="px-3 py-1.5 rounded-lg bg-white border border-[#E6E0D8] text-[#685B52] hover:border-[#CFC2B7] hover:text-[#3D3028] transition flex items-center gap-1.5 shadow-sm">
+          <span>⏱️</span>
+          <span>沖煮計時</span>
+        </button>
+        <button onclick="resetDefaults()" class="px-3 py-1.5 rounded-lg bg-white border border-[#E6E0D8] text-[#8C7E75] hover:border-[#CFC2B7] hover:text-[#3D3028] transition shadow-sm">
+          重設預設
+        </button>
+      </div>
+    </header>
+
+    <!-- 互動式沖煮計時器模式 (支援換段提示音與倒數提示) -->
+    <section id="timer-bar" class="hidden mb-6 canva-card p-4 sm:p-5 border-[#D8CCC4] bg-[#FDFCFB] transition-all">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <div class="text-xs font-bold text-[#654D3F] flex items-center gap-2">
+            <span id="timer-status-dot" class="w-2.5 h-2.5 rounded-full bg-stone-400"></span>
+            <span id="timer-status-title">即時注水指引計時器</span>
+          </div>
+          <div class="text-xs text-[#8C7E75] mt-1" id="timer-step-desc">
+            點擊「開始沖煮」，系統將隨秒數自動換段並發出提示音
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <!-- 碼錶數字 -->
+          <div class="text-3xl sm:text-4xl font-mono-num font-bold text-[#2C2521] bg-[#FAF9F7] px-4 py-1.5 rounded-xl border border-[#EDE8E2]" id="timer-digits">
+            00:00
+          </div>
+
+          <!-- 控制鍵 -->
+          <button id="timer-run-btn" onclick="toggleTimer()" class="px-4 py-2 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition shadow-sm flex items-center gap-1.5">
+            <span>▶</span>
+            <span id="timer-run-text">開始沖煮</span>
+          </button>
+          
+          <button onclick="resetTimer()" class="px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-[#685B52] text-xs hover:border-[#CFC2B7] transition">
+            重設
+          </button>
+
+          <!-- 提示音開關按鈕 -->
+          <button onclick="toggleAudio()" id="audio-btn" class="px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-xs hover:border-[#CFC2B7] text-[#685B52] transition flex items-center gap-1" title="點擊開關步驟提示音">
+            <span id="audio-icon">🔊</span>
+            <span id="audio-text" class="text-[11px] font-medium hidden sm:inline">提示音開啟</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 當前步驟與水量即時資訊列 -->
+      <div class="mt-3.5 pt-3 border-t border-[#F0EAE3] flex flex-wrap items-center justify-between gap-2 text-xs text-[#685B52]">
+        <div class="flex items-center gap-2">
+          <span>當前進度：</span>
+          <strong id="timer-current-target" class="text-[#2C2521] font-semibold bg-[#FAF9F7] px-2.5 py-1 rounded-md border border-[#EDE8E2]">準備中</strong>
+          <span id="timer-step-countdown" class="text-[#9B8D83] font-mono-num text-[11px]"></span>
+        </div>
+        <div>
+          <span>目標累計注水：</span>
+          <strong id="timer-water-goal" class="text-[#654D3F] font-mono-num font-bold text-sm">0</strong>
+          <span class="text-[#8C7E75]">/ <span id="timer-total-water-goal">0</span>g</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 主區塊：雙欄佈局 (左欄：選擇區 / 右欄：推薦參數 + 詳細步驟) -->
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- 左欄：使用者選擇區 (寬度約佔 4 欄) -->
+      <section class="lg:col-span-4 space-y-4">
+        
+        <div class="canva-card p-5 sm:p-6 space-y-5">
+
+          <!-- 1. 沖煮手法 -->
+          <div>
+            <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
+              <span>沖煮手法</span>
+              <span id="selected-method-label" class="text-xs font-normal text-[#8C7E75]">四六法</span>
+            </div>
+            <!-- 手法按鈕網格 (6 種主流手法) -->
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <button onclick="selectMethod('four_six')" class="canva-btn active py-2.5 px-3 rounded-xl text-center" data-method="four_six">
+                四六法
+              </button>
+              <button onclick="selectMethod('single_pour')" class="canva-btn py-2.5 px-3 rounded-xl text-center" data-method="single_pour">
+                一刀流
+              </button>
+              <button onclick="selectMethod('three_stage')" class="canva-btn py-2.5 px-3 rounded-xl text-center" data-method="three_stage">
+                經典三段式
+              </button>
+              <button onclick="selectMethod('hoffmann')" class="canva-btn py-2.5 px-3 rounded-xl text-center" data-method="hoffmann">
+                Hoffmann法
+              </button>
+              <button onclick="selectMethod('matsuya')" class="canva-btn py-2.5 px-3 rounded-xl text-center" data-method="matsuya">
+                松屋流
+              </button>
+              <button onclick="selectMethod('immersion')" class="canva-btn py-2.5 px-3 rounded-xl text-center" data-method="immersion">
+                浸泡法
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. 烘焙度 (5 階) -->
+          <div>
+            <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
+              <span>烘焙度</span>
+              <span id="selected-roast-label" class="text-xs font-normal text-[#8C7E75]">中焙</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-xs">
+              <button onclick="selectRoast('light')" class="canva-btn py-2.5 px-2 rounded-xl text-center" data-roast="light">
+                淺焙
+              </button>
+              <button onclick="selectRoast('medium_light')" class="canva-btn py-2.5 px-2 rounded-xl text-center" data-roast="medium_light">
+                中淺焙
+              </button>
+              <button onclick="selectRoast('medium')" class="canva-btn active py-2.5 px-2 rounded-xl text-center" data-roast="medium">
+                中焙
+              </button>
+              <button onclick="selectRoast('medium_dark')" class="canva-btn py-2.5 px-2 rounded-xl text-center" data-roast="medium_dark">
+                中深焙
+              </button>
+              <button onclick="selectRoast('dark')" class="canva-btn py-2.5 px-2 rounded-xl text-center col-span-2" data-roast="dark">
+                深焙
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. 咖啡粉量 -->
+          <div>
+            <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
+              <span>咖啡粉量</span>
+              <span class="text-xs font-normal text-[#8C7E75]">建議 1-2 杯</span>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <div class="relative flex-1">
+                <input type="number" id="dose-input" min="8" max="50" step="0.5" value="15" 
+                       oninput="onDoseChange(this.value)"
+                       class="w-full bg-white border border-[#E6E0D8] rounded-xl py-2 px-3 text-left font-mono-num text-sm text-[#2C2521] font-semibold focus:outline-none focus:border-[#CFC2B7] transition">
+                <span class="absolute right-3 top-2.5 text-xs text-[#8C7E75] font-medium pointer-events-none">g</span>
+              </div>
+              <button onclick="stepDose(-1)" class="w-9 h-9 rounded-xl border border-[#E6E0D8] bg-white hover:border-[#CFC2B7] text-[#685B52] flex items-center justify-center font-bold text-base transition">
+                -
+              </button>
+              <button onclick="stepDose(1)" class="w-9 h-9 rounded-xl border border-[#E6E0D8] bg-white hover:border-[#CFC2B7] text-[#685B52] flex items-center justify-center font-bold text-base transition">
+                +
+              </button>
+            </div>
+            <!-- 微調滑桿 -->
+            <div class="mt-2.5">
+              <input type="range" id="dose-range" min="10" max="35" step="1" value="15" 
+                     oninput="onDoseChange(this.value)"
+                     class="w-full h-1.5 bg-[#EAE4DC] rounded-lg cursor-pointer">
+              <div class="flex justify-between text-[10px] text-[#9B8D83] mt-1 font-mono-num">
+                <span>10g</span>
+                <span>20g</span>
+                <span>35g</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. 風味偏好 -->
+          <div>
+            <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
+              <span>風味偏好</span>
+              <span id="selected-flavor-label" class="text-xs font-normal text-[#8C7E75]">平衡順口</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <button onclick="selectFlavor('acid')" class="canva-btn py-2.5 px-3 rounded-xl text-center" data-flavor="acid">
+                強調酸質
+              </button>
+              <button onclick="selectFlavor('sweet')" class="canva-btn py-2.5 px-3 rounded-xl text-center" data-flavor="sweet">
+                突出甜感
+              </button>
+              <button onclick="selectFlavor('body')" class="canva-btn py-2.5 px-3 rounded-xl text-center" data-flavor="body">
+                追求厚實
+              </button>
+              <button onclick="selectFlavor('balance')" class="canva-btn active py-2.5 px-3 rounded-xl text-center" data-flavor="balance">
+                平衡順口
+              </button>
+            </div>
+          </div>
+
+          <!-- 重新計算按鈕 -->
+          <div class="pt-2">
+            <button onclick="recalculate()" class="w-full py-3 px-4 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white font-medium text-sm transition shadow-sm flex items-center justify-center gap-1.5 active:scale-[0.99]">
+              <span>重新計算</span>
+            </button>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- 右欄：推薦參數與詳細步驟 (寬度約佔 8 欄) -->
+      <section class="lg:col-span-8 space-y-6">
+
+        <!-- 推薦參數 (4 大指標卡片) -->
+        <div>
+          <div class="text-base sm:text-lg font-bold text-[#2C2521] mb-3">
+            推薦參數
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            
+            <!-- 水溫卡 -->
+            <div class="canva-card p-4 sm:p-5 flex flex-col justify-between">
+              <div class="text-xs text-[#8C7E75] font-medium">水溫</div>
+              <div class="mt-2">
+                <div class="text-2xl font-bold text-[#2C2521] font-mono-num" id="param-temp">92°C</div>
+                <div class="text-[11px] text-[#9B8D83] mt-0.5" id="param-temp-note">標準萃取水溫</div>
+              </div>
+            </div>
+
+            <!-- 研磨度卡 -->
+            <div class="canva-card p-4 sm:p-5 flex flex-col justify-between">
+              <div class="text-xs text-[#8C7E75] font-medium">研磨度</div>
+              <div class="mt-2">
+                <div class="text-lg sm:text-xl font-bold text-[#2C2521]" id="param-grind">偏粗研磨</div>
+                <div class="text-[11px] text-[#9B8D83] mt-0.5" id="param-grind-note">類似粗砂糖</div>
+              </div>
+            </div>
+
+            <!-- 粉水比卡 -->
+            <div class="canva-card p-4 sm:p-5 flex flex-col justify-between">
+              <div class="text-xs text-[#8C7E75] font-medium">粉水比</div>
+              <div class="mt-2">
+                <div class="text-2xl font-bold text-[#2C2521] font-mono-num" id="param-ratio">1:15</div>
+                <div class="text-[11px] text-[#9B8D83] mt-0.5" id="param-ratio-note">金杯平衡萃取</div>
+              </div>
+            </div>
+
+            <!-- 總注水量卡 -->
+            <div class="canva-card p-4 sm:p-5 flex flex-col justify-between">
+              <div class="text-xs text-[#8C7E75] font-medium">總注水量</div>
+              <div class="mt-2">
+                <div class="text-2xl font-bold text-[#2C2521] font-mono-num" id="param-water">225g</div>
+                <div class="text-[11px] text-[#9B8D83] mt-0.5" id="param-water-note">依 15g 粉計算</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 詳細沖煮步驟 (秒數與總時間 100% 精準對齊) -->
+        <div class="canva-card p-5 sm:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-base font-bold text-[#2C2521]">
+              詳細沖煮步驟
+            </h2>
+            <div class="text-xs text-[#8C7E75]">
+              手法指引：<span id="guide-method-name" class="font-semibold text-[#654D3F]">四六法 (粕谷哲)</span>
+            </div>
+          </div>
+
+          <!-- 表格結構 (步驟 / 注水量 / 累計水量 / 注水秒數區間 / 注水操作簡記) -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-[#F0EAE3] text-[11px] sm:text-xs text-[#8C7E75] font-medium">
+                  <th class="py-2.5 pr-3 font-normal">步驟</th>
+                  <th class="py-2.5 px-3 font-normal">注水量</th>
+                  <th class="py-2.5 px-3 font-normal">累計水量</th>
+                  <th class="py-2.5 px-3 font-normal">注水秒數 / 時間區間</th>
+                  <th class="py-2.5 pl-3 font-normal">注水操作簡記</th>
+                </tr>
+              </thead>
+              <tbody id="steps-tbody" class="text-xs sm:text-sm divide-y divide-[#F7F4F0]">
+                <!-- 動態注入步驟資料 -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 表格底端：預估總時間 (與上方所有步驟秒數之和完全一致) -->
+          <div class="mt-5 pt-4 border-t border-[#F0EAE3] flex items-center justify-between">
+            <div>
+              <div class="text-xs sm:text-sm text-[#8C7E75] font-medium">
+                預估總時間
+              </div>
+              <div class="text-[11px] text-[#9B8D83] mt-0.5">
+                所有步驟時長加總（注水 + 滴濾時間）
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-lg sm:text-xl font-bold text-[#2C2521] font-mono-num" id="total-time-estimate">
+                約 2:45
+              </div>
+              <div class="text-[11px] text-[#8C7E75] font-mono-num mt-0.5" id="total-seconds-count">
+                共 165 秒
+              </div>
+            </div>
+          </div>
+
+          <!-- 萃取微調小訣竅 (文字精簡) -->
+          <div class="mt-4 p-3.5 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] text-xs text-[#685B52] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="text-base">💡</span>
+              <span id="flavor-adjustment-tip">若喝起來偏酸萃取不足，建議水溫調高 1-2°C 或調細研磨；若偏苦雜澀則反向微調。</span>
+            </div>
+            <button onclick="quickTuneTemp(1)" class="text-[11px] text-[#654D3F] hover:underline whitespace-nowrap font-medium">
+              +1°C 提高萃取
+            </button>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- 頁腳 -->
+    <footer class="mt-10 pt-4 border-t border-[#EDE8E2] text-center text-xs text-[#9B8D83]">
+      BrewCraft · 手沖咖啡參數調配系統 · 依照 Canva 極簡工具介面規範建置
+    </footer>
+
+  </div>
+
+  <!-- JavaScript 核心調配邏輯、時間精準換算與 Web Audio 提示音模組 -->
+  <script>
+    // 系統狀態
+    const state = {
+      method: 'four_six',   // four_six, single_pour, three_stage, hoffmann, matsuya, immersion
+      roast: 'medium',      // light, medium_light, medium, medium_dark, dark
+      dose: 15.0,           // 8 ~ 50g
+      flavor: 'balance',    // acid, sweet, body, balance
+      tempAdjust: 0,
+    };
+
+    // 烘焙度基礎參數表
+    const ROAST_CONFIGS = {
+      light: {
+        name: '淺焙',
+        baseTemp: 93,
+        baseRatio: 15.0,
+        grind: '中細研磨',
+        grindNote: '類似白砂糖 / 細海鹽'
+      },
+      medium_light: {
+        name: '中淺焙',
+        baseTemp: 92,
+        baseRatio: 15.0,
+        grind: '中細研磨',
+        grindNote: '類似白砂糖'
+      },
+      medium: {
+        name: '中焙',
+        baseTemp: 90,
+        baseRatio: 15.0,
+        grind: '偏粗研磨',
+        grindNote: '類似粗海鹽'
+      },
+      medium_dark: {
+        name: '中深焙',
+        baseTemp: 88,
+        baseRatio: 15.5,
+        grind: '中度研磨',
+        grindNote: '顆粒均勻避免過萃'
+      },
+      dark: {
+        name: '深焙',
+        baseTemp: 85,
+        baseRatio: 16.0,
+        grind: '偏粗研磨',
+        grindNote: '粗顆粒避免焦苦'
+      }
+    };
+
+    // 手法定義與名稱
+    const METHOD_CONFIGS = {
+      four_six: {
+        name: '四六法 (粕谷哲)',
+        ratioMultiplier: 1.0,
+        grindModifier: '偏粗研磨',
+        grindNote: '每段等水排乾，顆粒偏粗'
+      },
+      single_pour: {
+        name: '一刀流 (極致純淨)',
+        ratioMultiplier: 0.98,
+        grindModifier: '中細研磨',
+        grindNote: '細水流不中斷，萃取乾淨'
+      },
+      three_stage: {
+        name: '經典三段式',
+        ratioMultiplier: 1.0,
+        grindModifier: '中度研磨',
+        grindNote: '傳統手沖標準研磨'
+      },
+      hoffmann: {
+        name: 'James Hoffmann 旋轉攪拌法',
+        ratioMultiplier: 1.05,
+        grindModifier: '中細偏細',
+        grindNote: 'Swirl搖勻粉床，高萃取率'
+      },
+      matsuya: {
+        name: '松屋流 (點滴深悶蒸)',
+        ratioMultiplier: 0.95,
+        grindModifier: '粗研磨',
+        grindNote: '長時間深悶蒸後高濃度稀釋'
+      },
+      immersion: {
+        name: '浸泡法 (Switch / 聰明濾杯)',
+        ratioMultiplier: 1.0,
+        grindModifier: '中度研磨',
+        grindNote: '關閥浸泡後一次釋放'
+      }
+    };
+
+    // 風味調整偏好
+    const FLAVOR_CONFIGS = {
+      acid: {
+        name: '強調酸質',
+        tempDelta: 1,
+        ratioDelta: -0.5,
+        note: '偏高溫激發果酸香氣，縮短後段萃取保持明亮。'
+      },
+      sweet: {
+        name: '突出甜感',
+        tempDelta: 0,
+        ratioDelta: 0,
+        note: '前段適當延長悶蒸，中段穩定注水帶出焦糖甜感。'
+      },
+      body: {
+        name: '追求厚實',
+        tempDelta: -1,
+        ratioDelta: -1.0,
+        note: '粉水比適度收窄，增加萃取接觸時間，口感厚實。'
+      },
+      balance: {
+        name: '平衡順口',
+        tempDelta: 0,
+        ratioDelta: 0,
+        note: '金杯比例平衡萃取，酸甜苦甘層次分明。'
+      }
+    };
+
+    // 時間格式化輔助函數：秒數 -> mm:ss
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${m}:${String(s).padStart(2, '0')}`;
+    }
+
+    // 點擊手法
+    function selectMethod(methodKey) {
+      state.method = methodKey;
+      document.querySelectorAll('[data-method]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.method === methodKey);
+      });
+      document.getElementById('selected-method-label').textContent = METHOD_CONFIGS[methodKey].name.split(' ')[0];
+      calculateAndRender();
+      if (timerRunning) resetTimer();
+    }
+
+    // 點擊烘焙度
+    function selectRoast(roastKey) {
+      state.roast = roastKey;
+      state.tempAdjust = 0;
+      document.querySelectorAll('[data-roast]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.roast === roastKey);
+      });
+      document.getElementById('selected-roast-label').textContent = ROAST_CONFIGS[roastKey].name;
+      calculateAndRender();
+    }
+
+    // 點擊風味偏好
+    function selectFlavor(flavorKey) {
+      state.flavor = flavorKey;
+      document.querySelectorAll('[data-flavor]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.flavor === flavorKey);
+      });
+      document.getElementById('selected-flavor-label').textContent = FLAVOR_CONFIGS[flavorKey].name;
+      calculateAndRender();
+    }
+
+    // 粉量改變
+    function onDoseChange(val) {
+      let num = parseFloat(val);
+      if (isNaN(num)) num = 15;
+      if (num < 5) num = 5;
+      if (num > 60) num = 60;
+      state.dose = num;
+      document.getElementById('dose-input').value = num;
+      document.getElementById('dose-range').value = Math.min(Math.max(num, 10), 35);
+      calculateAndRender();
+      if (timerRunning) resetTimer();
+    }
+
+    function stepDose(delta) {
+      onDoseChange(state.dose + delta);
+    }
+
+    function quickTuneTemp(delta) {
+      state.tempAdjust += delta;
+      calculateAndRender();
+    }
+
+    function recalculate() {
+      calculateAndRender();
+      const tbody = document.getElementById('steps-tbody');
+      tbody.style.opacity = '0.5';
+      setTimeout(() => { tbody.style.opacity = '1'; }, 150);
+    }
+
+    function resetDefaults() {
+      state.method = 'four_six';
+      state.roast = 'medium';
+      state.dose = 15.0;
+      state.flavor = 'balance';
+      state.tempAdjust = 0;
+      
+      selectMethod('four_six');
+      selectRoast('medium');
+      selectFlavor('balance');
+      onDoseChange(15);
+      resetTimer();
+    }
+
+    // ==========================================
+    // 核心步驟生成：秒數精準計算 (各步秒數總和 == 預估總時間)
+    // ==========================================
+    function generateSteps(method, dose, totalWater) {
+      let rawSteps = [];
+
+      if (method === 'four_six') {
+        // 粕谷哲 4:6 法：前 40% 水 (2注) + 後 60% 水 (3注)
+        // 總時長 165 秒 (2分45秒) = 45s + 40s + 30s + 25s + 25s
+        const bloomWater = Math.round(totalWater * 0.20);
+        const pour2 = Math.round(totalWater * 0.20);
+        const remaining = totalWater - bloomWater - pour2;
+        const pour3 = Math.round(remaining / 3);
+        const pour4 = Math.round(remaining / 3);
+        const pour5 = totalWater - (bloomWater + pour2 + pour3 + pour4);
+
+        rawSteps = [
+          { name: '悶蒸', amount: bloomWater, durationSec: 45, note: '由中心向外輕柔繞圈，確保浸潤並排氣至 45 秒' },
+          { name: '第一段', amount: pour2, durationSec: 40, note: '穩定繞圈注水，調整酸甜明亮度，落水至 1:25' },
+          { name: '第二段', amount: pour3, durationSec: 30, note: '後60%第一注，維持細水流繞圈，落水至 1:55' },
+          { name: '第三段', amount: pour4, durationSec: 25, note: '提升萃取醇厚度，等水落乾再注，落水至 2:20' },
+          { name: '第四段', amount: pour5, durationSec: 25, note: '收尾注至目標水量，落乾移開濾杯，於 2:45 完成' }
+        ];
+      } else if (method === 'single_pour') {
+        // 一刀流：悶蒸 35s + 連續細水流 65s + 滴濾收尾 20s = 120 秒 (2分00秒)
+        const bloomWater = Math.round(dose * 2.5);
+        const mainPour = totalWater - bloomWater;
+        rawSteps = [
+          { name: '悶蒸', amount: bloomWater, durationSec: 35, note: '中心點向外微幅潤濕，排氣膨脹至 35 秒' },
+          { name: '持續注水', amount: mainPour, durationSec: 65, note: '極細穩定水流不中斷，中心小範圍繞圈注滿' },
+          { name: '滴濾收尾', amount: 0, durationSec: 20, note: '靜置等待水層平穩濾乾，移開濾杯' }
+        ];
+      } else if (method === 'three_stage') {
+        // 經典三段式：悶蒸 40s + 第一段 50s + 第二段 50s = 140 秒 (2分20秒)
+        const bloomWater = Math.round(dose * 2.2);
+        const rest = totalWater - bloomWater;
+        const pour1 = Math.round(rest * 0.55);
+        const pour2 = totalWater - bloomWater - pour1;
+        rawSteps = [
+          { name: '悶蒸', amount: bloomWater, durationSec: 40, note: '浸濕全部粉床，釋放二氧化碳至 40 秒' },
+          { name: '第一段注水', amount: pour1, durationSec: 50, note: '由內向外穩定均勻繞圈，帶出果香酸甜' },
+          { name: '第二段注水', amount: pour2, durationSec: 50, note: '中心維持平穩水柱補足水量，滴濾完畢移開' }
+        ];
+      } else if (method === 'hoffmann') {
+        // Hoffmann 法：悶蒸+輕搖 45s + 大水流 35s + 補水 35s + 輕晃平整滴落 50s = 165 秒 (2分45秒)
+        const bloomWater = Math.round(dose * 3.0);
+        const pour1 = Math.round((totalWater * 0.6) - bloomWater);
+        const pour2 = totalWater - bloomWater - pour1;
+        rawSteps = [
+          { name: '悶蒸 + 輕搖 (Swirl)', amount: bloomWater, durationSec: 45, note: '注水後輕搖濾杯消除乾粉結塊，浸潤至 45 秒' },
+          { name: '第一段大水流', amount: pour1, durationSec: 35, note: '較大水流衝擊攪拌，注入至 60% 總水量' },
+          { name: '第二段細水流', amount: pour2, durationSec: 35, note: '輕柔補至目標總水量，完成後順勢輕微晃動' },
+          { name: '粉床平整滴濾', amount: 0, durationSec: 50, note: '讓咖啡液自然滴盡，粉床收杯平整如鏡' }
+        ];
+      } else if (method === 'matsuya') {
+        // 松屋流：點滴 30s + 加蓋深悶蒸 180s + 核心濃縮 45s + Bypass熱水 15s = 270 秒 (4分30秒)
+        const bloomWater = Math.round(dose * 2.0);
+        const extractWater = Math.round(totalWater * 0.55);
+        const bypassWater = totalWater - bloomWater - extractWater;
+        rawSteps = [
+          { name: '中心點滴潤濕', amount: bloomWater, durationSec: 30, note: '細小點滴僅潤濕中心粉芯' },
+          { name: '加蓋深悶蒸', amount: 0, durationSec: 180, note: '蓋上悶蒸蓋深層悶蒸 3 分鐘，排淨氣體' },
+          { name: '核心萃取注水', amount: extractWater, durationSec: 45, note: '大水流僅在中心硬幣大小區域注水' },
+          { name: '熱水稀釋 (Bypass)', amount: bypassWater, durationSec: 15, note: '移開濾杯，向分享壺直接加入純淨熱水' }
+        ];
+      } else if (method === 'immersion') {
+        // 浸泡法 (Switch/聰明濾杯)：開閥浸透 35s + 關閥浸泡 85s + 開閥落水 30s = 150 秒 (2分30秒)
+        const bloomWater = Math.round(totalWater * 0.4);
+        const remaining = totalWater - bloomWater;
+        rawSteps = [
+          { name: '開閥初浸透', amount: bloomWater, durationSec: 35, note: '開閥注水滴出底層明亮酸甜，35 秒時關閉止水閥' },
+          { name: '關閥全浸泡', amount: remaining, durationSec: 85, note: '一口氣注滿全部熱水，關閥均勻浸泡萃取至 2:00' },
+          { name: '開閥釋放滴濾', amount: 0, durationSec: 30, note: '按下開關，重力自然過濾落水，於 2:30 完成' }
+        ];
+      }
+
+      // 動態組裝累計水量、起始秒數、結束秒數與時間區間字串
+      let curCumulativeWater = 0;
+      let curStartSec = 0;
+
+      const steps = rawSteps.map(step => {
+        curCumulativeWater += step.amount;
+        const start = curStartSec;
+        const end = curStartSec + step.durationSec;
+        curStartSec = end;
+
+        return {
+          name: step.name,
+          amount: step.amount,
+          cumulative: curCumulativeWater,
+          durationSec: step.durationSec,
+          startSec: start,
+          endSec: end,
+          timeRangeStr: `${formatTime(start)} - ${formatTime(end)}`,
+          note: step.note
+        };
+      });
+
+      return steps;
+    }
+
+    // ==========================================
+    // 畫面計算與渲染模組
+    // ==========================================
+    let currentStepsCache = [];
+    let totalBrewSeconds = 165;
+
+    function calculateAndRender() {
+      const roastConf = ROAST_CONFIGS[state.roast];
+      const methodConf = METHOD_CONFIGS[state.method];
+      const flavorConf = FLAVOR_CONFIGS[state.flavor];
+
+      // 1. 水溫計算
+      let finalTemp = roastConf.baseTemp + flavorConf.tempDelta + state.tempAdjust;
+      if (finalTemp > 97) finalTemp = 97;
+      if (finalTemp < 80) finalTemp = 80;
+
+      // 2. 粉水比計算
+      let baseRatio = roastConf.baseRatio + flavorConf.ratioDelta;
+      let finalRatioVal = baseRatio * methodConf.ratioMultiplier;
+      finalRatioVal = Math.round(finalRatioVal * 10) / 10;
+      let ratioStr = `1:${finalRatioVal}`;
+
+      // 3. 總水量計算
+      let totalWater = Math.round(state.dose * finalRatioVal);
+
+      // 4. 研磨度文字
+      let finalGrind = methodConf.grindModifier || roastConf.grind;
+      let grindNote = methodConf.grindNote || roastConf.grindNote;
+
+      // 渲染四大指標卡片
+      document.getElementById('param-temp').textContent = `${finalTemp}°C`;
+      document.getElementById('param-temp-note').textContent = state.tempAdjust !== 0 ? `基準 ${roastConf.baseTemp}°C (微調 ${state.tempAdjust > 0 ? '+' : ''}${state.tempAdjust}°C)` : `${roastConf.name}標準水溫`;
+
+      document.getElementById('param-grind').textContent = finalGrind;
+      document.getElementById('param-grind-note').textContent = grindNote;
+
+      document.getElementById('param-ratio').textContent = ratioStr;
+      document.getElementById('param-ratio-note').textContent = `${flavorConf.name}比例`;
+
+      document.getElementById('param-water').textContent = `${totalWater}g`;
+      document.getElementById('param-water-note').textContent = `依 ${state.dose}g 粉計算`;
+
+      // 渲染步驟與計算精準總秒數
+      const steps = generateSteps(state.method, state.dose, totalWater);
+      currentStepsCache = steps;
+
+      // 總秒數由所有步驟 durationSec 直接加總，保證 100% 精準對齊！
+      totalBrewSeconds = steps.reduce((sum, s) => sum + s.durationSec, 0);
+
+      // 渲染方法標題與總時間
+      document.getElementById('guide-method-name').textContent = methodConf.name;
+      document.getElementById('total-time-estimate').textContent = `約 ${formatTime(totalBrewSeconds)}`;
+      document.getElementById('total-seconds-count').textContent = `共 ${totalBrewSeconds} 秒 (各步秒數加總)`;
+      document.getElementById('flavor-adjustment-tip').textContent = flavorConf.note;
+
+      // 計時器區塊更新
+      document.getElementById('timer-total-water-goal').textContent = totalWater;
+
+      // 渲染步驟表格
+      const tbody = document.getElementById('steps-tbody');
+      tbody.innerHTML = '';
+
+      steps.forEach((st, idx) => {
+        const tr = document.createElement('tr');
+        tr.id = `step-row-${idx}`;
+        tr.className = 'hover:bg-[#FAF9F7] transition-colors';
+        tr.innerHTML = `
+          <td class="py-3.5 pr-3 font-medium text-[#2C2521]">${st.name}</td>
+          <td class="py-3.5 px-3 text-[#3D3028] font-mono-num font-semibold">${st.amount > 0 ? '+' + st.amount + 'g' : '-'}</td>
+          <td class="py-3.5 px-3 text-[#2C2521] font-mono-num font-bold">${st.cumulative}g</td>
+          <td class="py-3.5 px-3 text-[#3D3028] whitespace-nowrap">
+            <span class="font-mono-num font-semibold">${st.durationSec} 秒</span>
+            <span class="block text-[11px] text-[#9B8D83] font-mono-num font-normal mt-0.5">${st.timeRangeStr}</span>
+          </td>
+          <td class="py-3.5 pl-3 text-[#7C6E64] text-xs">${st.note}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ==========================================
+    // Web Audio API 提示音合成模組
+    // ==========================================
+    let audioCtx = null;
+    let audioEnabled = true;
+
+    // 初始化或解鎖 AudioContext (配合瀏覽器使用者手勢規範)
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // 合成平滑乾淨的提示音波形
+    function playSynthesizedTone(freq, type, duration, startTime, gainVal = 0.18) {
+      if (!audioEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.type = type; // 'sine' 或 'triangle'
+        osc.frequency.setValueAtTime(freq, startTime);
+
+        // 平滑包絡線 (防爆音)
+        gainNode.gain.setValueAtTime(0.0001, startTime);
+        gainNode.gain.exponentialRampToValueAtTime(gainVal, startTime + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      } catch (e) {
+        console.warn('Audio playback error:', e);
+      }
+    }
+
+    // 1. 換段提示音：清脆雙音和弦 (A5 -> E6)
+    function playStepChangeSound() {
+      if (!audioEnabled) return;
+      initAudioContext();
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      playSynthesizedTone(880, 'sine', 0.12, now, 0.22);           // 880 Hz
+      playSynthesizedTone(1318.5, 'sine', 0.25, now + 0.10, 0.25); // 1318.5 Hz
+    }
+
+    // 2. 換段前 3 秒微提示音：短促輕快嗶聲
+    function playCountdownTick() {
+      if (!audioEnabled) return;
+      initAudioContext();
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      playSynthesizedTone(659.25, 'sine', 0.06, now, 0.14); // E5
+    }
+
+    // 3. 沖煮完成提示音：C大調經典四音上行琶音
+    function playCompleteSound() {
+      if (!audioEnabled) return;
+      initAudioContext();
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      playSynthesizedTone(523.25, 'triangle', 0.18, now, 0.22);        // C5
+      playSynthesizedTone(659.25, 'triangle', 0.18, now + 0.12, 0.22); // E5
+      playSynthesizedTone(783.99, 'triangle', 0.22, now + 0.24, 0.24); // G5
+      playSynthesizedTone(1046.5, 'sine', 0.50, now + 0.36, 0.28);     // C6
+    }
+
+    // 切換聲音開關
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      initAudioContext();
+      
+      const audioIcon = document.getElementById('audio-icon');
+      const audioText = document.getElementById('audio-text');
+      if (audioEnabled) {
+        audioIcon.textContent = '🔊';
+        audioText.textContent = '提示音開啟';
+        playStepChangeSound(); // 播放一下讓使用者確認聲音正常
+      } else {
+        audioIcon.textContent = '🔇';
+        audioText.textContent = '靜音模式';
+      }
+    }
+
+    // ==========================================
+    // 沖煮計時器模組 (含換段自動響鈴與視覺聯動)
+    // ==========================================
+    let timerRunning = false;
+    let timerSeconds = 0;
+    let timerInterval = null;
+    let currentActiveStepIndex = -1;
+
+    function toggleTimerSection() {
+      const section = document.getElementById('timer-bar');
+      section.classList.toggle('hidden');
+      if (!section.classList.contains('hidden')) {
+        initAudioContext();
+      }
+    }
+
+    function toggleTimer() {
+      initAudioContext();
+      if (timerRunning) {
+        // 暫停
+        clearInterval(timerInterval);
+        timerRunning = false;
+        document.getElementById('timer-run-text').textContent = '繼續沖煮';
+        document.getElementById('timer-run-btn').className = 'px-4 py-2 rounded-xl bg-amber-700 hover:bg-amber-600 text-white text-xs font-semibold transition flex items-center gap-1.5';
+        document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
+      } else {
+        // 開始或繼續
+        timerRunning = true;
+        document.getElementById('timer-run-text').textContent = '暫停計時';
+        document.getElementById('timer-run-btn').className = 'px-4 py-2 rounded-xl bg-[#8C7E75] hover:bg-[#786A61] text-white text-xs font-semibold transition flex items-center gap-1.5';
+        document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-subtle-pulse';
+
+        // 第一次啟動播放開場提示音
+        if (timerSeconds === 0) {
+          playStepChangeSound();
+        }
+
+        timerInterval = setInterval(onTimerTick, 1000);
+        updateTimerStepHighlight();
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      timerSeconds = 0;
+      currentActiveStepIndex = -1;
+
+      document.getElementById('timer-digits').textContent = '00:00';
+      document.getElementById('timer-run-text').textContent = '開始沖煮';
+      document.getElementById('timer-run-btn').className = 'px-4 py-2 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition shadow-sm flex items-center gap-1.5';
+      document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-stone-400';
+      document.getElementById('timer-status-title').textContent = '即時注水指引計時器';
+      document.getElementById('timer-current-target').textContent = '準備中';
+      document.getElementById('timer-step-countdown').textContent = '';
+      document.getElementById('timer-water-goal').textContent = '0';
+      document.getElementById('timer-step-desc').textContent = '點擊「開始沖煮」，系統將隨秒數自動換段並發出提示音';
+
+      document.querySelectorAll('#steps-tbody tr').forEach(tr => tr.classList.remove('step-row-active'));
+    }
+
+    function onTimerTick() {
+      timerSeconds++;
+      document.getElementById('timer-digits').textContent = formatTime(timerSeconds);
+      updateTimerStepHighlight();
+    }
+
+    function updateTimerStepHighlight() {
+      if (!currentStepsCache || currentStepsCache.length === 0) return;
+
+      // 1. 判斷是否已達或超過總時間
+      if (timerSeconds >= totalBrewSeconds) {
+        if (currentActiveStepIndex !== 999) {
+          currentActiveStepIndex = 999;
+          playCompleteSound(); // 沖煮完成大合音
+        }
+        document.getElementById('timer-status-title').textContent = '✨ 沖煮完成！請享用咖啡 ☕';
+        document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
+        document.getElementById('timer-current-target').textContent = '沖煮完成';
+        document.getElementById('timer-step-countdown').textContent = '請移開濾杯享用';
+        document.getElementById('timer-water-goal').textContent = currentStepsCache[currentStepsCache.length - 1].cumulative;
+        document.getElementById('timer-step-desc').textContent = `已達到預估總時間 ${formatTime(totalBrewSeconds)}，請靜待濾乾後品嚐。`;
+
+        document.querySelectorAll('#steps-tbody tr').forEach((tr, idx) => {
+          tr.classList.toggle('step-row-active', idx === currentStepsCache.length - 1);
+        });
+        return;
+      }
+
+      // 2. 尋找當前秒數所對應的步驟索引
+      let activeIndex = currentStepsCache.findIndex(st => timerSeconds >= st.startSec && timerSeconds < st.endSec);
+      if (activeIndex === -1) activeIndex = 0;
+
+      const activeStep = currentStepsCache[activeIndex];
+
+      // 3. 換段事件偵測與提示音觸發
+      if (activeIndex !== currentActiveStepIndex) {
+        currentActiveStepIndex = activeIndex;
+        playStepChangeSound(); // 換段發出雙音提示！
+      } else {
+        // 換段前 3 秒、2 秒、1 秒發出短促預備提示
+        const remainingInStep = activeStep.endSec - timerSeconds;
+        if (remainingInStep >= 1 && remainingInStep <= 3) {
+          playCountdownTick();
+        }
+      }
+
+      // 4. 更新計時器面板資訊
+      const remainingSec = activeStep.endSec - timerSeconds;
+      document.getElementById('timer-current-target').textContent = `${activeStep.name} (目標累計 ${activeStep.cumulative}g)`;
+      document.getElementById('timer-step-countdown').textContent = `(本段剩餘 ${remainingSec} 秒)`;
+      document.getElementById('timer-water-goal').textContent = activeStep.cumulative;
+      document.getElementById('timer-step-desc').textContent = `${activeStep.name}：${activeStep.note}`;
+
+      // 5. 高亮表格當前列
+      document.querySelectorAll('#steps-tbody tr').forEach((tr, idx) => {
+        tr.classList.toggle('step-row-active', idx === activeIndex);
+      });
+    }
+
+    // ==========================================
+    // 複製配方文字
+    // ==========================================
+    function copyRecipe() {
+      const roastConf = ROAST_CONFIGS[state.roast];
+      const methodConf = METHOD_CONFIGS[state.method];
+      const flavorConf = FLAVOR_CONFIGS[state.flavor];
+      const temp = document.getElementById('param-temp').textContent;
+      const ratio = document.getElementById('param-ratio').textContent;
+      const grind = document.getElementById('param-grind').textContent;
+      const water = document.getElementById('param-water').textContent;
+      const estTime = document.getElementById('total-time-estimate').textContent;
+
+      let text = `【BrewCraft 手沖咖啡調配指南】\n`;
+      text += `━━━━━━━━━━━━━━━━━━━━━\n`;
+      text += `· 沖煮手法：${methodConf.name}\n`;
+      text += `· 咖啡烘焙：${roastConf.name}\n`;
+      text += `· 咖啡粉量：${state.dose}g\n`;
+      text += `· 風味取向：${flavorConf.name}\n`;
+      text += `─────────────────────\n`;
+      text += `[推薦參數]\n`;
+      text += `· 建議水溫：${temp}\n`;
+      text += `· 研磨刻度：${grind}\n`;
+      text += `· 建議粉水比：${ratio}\n`;
+      text += `· 總注水量：${water}\n`;
+      text += `· 預估總時間：${estTime} (共 ${totalBrewSeconds} 秒)\n`;
+      text += `─────────────────────\n`;
+      text += `[詳細沖煮步驟]\n`;
+
+      currentStepsCache.forEach((st, i) => {
+        text += `${i + 1}. ${st.name}: ${st.amount > 0 ? '+' + st.amount + 'g' : '-'} (累計 ${st.cumulative}g) | ${st.durationSec}秒 (${st.timeRangeStr}) | ${st.note}\n`;
+      });
+      text += `━━━━━━━━━━━━━━━━━━━━━`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        const btnText = document.getElementById('copy-btn-text');
+        btnText.textContent = '已複製！';
+        setTimeout(() => { btnText.textContent = '複製配方'; }, 2000);
+      }).catch(err => {
+        alert('配方內容：\n\n' + text);
+      });
+    }
+
+    // 初始化頁面
+    window.addEventListener('DOMContentLoaded', () => {
+      calculateAndRender();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "brewcraft-pour-over-calculator",
+  "version": "1.0.0",
+  "description": "極簡手沖咖啡參數調配系統 - 支援6大沖煮手法與5階烘焙度",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve -l 3000 .",
+    "dev": "npx serve -l 3000 ."
+  },
+  "keywords": [
+    "coffee",
+    "pour-over",
+    "calculator",
+    "hario-v60",
+    "four-six-method"
+  ],
+  "author": "",
+  "license": "MIT"
+}
