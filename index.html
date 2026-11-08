@@ -964,6 +964,7 @@
       ratioAdjust: 0,
       customGrind: null,
       isCustomSteps: false,
+      isEditingSteps: false,
       customStepsData: null
     };
 
@@ -1127,6 +1128,7 @@
       state.method = methodKey;
       state.customGrind = null;
       state.isCustomSteps = false;
+      state.isEditingSteps = false;
       state.customStepsData = null;
       document.querySelectorAll('[data-method]').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.method === methodKey);
@@ -1201,6 +1203,7 @@
       state.ratioAdjust = 0;
       state.customGrind = null;
       state.isCustomSteps = false;
+      state.isEditingSteps = false;
       state.customStepsData = null;
 
       if (timerRunning) resetTimer();
@@ -1223,6 +1226,7 @@
       state.ratioAdjust = 0;
       state.customGrind = null;
       state.isCustomSteps = false;
+      state.isEditingSteps = false;
       state.customStepsData = null;
       
       selectMethod('four_six');
@@ -1305,9 +1309,15 @@
     }
 
     function toggleCustomStepsMode() {
-      state.isCustomSteps = !state.isCustomSteps;
-      if (state.isCustomSteps && !state.customStepsData) {
-        state.customStepsData = JSON.parse(JSON.stringify(currentStepsCache));
+      if (state.isEditingSteps) {
+        state.isEditingSteps = false;
+        state.isCustomSteps = true;
+      } else {
+        state.isEditingSteps = true;
+        state.isCustomSteps = true;
+        if (!state.customStepsData || state.customStepsData.length === 0) {
+          state.customStepsData = JSON.parse(JSON.stringify(currentStepsCache));
+        }
       }
       renderStepsTable();
       updateCustomStepControlsUI();
@@ -1315,6 +1325,7 @@
 
     function resetToRecommendedSteps() {
       state.isCustomSteps = false;
+      state.isEditingSteps = false;
       state.customStepsData = null;
       calculateAndRender();
       if (timerRunning) resetTimer();
@@ -1326,53 +1337,73 @@
       const btnText = document.getElementById('custom-steps-btn-text');
       const btnIcon = document.getElementById('custom-steps-btn-icon');
 
-      if (state.isCustomSteps) {
-        badge.classList.remove('hidden');
-        resetBtn.classList.remove('hidden');
-        btnText.textContent = '完成自訂編輯';
-        btnIcon.textContent = '✓';
+      if (badge) badge.classList.toggle('hidden', !state.isCustomSteps);
+      if (resetBtn) resetBtn.classList.toggle('hidden', !state.isCustomSteps);
+
+      if (state.isEditingSteps) {
+        if (btnText) btnText.textContent = '完成自訂編輯';
+        if (btnIcon) btnIcon.textContent = '✓';
       } else {
-        badge.classList.add('hidden');
-        resetBtn.classList.add('hidden');
-        btnText.textContent = '自訂各段秒數與水量';
-        btnIcon.textContent = '✏️';
+        if (btnText) btnText.textContent = state.isCustomSteps ? '修改各段參數' : '自訂各段秒數與水量';
+        if (btnIcon) btnIcon.textContent = '✏️';
       }
     }
 
     function onCustomStepAmountChange(idx, val) {
-      if (!state.customStepsData || !state.customStepsData[idx]) return;
+      if (!state.customStepsData) {
+        state.customStepsData = JSON.parse(JSON.stringify(currentStepsCache));
+      }
+      if (!state.customStepsData[idx]) return;
       let num = parseInt(val);
       if (isNaN(num) || num < 0) num = 0;
       state.customStepsData[idx].amount = num;
       state.isCustomSteps = true;
-      recalculateCustomStepsAndRender();
+      recalculateCustomStepsMetrics();
     }
 
     function onCustomStepDurationChange(idx, val) {
-      if (!state.customStepsData || !state.customStepsData[idx]) return;
+      if (!state.customStepsData) {
+        state.customStepsData = JSON.parse(JSON.stringify(currentStepsCache));
+      }
+      if (!state.customStepsData[idx]) return;
       let sec = parseInt(val);
       if (isNaN(sec) || sec < 3) sec = 3;
       state.customStepsData[idx].durationSec = sec;
       state.isCustomSteps = true;
-      recalculateCustomStepsAndRender();
+      recalculateCustomStepsMetrics();
     }
 
     function onCustomStepNoteChange(idx, val) {
-      if (!state.customStepsData || !state.customStepsData[idx]) return;
-      state.customStepsData[idx].note = val.trim();
+      if (!state.customStepsData) {
+        state.customStepsData = JSON.parse(JSON.stringify(currentStepsCache));
+      }
+      if (!state.customStepsData[idx]) return;
+      state.customStepsData[idx].note = val;
+      state.customStepsData[idx].actionTip = val;
+      if (currentStepsCache && currentStepsCache[idx]) {
+        currentStepsCache[idx].note = val;
+        currentStepsCache[idx].actionTip = val;
+      }
       state.isCustomSteps = true;
     }
 
-    function recalculateCustomStepsAndRender() {
+    function recalculateCustomStepsMetrics() {
+      if (!state.customStepsData) return;
       let curCum = 0;
       let curStart = 0;
-      state.customStepsData.forEach(st => {
+      state.customStepsData.forEach((st, i) => {
         curCum += st.amount;
         st.cumulative = curCum;
         st.startSec = curStart;
         st.endSec = curStart + st.durationSec;
         curStart = st.endSec;
         st.timeRangeStr = `${formatTime(st.startSec)} - ${formatTime(st.endSec)}`;
+
+        // 即時局部更新表格內的累計水量與時間區間標籤，不摧毀輸入框以保持打字焦點
+        const cumElem = document.getElementById(`step-cum-${i}`);
+        if (cumElem) cumElem.textContent = `${st.cumulative}g`;
+        const rangeElem = document.getElementById(`step-range-${i}`);
+        if (rangeElem) rangeElem.textContent = `(${st.timeRangeStr})`;
       });
 
       currentStepsCache = JSON.parse(JSON.stringify(state.customStepsData));
@@ -1380,18 +1411,24 @@
 
       // 動態連動總水量與粉水比
       const totalWater = curCum;
-      document.getElementById('param-water').textContent = `${totalWater}g`;
-      document.getElementById('param-water-note').textContent = '依自訂步驟加總';
-      document.getElementById('timer-total-water-goal').textContent = totalWater;
+      const paramWater = document.getElementById('param-water');
+      if (paramWater) paramWater.textContent = `${totalWater}g`;
+      const paramWaterNote = document.getElementById('param-water-note');
+      if (paramWaterNote) paramWaterNote.textContent = '依自訂步驟加總';
+      const timerTotalGoal = document.getElementById('timer-total-water-goal');
+      if (timerTotalGoal) timerTotalGoal.textContent = totalWater;
 
       const calcRatio = Math.round((totalWater / state.dose) * 10) / 10;
-      document.getElementById('param-ratio').textContent = `1:${calcRatio}`;
-      document.getElementById('param-ratio-note').textContent = '自訂粉水比';
+      const paramRatio = document.getElementById('param-ratio');
+      if (paramRatio) paramRatio.textContent = `1:${calcRatio}`;
+      const paramRatioNote = document.getElementById('param-ratio-note');
+      if (paramRatioNote) paramRatioNote.textContent = '自訂粉水比';
 
-      document.getElementById('total-time-estimate').textContent = `約 ${formatTime(totalBrewSeconds)}`;
-      document.getElementById('total-seconds-count').textContent = `共 ${totalBrewSeconds} 秒 (自訂步驟加總)`;
+      const totalEst = document.getElementById('total-time-estimate');
+      if (totalEst) totalEst.textContent = `約 ${formatTime(totalBrewSeconds)}`;
+      const totalSecCount = document.getElementById('total-seconds-count');
+      if (totalSecCount) totalSecCount.textContent = `共 ${totalBrewSeconds} 秒 (自訂步驟加總)`;
 
-      renderStepsTable();
       updateCustomStepControlsUI();
       if (timerRunning) resetTimer();
     }
@@ -1840,36 +1877,37 @@
         tr.id = `step-row-${idx}`;
         tr.className = 'hover:bg-[#FAF9F7] transition-colors';
 
-        if (state.isCustomSteps) {
-          // 自訂模式：注水量與注水秒數轉為直接可編輯之輸入框
+        if (state.isEditingSteps) {
+          // 編輯模式：注水量、注水秒數、注水操作簡記均為直接可編輯之輸入框
           tr.innerHTML = `
             <td class="py-3 pr-3 font-medium text-[#2C2521] text-xs">${escapeHtml(st.name)}</td>
             <td class="py-3 px-3">
               <div class="flex items-center gap-1">
-                <input type="number" min="0" max="800" value="${st.amount}" 
-                       onchange="onCustomStepAmountChange(${idx}, this.value)"
+                <input type="number" id="custom-step-amt-${idx}" min="0" max="800" value="${st.amount}" 
+                       oninput="onCustomStepAmountChange(${idx}, this.value)"
                        class="w-16 px-1.5 py-1 text-center font-mono-num font-bold rounded-lg border border-[#D8CCC4] bg-white text-xs text-[#2C2521] focus:border-[#654D3F] outline-none shadow-2xs">
                 <span class="text-xs text-[#8C7E75]">g</span>
               </div>
             </td>
-            <td class="py-3 px-3 text-[#2C2521] font-mono-num font-bold text-xs">${st.cumulative}g</td>
+            <td class="py-3 px-3 text-[#2C2521] font-mono-num font-bold text-xs" id="step-cum-${idx}">${st.cumulative}g</td>
             <td class="py-3 px-3">
               <div class="flex items-center gap-1.5">
-                <input type="number" min="3" max="300" value="${st.durationSec}" 
-                       onchange="onCustomStepDurationChange(${idx}, this.value)"
+                <input type="number" id="custom-step-dur-${idx}" min="3" max="300" value="${st.durationSec}" 
+                       oninput="onCustomStepDurationChange(${idx}, this.value)"
                        class="w-14 px-1.5 py-1 text-center font-mono-num font-bold rounded-lg border border-[#D8CCC4] bg-white text-xs text-[#2C2521] focus:border-[#654D3F] outline-none shadow-2xs">
                 <span class="text-xs text-[#8C7E75]">秒</span>
-                <span class="text-[11px] text-[#9B8D83] font-mono-num">(${st.timeRangeStr})</span>
+                <span class="text-[11px] text-[#9B8D83] font-mono-num" id="step-range-${idx}">(${st.timeRangeStr})</span>
               </div>
             </td>
             <td class="py-3 pl-3">
-              <input type="text" value="${escapeHtml(st.note)}" 
-                     onchange="onCustomStepNoteChange(${idx}, this.value)"
+              <input type="text" id="custom-step-note-${idx}" value="${escapeHtml(st.note)}" 
+                     oninput="onCustomStepNoteChange(${idx}, this.value)"
+                     placeholder="自訂此階段注水操作簡記..."
                      class="w-full px-2 py-1 rounded-lg border border-[#E6E0D8] bg-white text-xs text-[#685B52] focus:border-[#654D3F] outline-none">
             </td>
           `;
         } else {
-          // 推薦瀏覽模式：優雅排版，清晰標示
+          // 瀏覽與沖煮模式：優雅排版，呈現自訂或推薦步驟與操作簡記
           tr.innerHTML = `
             <td class="py-3.5 pr-3 font-medium text-[#2C2521]">${escapeHtml(st.name)}</td>
             <td class="py-3.5 px-3 text-[#3D3028] font-mono-num font-semibold">${st.amount > 0 ? '+' + st.amount + 'g' : '-'}</td>
@@ -2778,7 +2816,10 @@
                 const temp = (rate.params && rate.params.temp) || '92°C';
                 const ratio = (rate.params && rate.params.ratio) || '1:15';
                 const water = (rate.params && rate.params.water) || '225g';
+                const grind = (rate.params && rate.params.grind) || '標準研磨';
                 const safeRating = Math.min(Math.max(Math.round(rate.rating || 5), 1), 5);
+                const stepsList = (rate.params && rate.params.customSteps) || rate.steps || null;
+                const isCustom = rate.isCustom || (rate.params && rate.params.isCustomSteps);
 
                 return `
                   <div class="p-3 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] space-y-2">
@@ -2788,6 +2829,7 @@
                         <span class="px-2.5 py-0.5 rounded-md bg-[#ECE3DC] text-[#3D3028] text-xs font-bold">
                           ${escapeHtml(rate.methodName)}
                         </span>
+                        ${isCustom ? `<span class="px-1.5 py-0.5 rounded bg-[#E6E0D8] text-[#654D3F] text-[10px] font-semibold">自訂步驟與參數</span>` : ''}
                         <span class="text-amber-500 font-bold text-xs">${'★'.repeat(safeRating)}</span>
                         <span class="text-xs font-bold text-[#2C2521]">${rate.rating}.0 分</span>
                       </div>
@@ -2800,9 +2842,10 @@
 
                     <!-- 當時參數快照 -->
                     <div class="text-[11px] text-[#685B52] font-mono-num flex items-center justify-between flex-wrap gap-2 pt-0.5">
-                      <div class="flex gap-2.5">
+                      <div class="flex gap-2.5 flex-wrap">
                         <span>粉量: <strong>${dose}g</strong></span>
                         <span>水溫: <strong>${escapeHtml(temp)}</strong></span>
+                        <span>研磨: <strong>${escapeHtml(grind)}</strong></span>
                         <span>比例: <strong>${escapeHtml(ratio)}</strong></span>
                         <span>總水: <strong>${escapeHtml(water)}</strong></span>
                       </div>
@@ -2810,6 +2853,33 @@
                         套用此參數 ▶
                       </button>
                     </div>
+
+                    <!-- 沖煮步驟列表 (含注水量、累積水量、注水秒數、注水操作簡記) -->
+                    ${stepsList && stepsList.length > 0 ? `
+                      <details class="text-[11px] bg-white rounded-lg border border-[#E6E0D8] p-2 select-none group">
+                        <summary class="font-semibold text-[#654D3F] flex items-center justify-between cursor-pointer outline-none text-xs">
+                          <span class="flex items-center gap-1.5">
+                            <span>📋 沖煮步驟細節 (${stepsList.length} 段${isCustom ? ' · 已自訂' : ''})</span>
+                          </span>
+                          <span class="text-[10px] text-[#8C7E75] font-normal group-open:rotate-180 transition-transform">▾</span>
+                        </summary>
+                        <div class="mt-2 space-y-1.5 pt-2 border-t border-[#F0EAE3]">
+                          ${stepsList.map(st => `
+                            <div class="flex items-start justify-between gap-2 text-[10px] leading-relaxed">
+                              <div class="flex items-center gap-1.5 flex-shrink-0 font-mono-num">
+                                <span class="font-bold text-[#2C2521]">${escapeHtml(st.name)}</span>
+                                <span class="text-[#3D3028]">${st.amount > 0 ? '+' + st.amount + 'g' : '-'}</span>
+                                <span class="text-[#8C7E75]">(${st.cumulative}g)</span>
+                                <span class="text-[#654D3F] font-semibold">${st.durationSec}秒</span>
+                              </div>
+                              <div class="text-[#685B52] text-right flex-1 truncate" title="${escapeHtml(st.note || '')}">
+                                ${escapeHtml(st.note || '')}
+                              </div>
+                            </div>
+                          `).join('')}
+                        </div>
+                      </details>
+                    ` : ''}
 
                     <!-- 風味標籤 -->
                     ${rate.tags && rate.tags.length > 0 ? `
@@ -2872,32 +2942,64 @@
       openRatingModalForCurrentBrew();
     }
 
-        function applyMethodRatingParams(beanId, ratingId) {
+    function applyMethodRatingParams(beanId, ratingId) {
       const beans = getSavedBeans();
       const bean = beans.find(b => b.id === beanId);
       if (!bean) return;
       const rate = bean.methodRatings ? bean.methodRatings.find(r => r.id === ratingId) : null;
       if (!rate) return;
 
-      if (rate.methodKey) selectMethod(rate.methodKey);
+      if (rate.methodKey) {
+        state.method = rate.methodKey;
+        document.querySelectorAll('[data-method]').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.method === rate.methodKey);
+        });
+        const methodLbl = document.getElementById('selected-method-label');
+        if (methodLbl) methodLbl.textContent = METHOD_CONFIGS[rate.methodKey].name.split(' ')[0];
+      }
+
       if (rate.params) {
-        if (rate.params.roast) selectRoast(rate.params.roast);
-        if (rate.params.flavor) selectFlavor(rate.params.flavor);
-        if (rate.params.dose) onDoseCommit(rate.params.dose);
+        if (rate.params.roast) {
+          state.roast = rate.params.roast;
+          document.querySelectorAll('[data-roast]').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.roast === rate.params.roast);
+          });
+          const roastLbl = document.getElementById('selected-roast-label');
+          if (roastLbl) roastLbl.textContent = ROAST_CONFIGS[rate.params.roast].name;
+        }
 
-        if (rate.params.tempAdjust !== undefined) state.tempAdjust = rate.params.tempAdjust;
-        if (rate.params.ratioAdjust !== undefined) state.ratioAdjust = rate.params.ratioAdjust;
-        if (rate.params.customGrind !== undefined) state.customGrind = rate.params.customGrind;
+        if (rate.params.flavor) {
+          state.flavor = rate.params.flavor;
+          document.querySelectorAll('[data-flavor]').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.flavor === rate.params.flavor);
+          });
+          const flavorLbl = document.getElementById('selected-flavor-label');
+          if (flavorLbl) flavorLbl.textContent = FLAVOR_CONFIGS[rate.params.flavor].name;
+        }
 
-        if (rate.params.isCustomSteps && rate.params.customSteps && rate.params.customSteps.length > 0) {
+        if (rate.params.dose !== undefined) {
+          state.dose = rate.params.dose;
+          const doseInp = document.getElementById('dose-input');
+          const doseRng = document.getElementById('dose-range');
+          if (doseInp) doseInp.value = state.dose;
+          if (doseRng) doseRng.value = Math.min(Math.max(state.dose, 10), 35);
+        }
+
+        state.tempAdjust = rate.params.tempAdjust !== undefined ? rate.params.tempAdjust : 0;
+        state.ratioAdjust = rate.params.ratioAdjust !== undefined ? rate.params.ratioAdjust : 0;
+        state.customGrind = rate.params.customGrind !== undefined ? rate.params.customGrind : null;
+
+        const savedSteps = rate.params.customSteps || rate.steps;
+        if (rate.params.isCustomSteps && savedSteps && savedSteps.length > 0) {
           state.isCustomSteps = true;
-          state.customStepsData = JSON.parse(JSON.stringify(rate.params.customSteps));
+          state.customStepsData = JSON.parse(JSON.stringify(savedSteps));
         } else {
           state.isCustomSteps = false;
           state.customStepsData = null;
         }
       }
 
+      state.isEditingSteps = false;
       calculateAndRender();
       if (timerRunning) resetTimer();
       closeRecipeVaultModal();
@@ -2941,6 +3043,11 @@
       const commentInput = document.getElementById('rate-comment-input');
       const comment = commentInput.value.trim();
 
+      // 取得完整的步驟清單（包含每段名稱、注水量、累積水量、注水秒數、注水操作簡記）
+      const stepsToSave = (state.isCustomSteps && state.customStepsData && state.customStepsData.length > 0)
+        ? JSON.parse(JSON.stringify(state.customStepsData))
+        : JSON.parse(JSON.stringify(currentStepsCache));
+
       const isCustomParams = state.isCustomSteps || state.tempAdjust !== 0 || state.ratioAdjust !== 0 || state.customGrind !== null;
 
       const newRating = {
@@ -2960,10 +3067,11 @@
           ratioAdjust: state.ratioAdjust,
           customGrind: state.customGrind,
           isCustomSteps: state.isCustomSteps,
-          customSteps: state.isCustomSteps && state.customStepsData ? JSON.parse(JSON.stringify(state.customStepsData)) : null,
+          customSteps: stepsToSave,
           flavor: state.flavor,
           roast: state.roast
         },
+        steps: stepsToSave,
         tags: [...currentLogTags],
         comment: comment || '（未填寫文字心得）'
       };
