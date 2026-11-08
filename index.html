@@ -612,6 +612,22 @@
                 平衡順口
               </button>
             </div>
+
+            <!-- 風味萃取導引提示卡片 (已依需求改移至風味偏好正下方，依所選風味即時說明) -->
+            <div class="mt-3 p-3.5 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] text-xs text-[#685B52] space-y-2">
+              <div class="flex items-start gap-2">
+                <span class="text-base flex-shrink-0">💡</span>
+                <div class="flex-1 leading-relaxed" id="flavor-adjustment-tip">
+                  金杯標準平衡萃取，標準水溫與黃金秒數節奏，酸、甜、甘、醇四大維度均衡展現。
+                </div>
+              </div>
+              <div class="text-[11px] text-[#8C7E75] pl-6 flex items-center justify-between border-t border-[#EDE8E2]/60 pt-1.5">
+                <span id="flavor-timing-adjustment-note">⏱️ 標準金杯秒數節奏 · 層次分明</span>
+                <button onclick="stepCustomTemp(1)" class="text-[11px] text-[#654D3F] hover:underline font-medium">
+                  +1°C 提高萃取
+                </button>
+              </div>
+            </div>
           </div>
 
           <!-- 重新計算與一鍵收藏按鈕 -->
@@ -633,47 +649,77 @@
       <!-- 右欄：推薦參數與詳細步驟 (寬度約佔 8 欄) -->
       <section class="lg:col-span-8 space-y-6">
 
-        <!-- 推薦參數 (4 大指標卡片) -->
+        <!-- 推薦參數 (4 大指標卡片 - 支援自定義調整水溫、研磨度、粉水比) -->
         <div>
-          <div class="text-base sm:text-lg font-bold text-[#2C2521] mb-3">
-            推薦參數
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-base sm:text-lg font-bold text-[#2C2521]">
+              推薦與自訂參數
+            </div>
+            <div class="text-xs text-[#8C7E75]">
+              點擊可直接微調各項參數
+            </div>
           </div>
 
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             
-            <!-- 水溫卡 -->
+            <!-- 1. 水溫卡 (支援自定義調整) -->
             <div class="canva-card p-4 sm:p-5 flex flex-col justify-between">
-              <div class="text-xs text-[#8C7E75] font-medium">水溫</div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-[#8C7E75] font-medium">水溫</span>
+                <button id="reset-temp-btn" onclick="resetCustomTemp()" class="hidden text-[10px] text-[#8C7E75] hover:text-[#654D3F] transition">↺ 推薦</button>
+              </div>
               <div class="mt-2">
-                <div class="text-2xl font-bold text-[#2C2521] font-mono-num" id="param-temp">92°C</div>
-                <div class="text-[11px] text-[#9B8D83] mt-0.5" id="param-temp-note">標準萃取水溫</div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="stepCustomTemp(-1)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#ECE3DC] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="-1°C">-</button>
+                  <span class="text-2xl font-bold text-[#2C2521] font-mono-num cursor-pointer hover:underline" id="param-temp" title="點擊自訂水溫" onclick="editCustomTempPrompt()">92°C</span>
+                  <button onclick="stepCustomTemp(1)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#ECE3DC] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="+1°C">+</button>
+                </div>
+                <div class="text-[11px] text-[#9B8D83] mt-0.5 truncate" id="param-temp-note">標準萃取水溫</div>
               </div>
             </div>
 
-            <!-- 研磨度卡 -->
+            <!-- 2. 研磨度卡 (支援自定義選擇/調整) -->
             <div class="canva-card p-4 sm:p-5 flex flex-col justify-between">
-              <div class="text-xs text-[#8C7E75] font-medium">研磨度</div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-[#8C7E75] font-medium">研磨度</span>
+                <button id="reset-grind-btn" onclick="resetCustomGrind()" class="hidden text-[10px] text-[#8C7E75] hover:text-[#654D3F] transition">↺ 推薦</button>
+              </div>
               <div class="mt-2">
-                <div class="text-lg sm:text-xl font-bold text-[#2C2521]" id="param-grind">偏粗研磨</div>
-                <div class="text-[11px] text-[#9B8D83] mt-0.5" id="param-grind-note">類似粗砂糖</div>
+                <select id="param-grind-select" onchange="onCustomGrindSelect(this.value)" class="text-sm sm:text-base font-bold text-[#2C2521] bg-transparent border-b border-dashed border-[#CFC2B7] focus:outline-none cursor-pointer py-0.5 w-full">
+                  <option value="極細研磨">極細研磨</option>
+                  <option value="細研磨">細研磨</option>
+                  <option value="中細偏細">中細偏細</option>
+                  <option value="中度研磨">中度研磨</option>
+                  <option value="中粗研磨">中粗研磨</option>
+                  <option value="偏粗研磨" selected>偏粗研磨</option>
+                  <option value="粗研磨">粗研磨</option>
+                </select>
+                <div class="text-[11px] text-[#9B8D83] mt-0.5 truncate" id="param-grind-note">每段等水排乾，顆粒偏粗</div>
               </div>
             </div>
 
-            <!-- 粉水比卡 -->
+            <!-- 3. 粉水比卡 (支援自定義調整) -->
             <div class="canva-card p-4 sm:p-5 flex flex-col justify-between">
-              <div class="text-xs text-[#8C7E75] font-medium">粉水比</div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-[#8C7E75] font-medium">粉水比</span>
+                <button id="reset-ratio-btn" onclick="resetCustomRatio()" class="hidden text-[10px] text-[#8C7E75] hover:text-[#654D3F] transition">↺ 推薦</button>
+              </div>
               <div class="mt-2">
-                <div class="text-2xl font-bold text-[#2C2521] font-mono-num" id="param-ratio">1:15</div>
-                <div class="text-[11px] text-[#9B8D83] mt-0.5" id="param-ratio-note">金杯平衡萃取</div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="stepCustomRatio(-0.5)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#ECE3DC] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="-0.5">-</button>
+                  <span class="text-2xl font-bold text-[#2C2521] font-mono-num cursor-pointer hover:underline" id="param-ratio" title="點擊自訂粉水比" onclick="editCustomRatioPrompt()">1:15</span>
+                  <button onclick="stepCustomRatio(0.5)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#ECE3DC] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="+0.5">+</button>
+                </div>
+                <div class="text-[11px] text-[#9B8D83] mt-0.5 truncate" id="param-ratio-note">金杯平衡萃取</div>
               </div>
             </div>
 
-            <!-- 總注水量卡 -->
+            <!-- 4. 總注水量卡 (隨自訂動態連動) -->
             <div class="canva-card p-4 sm:p-5 flex flex-col justify-between">
               <div class="text-xs text-[#8C7E75] font-medium">總注水量</div>
               <div class="mt-2">
                 <div class="text-2xl font-bold text-[#2C2521] font-mono-num" id="param-water">225g</div>
-                <div class="text-[11px] text-[#9B8D83] mt-0.5" id="param-water-note">依 15g 粉計算</div>
+                <div class="text-[11px] text-[#9B8D83] mt-0.5 truncate" id="param-water-note">依 15g 粉計算</div>
               </div>
             </div>
 
@@ -682,12 +728,22 @@
 
         <!-- 詳細沖煮步驟 (秒數與總時間 100% 精準對齊) -->
         <div class="canva-card p-5 sm:p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-base font-bold text-[#2C2521]">
-              詳細沖煮步驟
-            </h2>
-            <div class="text-xs text-[#8C7E75]">
-              手法指引：<span id="guide-method-name" class="font-semibold text-[#654D3F]">四六法 (粕谷哲)</span>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div class="flex items-center gap-2">
+              <h2 class="text-base font-bold text-[#2C2521]">
+                詳細沖煮步驟
+              </h2>
+              <span id="custom-steps-badge" class="hidden px-2 py-0.5 rounded-full bg-[#ECE3DC] text-[#654D3F] text-[10px] font-bold">已自訂各段參數</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-[#8C7E75] hidden md:inline">手法指引：<span id="guide-method-name" class="font-semibold text-[#654D3F]">四六法 (粕谷哲)</span></span>
+              <button id="toggle-custom-steps-btn" onclick="toggleCustomStepsMode()" class="px-2.5 py-1 rounded-lg border border-[#E6E0D8] bg-white hover:border-[#CFC2B7] text-[#654D3F] font-medium transition flex items-center gap-1 shadow-2xs">
+                <span id="custom-steps-btn-icon">✏️</span>
+                <span id="custom-steps-btn-text">自訂各段秒數與水量</span>
+              </button>
+              <button id="reset-custom-steps-btn" onclick="resetToRecommendedSteps()" class="hidden px-2 py-1 rounded-lg border border-[#E6E0D8] bg-[#FAF9F7] hover:bg-[#EDE8E2] text-[#8C7E75] text-[11px] transition" title="恢復推薦標準參數">
+                ↺ 恢復推薦
+              </button>
             </div>
           </div>
 
@@ -729,19 +785,7 @@
             </div>
           </div>
 
-          <!-- 萃取微調小訣竅 (文字精簡) -->
-          <div class="mt-4 p-3.5 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] text-xs text-[#685B52] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-              <span class="text-base">💡</span>
-              <span id="flavor-adjustment-tip">若喝起來偏酸萃取不足，建議水溫調高 1-2°C 或調細研磨；若偏苦雜澀則反向微調。</span>
-            </div>
-            <button onclick="quickTuneTemp(1)" class="text-[11px] text-[#654D3F] hover:underline whitespace-nowrap font-medium">
-              +1°C 提高萃取
-            </button>
           </div>
-
-        </div>
-
       </section>
 
     </main>
@@ -916,6 +960,10 @@
       dose: 15.0,           // 8 ~ 50g
       flavor: 'balance',    // acid, sweet, body, balance
       tempAdjust: 0,
+      ratioAdjust: 0,
+      customGrind: null,
+      isCustomSteps: false,
+      customStepsData: null
     };
 
     // 烘焙度基礎參數表
@@ -1009,31 +1057,55 @@
       }
     };
 
-    // 風味調整偏好
+    // 風味調整偏好 (針對酸質、甜感、厚實、平衡之萃取科學設定)
     const FLAVOR_CONFIGS = {
       acid: {
         name: '強調酸質',
-        tempDelta: 1,
-        ratioDelta: -0.5,
-        note: '偏高溫激發果酸香氣，縮短後段萃取保持明亮。'
+        tempDelta: 1,      // +1°C 提高揮發性花果酸香氣
+        ratioDelta: 0,
+        timingModifier: {
+          bloomDelta: -10, // 縮短悶蒸至 35s
+          stepDelta: -4    // 縮短每段萃取間隔，快速落水避開後段苦澀
+        },
+        pourRatio46: [0.24, 0.16], // Kasuya 四六法則：前段第一注大、第二注小，激發明亮果酸
+        note: '偏高水溫激發花果酸香，縮短悶蒸與每段落水秒數（-15s），前段加大注水，保持果酸純淨明亮。',
+        timingNote: '⏱️ 悶蒸縮短至 35s · 節奏輕快避開雜苦 (-15s)'
       },
       sweet: {
         name: '突出甜感',
-        tempDelta: 0,
-        ratioDelta: 0,
-        note: '前段適當延長悶蒸，中段穩定注水帶出焦糖甜感。'
+        tempDelta: -1,     // -1°C 溫和水溫避免燙傷細粉萃出雜苦
+        ratioDelta: 0.2,   // 微幅增加萃取量
+        timingModifier: {
+          bloomDelta: 7,   // 延長悶蒸至 52s，讓可溶性糖分充分浸潤
+          stepDelta: 3     // 延長落水間隔，給予焦糖化物質溶解時間
+        },
+        pourRatio46: [0.16, 0.24], // Kasuya 四六法則：前段第一注小、第二注大，甜感最大化！
+        note: '微降水溫避免澀感，延長悶蒸至 52s 與每段落水間隔（+10s），前小後大注水，充分釋放焦糖甜感。',
+        timingNote: '⏱️ 悶蒸延長至 52s · 溫和間隔充分溶解甜感 (+10s)'
       },
       body: {
         name: '追求厚實',
-        tempDelta: -1,
-        ratioDelta: -1.0,
-        note: '粉水比適度收窄，增加萃取接觸時間，口感厚實。'
+        tempDelta: -2,     // -2°C
+        ratioDelta: -1.0,  // 粉水比收窄至 1:14，提高 TDS 濃度
+        timingModifier: {
+          bloomDelta: 5,
+          stepDelta: 6     // 增加粉水接觸時間，萃取微乳化咖啡油脂
+        },
+        pourRatio46: [0.20, 0.20],
+        note: '收窄粉水比提高濃度，拉長每段滴濾時間（+20s），充分浸透釋放咖啡油脂與厚實醇度。',
+        timingNote: '⏱️ 萃取接觸時間延長 · 口感濃郁厚實 (+20s)'
       },
       balance: {
         name: '平衡順口',
-        tempDelta: 0,
-        ratioDelta: 0,
-        note: '金杯比例平衡萃取，酸甜苦甘層次分明。'
+        tempDelta: 0,      // 92°C 標準水溫
+        ratioDelta: 0,     // 1:15 標準比例
+        timingModifier: {
+          bloomDelta: 0,
+          stepDelta: 0     // 標準時間節奏
+        },
+        pourRatio46: [0.20, 0.20],
+        note: '金杯標準平衡萃取，標準水溫與黃金秒數節奏，酸、甜、甘、醇四大維度均衡展現。',
+        timingNote: '⏱️ 標準金杯秒數節奏 · 層次分明'
       }
     };
 
@@ -1052,6 +1124,8 @@
 
     function selectMethod(methodKey) {
       state.method = methodKey;
+      state.isCustomSteps = false;
+      state.customStepsData = null;
       document.querySelectorAll('[data-method]').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.method === methodKey);
       });
@@ -1075,8 +1149,10 @@
       document.querySelectorAll('[data-flavor]').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.flavor === flavorKey);
       });
-      document.getElementById('selected-flavor-label').textContent = FLAVOR_CONFIGS[flavorKey].name;
+      const lbl = document.getElementById('selected-flavor-label');
+      if (lbl) lbl.textContent = FLAVOR_CONFIGS[flavorKey].name;
       calculateAndRender();
+      if (timerRunning) resetTimer();
     }
 
         function onDoseInput(val) {
@@ -1136,94 +1212,294 @@
       resetTimer();
     }
 
-    function generateSteps(method, dose, totalWater) {
+
+    // ========================================================
+    // 自定義參數控制器 (水溫、研磨度、粉水比、各階段水量與秒數)
+    // ========================================================
+
+    function stepCustomTemp(delta) {
+      state.tempAdjust += delta;
+      calculateAndRender();
+      if (timerRunning) resetTimer();
+    }
+
+    function resetCustomTemp() {
+      state.tempAdjust = 0;
+      calculateAndRender();
+      if (timerRunning) resetTimer();
+    }
+
+    function editCustomTempPrompt() {
+      const current = parseInt(document.getElementById('param-temp').textContent) || 92;
+      const input = prompt('請輸入自訂萃取水溫 (°C，建議範圍 80 - 98)：', current);
+      if (input !== null) {
+        const val = parseInt(input);
+        if (!isNaN(val) && val >= 75 && val <= 100) {
+          const roastConf = ROAST_CONFIGS[state.roast];
+          const flavorConf = FLAVOR_CONFIGS[state.flavor];
+          const base = roastConf.baseTemp + flavorConf.tempDelta;
+          state.tempAdjust = val - base;
+          calculateAndRender();
+          if (timerRunning) resetTimer();
+        }
+      }
+    }
+
+    function onCustomGrindSelect(val) {
+      state.customGrind = val;
+      calculateAndRender();
+    }
+
+    function resetCustomGrind() {
+      state.customGrind = null;
+      calculateAndRender();
+    }
+
+    function stepCustomRatio(delta) {
+      state.ratioAdjust = Math.round((state.ratioAdjust + delta) * 10) / 10;
+      calculateAndRender();
+      if (timerRunning) resetTimer();
+    }
+
+    function resetCustomRatio() {
+      state.ratioAdjust = 0;
+      calculateAndRender();
+      if (timerRunning) resetTimer();
+    }
+
+    function editCustomRatioPrompt() {
+      const current = parseFloat(document.getElementById('param-ratio').textContent.replace('1:', '')) || 15;
+      const input = prompt('請輸入自訂粉水比 (例：15 代表 1:15，建議範圍 10 - 22)：', current);
+      if (input !== null) {
+        const val = parseFloat(input);
+        if (!isNaN(val) && val >= 8 && val <= 25) {
+          const roastConf = ROAST_CONFIGS[state.roast];
+          const methodConf = METHOD_CONFIGS[state.method];
+          const flavorConf = FLAVOR_CONFIGS[state.flavor];
+          const baseRatio = (roastConf.baseRatio + flavorConf.ratioDelta) * methodConf.ratioMultiplier;
+          state.ratioAdjust = Math.round((val - baseRatio) * 10) / 10;
+          calculateAndRender();
+          if (timerRunning) resetTimer();
+        }
+      }
+    }
+
+    function toggleCustomStepsMode() {
+      state.isCustomSteps = !state.isCustomSteps;
+      if (state.isCustomSteps && !state.customStepsData) {
+        state.customStepsData = JSON.parse(JSON.stringify(currentStepsCache));
+      }
+      renderStepsTable();
+      updateCustomStepControlsUI();
+    }
+
+    function resetToRecommendedSteps() {
+      state.isCustomSteps = false;
+      state.customStepsData = null;
+      calculateAndRender();
+      if (timerRunning) resetTimer();
+    }
+
+    function updateCustomStepControlsUI() {
+      const badge = document.getElementById('custom-steps-badge');
+      const resetBtn = document.getElementById('reset-custom-steps-btn');
+      const btnText = document.getElementById('custom-steps-btn-text');
+      const btnIcon = document.getElementById('custom-steps-btn-icon');
+
+      if (state.isCustomSteps) {
+        badge.classList.remove('hidden');
+        resetBtn.classList.remove('hidden');
+        btnText.textContent = '完成自訂編輯';
+        btnIcon.textContent = '✓';
+      } else {
+        badge.classList.add('hidden');
+        resetBtn.classList.add('hidden');
+        btnText.textContent = '自訂各段秒數與水量';
+        btnIcon.textContent = '✏️';
+      }
+    }
+
+    function onCustomStepAmountChange(idx, val) {
+      if (!state.customStepsData || !state.customStepsData[idx]) return;
+      let num = parseInt(val);
+      if (isNaN(num) || num < 0) num = 0;
+      state.customStepsData[idx].amount = num;
+      state.isCustomSteps = true;
+      recalculateCustomStepsAndRender();
+    }
+
+    function onCustomStepDurationChange(idx, val) {
+      if (!state.customStepsData || !state.customStepsData[idx]) return;
+      let sec = parseInt(val);
+      if (isNaN(sec) || sec < 3) sec = 3;
+      state.customStepsData[idx].durationSec = sec;
+      state.isCustomSteps = true;
+      recalculateCustomStepsAndRender();
+    }
+
+    function onCustomStepNoteChange(idx, val) {
+      if (!state.customStepsData || !state.customStepsData[idx]) return;
+      state.customStepsData[idx].note = val.trim();
+      state.isCustomSteps = true;
+    }
+
+    function recalculateCustomStepsAndRender() {
+      let curCum = 0;
+      let curStart = 0;
+      state.customStepsData.forEach(st => {
+        curCum += st.amount;
+        st.cumulative = curCum;
+        st.startSec = curStart;
+        st.endSec = curStart + st.durationSec;
+        curStart = st.endSec;
+        st.timeRangeStr = `${formatTime(st.startSec)} - ${formatTime(st.endSec)}`;
+      });
+
+      currentStepsCache = JSON.parse(JSON.stringify(state.customStepsData));
+      totalBrewSeconds = currentStepsCache.reduce((sum, s) => sum + s.durationSec, 0);
+
+      // 動態連動總水量與粉水比
+      const totalWater = curCum;
+      document.getElementById('param-water').textContent = `${totalWater}g`;
+      document.getElementById('param-water-note').textContent = '依自訂步驟加總';
+      document.getElementById('timer-total-water-goal').textContent = totalWater;
+
+      const calcRatio = Math.round((totalWater / state.dose) * 10) / 10;
+      document.getElementById('param-ratio').textContent = `1:${calcRatio}`;
+      document.getElementById('param-ratio-note').textContent = '自訂粉水比';
+
+      document.getElementById('total-time-estimate').textContent = `約 ${formatTime(totalBrewSeconds)}`;
+      document.getElementById('total-seconds-count').textContent = `共 ${totalBrewSeconds} 秒 (自訂步驟加總)`;
+
+      renderStepsTable();
+      updateCustomStepControlsUI();
+      if (timerRunning) resetTimer();
+    }
+
+    function generateSteps(method, dose, totalWater, flavorKey = state.flavor) {
+      // 若處於自定義步驟模式，優先回傳已自定義的步驟資料
+      if (state.isCustomSteps && state.customStepsData && state.customStepsData.length > 0) {
+        return state.customStepsData;
+      }
+
+      const flavorConf = FLAVOR_CONFIGS[flavorKey] || FLAVOR_CONFIGS['balance'];
+      const tMod = flavorConf.timingModifier || { bloomDelta: 0, stepDelta: 0 };
       let rawSteps = [];
 
       if (method === 'four_six') {
-        const bloomWater = Math.round(totalWater * 0.20);
-        const pour2 = Math.round(totalWater * 0.20);
+        // 依風味動態分配前 40% 水量 (Kasuya 4:6 法則：酸質前大多、甜感前小後大)
+        const p1Ratio = flavorConf.pourRatio46 ? flavorConf.pourRatio46[0] : 0.20;
+        const p2Ratio = flavorConf.pourRatio46 ? flavorConf.pourRatio46[1] : 0.20;
+        const bloomWater = Math.round(totalWater * p1Ratio);
+        const pour2 = Math.round(totalWater * p2Ratio);
         const remaining = totalWater - bloomWater - pour2;
         const pour3 = Math.round(remaining / 3);
         const pour4 = Math.round(remaining / 3);
         const pour5 = totalWater - (bloomWater + pour2 + pour3 + pour4);
 
+        const bloomSec = Math.max(30, 45 + tMod.bloomDelta);
+        const step2Sec = Math.max(25, 40 + tMod.stepDelta);
+        const step3Sec = Math.max(20, 30 + tMod.stepDelta);
+        const step4Sec = Math.max(18, 25 + tMod.stepDelta);
+        const step5Sec = Math.max(18, 25 + tMod.stepDelta);
+
         rawSteps = [
           {
             name: '悶蒸',
             amount: bloomWater,
-            durationSec: 45,
-            note: '由中心向外輕柔繞圈，確保浸潤並排氣至 45 秒',
+            durationSec: bloomSec,
+            note: `由中心向外柔和繞圈，確保浸透並排氣至 ${formatTime(bloomSec)}`,
             animType: 'bloom',
             actionTitle: '溫潤注水 · 均勻排氣膨脹 (悶蒸)',
-            actionTip: '細水流從中心向外繞 2-3 圈注滿悶蒸水，使全粉床均勻浸透，觀察咖啡粉如漢堡般隆起排氣至 45 秒。'
+            actionTip: `細水流由內向外繞 2-3 圈注滿 ${bloomWater}g 悶蒸水，使全粉床均勻浸透，觀察咖啡漢堡膨脹至 ${bloomSec} 秒。`,
+            defaultAmount: bloomWater,
+            defaultDuration: bloomSec
           },
           {
             name: '第一段',
             amount: pour2,
-            durationSec: 40,
-            note: '穩定繞圈注水，調整酸甜明亮度，落水至 1:25',
+            durationSec: step2Sec,
+            note: `穩定繞圈注水，調節酸甜明亮與焦糖化，落水至 ${formatTime(bloomSec + step2Sec)}`,
             animType: 'spiral',
-            actionTitle: '穩定繞圈注水 (酸甜平衡)',
-            actionTip: '維持平穩水流由內向外均勻螺旋繞圈，激發咖啡明亮果酸與甜感，等待水層完全排乾至 1:25。'
+            actionTitle: '穩定繞圈注水 (風味主軸)',
+            actionTip: '維持平穩水流由內向外均勻螺旋繞圈，激發咖啡風味層次，等待水層完全排乾。',
+            defaultAmount: pour2,
+            defaultDuration: step2Sec
           },
           {
             name: '第二段',
             amount: pour3,
-            durationSec: 30,
-            note: '後60%第一注，維持細水流繞圈，落水至 1:55',
+            durationSec: step3Sec,
+            note: '後60%第一注，維持細水流繞圈，提升萃取乾淨度',
             animType: 'spiral',
             actionTitle: '後段細水流繞圈',
-            actionTip: '後60%第一注，維持細柔水流緩慢繞圈，提升整體萃取乾淨度，等待水落乾至 1:55。'
+            actionTip: '後60%第一注，維持細柔水流緩慢繞圈，等待水落乾。',
+            defaultAmount: pour3,
+            defaultDuration: step3Sec
           },
           {
             name: '第三段',
             amount: pour4,
-            durationSec: 25,
-            note: '提升萃取醇厚度，等水落乾再注，落水至 2:20',
+            durationSec: step4Sec,
+            note: '提升萃取醇厚度，等水完全落乾再進行下一注',
             animType: 'spiral',
             actionTitle: '提升醇厚度注水',
-            actionTip: '均勻繞圈注水，等水完全落乾後再進行最後一注，落水至 2:20。'
+            actionTip: '均勻繞圈注水，等水完全落乾後再注最後一注。',
+            defaultAmount: pour4,
+            defaultDuration: step4Sec
           },
           {
             name: '第四段',
             amount: pour5,
-            durationSec: 25,
-            note: '收尾注至目標水量，落乾移開濾杯，於 2:45 完成',
+            durationSec: step5Sec,
+            note: '收尾注至目標水量，落乾移開濾杯',
             animType: 'drain_rest',
             actionTitle: '收尾注水與自然滴濾',
-            actionTip: '注足最後目標水量，讓咖啡液自然滴盡，落乾後立即移開濾杯，於 2:45 完成。'
+            actionTip: '注足最後目標水量，讓咖啡液自然滴盡，落乾後立即移開濾杯。',
+            defaultAmount: pour5,
+            defaultDuration: step5Sec
           }
         ];
       } else if (method === 'single_pour') {
         const bloomWater = Math.round(dose * 2.5);
         const mainPour = totalWater - bloomWater;
+        const bloomSec = Math.max(25, 35 + tMod.bloomDelta);
+        const mainSec = Math.max(45, 65 + tMod.stepDelta * 2);
+        const drainSec = Math.max(15, 20 + tMod.stepDelta);
+
         rawSteps = [
           {
             name: '悶蒸',
             amount: bloomWater,
-            durationSec: 35,
-            note: '中心點向外微幅潤濕，排氣膨脹至 35 秒',
+            durationSec: bloomSec,
+            note: `中心點向外微幅潤濕，排氣膨脹至 ${bloomSec} 秒`,
             animType: 'bloom',
             actionTitle: '中心微潤 · 均勻排氣膨脹 (悶蒸)',
-            actionTip: '低水柱輕柔潤濕中心粉層，讓新鮮二氧化碳自然釋放膨脹成飽滿漢堡，靜置至 35 秒。'
+            actionTip: '低水柱輕柔潤濕中心粉層，讓新鮮二氧化碳自然釋放膨脹成飽滿漢堡。',
+            defaultAmount: bloomWater,
+            defaultDuration: bloomSec
           },
           {
             name: '持續注水',
             amount: mainPour,
-            durationSec: 65,
+            durationSec: mainSec,
             note: '極細穩定水流不中斷，中心小範圍繞圈注滿',
             animType: 'steady_center',
             actionTitle: '垂直極細注水不中斷',
-            actionTip: '極低水柱衝擊，中心硬幣範圍緩慢持續注水，水流垂直穩定、不中斷、不沖濾紙邊緣。'
+            actionTip: '極低水柱衝擊，中心硬幣範圍緩慢持續注水，水流垂直穩定、不中斷、不沖濾紙邊緣。',
+            defaultAmount: mainPour,
+            defaultDuration: mainSec
           },
           {
             name: '滴濾收尾',
             amount: 0,
-            durationSec: 20,
+            durationSec: drainSec,
             note: '靜置等待水層平穩濾乾，移開濾杯',
             animType: 'drain_rest',
             actionTitle: '靜待均勻滴濾',
-            actionTip: '停止注水，靜置等待水層平穩濾乾，粉床收杯平整如鏡，移開濾杯。'
+            actionTip: '停止注水，靜置等待水層平穩濾乾，粉床收杯平整如鏡，移開濾杯。',
+            defaultAmount: 0,
+            defaultDuration: drainSec
           }
         ];
       } else if (method === 'three_stage') {
@@ -1231,81 +1507,109 @@
         const rest = totalWater - bloomWater;
         const pour1 = Math.round(rest * 0.55);
         const pour2 = totalWater - bloomWater - pour1;
+
+        const bloomSec = Math.max(28, 40 + tMod.bloomDelta);
+        const pour1Sec = Math.max(35, 50 + tMod.stepDelta);
+        const pour2Sec = Math.max(35, 50 + tMod.stepDelta);
+
         rawSteps = [
           {
             name: '悶蒸',
             amount: bloomWater,
-            durationSec: 40,
-            note: '浸濕全部粉床，釋放二氧化碳至 40 秒',
+            durationSec: bloomSec,
+            note: `浸濕全部粉床，釋放二氧化碳至 ${bloomSec} 秒`,
             animType: 'bloom',
             actionTitle: '全粉床浸潤 · 漢堡膨脹 (悶蒸)',
-            actionTip: '均勻繞圈潤濕全部咖啡粉，新鮮二氧化碳受熱膨脹排氣，粉層飽滿隆起，等待至 40 秒。'
+            actionTip: '均勻繞圈潤濕全部咖啡粉，新鮮二氧化碳受熱膨脹排氣，粉層飽滿隆起。',
+            defaultAmount: bloomWater,
+            defaultDuration: bloomSec
           },
           {
             name: '第一段注水',
             amount: pour1,
-            durationSec: 50,
+            durationSec: pour1Sec,
             note: '由內向外穩定均勻繞圈，帶出果香酸甜',
             animType: 'spiral',
             actionTitle: '由內向外中等水流繞圈',
-            actionTip: '維持中等平穩水柱由內向外穩定繞圈，保持水層高度，帶出優雅花果香與酸甜層次。'
+            actionTip: '維持中等平穩水柱由內向外穩定繞圈，保持水層高度，帶出優雅花果香與酸甜層次。',
+            defaultAmount: pour1,
+            defaultDuration: pour1Sec
           },
           {
             name: '第二段注水',
             amount: pour2,
-            durationSec: 50,
+            durationSec: pour2Sec,
             note: '中心維持平穩水柱補足水量，滴濾完畢移開',
             animType: 'steady_center',
             actionTitle: '中心平穩水柱補足',
-            actionTip: '回到中心維持細穩水流補足剩餘水量，水位落乾即移開濾杯。'
+            actionTip: '回到中心維持細穩水流補足剩餘水量，水位落乾即移開濾杯。',
+            defaultAmount: pour2,
+            defaultDuration: pour2Sec
           }
         ];
       } else if (method === 'hoffmann') {
         const bloomWater = Math.round(dose * 3.0);
         const pour1 = Math.round((totalWater * 0.6) - bloomWater);
         const pour2 = totalWater - bloomWater - pour1;
+
+        const bloomSec = Math.max(30, 45 + tMod.bloomDelta);
+        const p1Sec = Math.max(25, 35 + tMod.stepDelta);
+        const p2Sec = Math.max(25, 35 + tMod.stepDelta);
+        const drainSec = Math.max(35, 50 + tMod.stepDelta);
+
         rawSteps = [
           {
             name: '悶蒸 + 輕搖 (Swirl)',
             amount: bloomWater,
-            durationSec: 45,
-            note: '注水後輕搖濾杯消除乾粉結塊，浸潤至 45 秒',
+            durationSec: bloomSec,
+            note: `注水後輕搖濾杯消除乾粉結塊，浸潤至 ${bloomSec} 秒`,
             animType: 'bloom',
             actionTitle: '悶蒸注水 + 均勻排氣膨脹 (Swirl)',
-            actionTip: '迅速注入悶蒸水並雙手輕搖濾杯 2-3 圈消除乾粉結塊，隨後靜待咖啡粉均勻膨脹排氣至 45 秒。'
+            actionTip: '迅速注入悶蒸水並雙手輕搖濾杯 2-3 圈消除乾粉結塊，隨後靜待咖啡粉均勻膨脹排氣。',
+            defaultAmount: bloomWater,
+            defaultDuration: bloomSec
           },
           {
             name: '第一段大水流',
             amount: pour1,
-            durationSec: 35,
+            durationSec: p1Sec,
             note: '較大水流衝擊攪拌，注入至 60% 總水量',
             animType: 'vigorous_pour',
             actionTitle: '大水流攪拌衝擊',
-            actionTip: '加大注水流量在 30 秒內注入至 60% 總水量，利用水流重力形成充分紊流攪拌萃取。'
+            actionTip: '加大注水流量快速注入，利用水流重力形成充分紊流攪拌萃取。',
+            defaultAmount: pour1,
+            defaultDuration: p1Sec
           },
           {
             name: '第二段細水流',
             amount: pour2,
-            durationSec: 35,
+            durationSec: p2Sec,
             note: '輕柔補至目標總水量，完成後順勢輕微晃動',
             animType: 'steady_center',
             actionTitle: '溫柔細水流補水',
-            actionTip: '降低水柱衝擊，輕柔平穩補至目標總水量，完成後順勢輕微晃動一次。'
+            actionTip: '降低水柱衝擊，輕柔平穩補至目標總水量，完成後順勢輕微晃動一次。',
+            defaultAmount: pour2,
+            defaultDuration: p2Sec
           },
           {
             name: '粉床平整滴濾',
             amount: 0,
-            durationSec: 50,
+            durationSec: drainSec,
             note: '讓咖啡液自然滴盡，粉床收杯平整如鏡',
             animType: 'drain_rest',
             actionTitle: '平整自然滴濾收杯',
-            actionTip: '讓咖啡液自然滴盡，粉渣平整沈降，移開濾杯享用。'
+            actionTip: '讓咖啡液自然滴盡，粉渣平整沈降，移開濾杯享用。',
+            defaultAmount: 0,
+            defaultDuration: drainSec
           }
         ];
       } else if (method === 'matsuya') {
         const bloomWater = Math.round(dose * 2.0);
         const extractWater = Math.round(totalWater * 0.55);
         const bypassWater = totalWater - bloomWater - extractWater;
+
+        const steamSec = Math.max(120, 180 + tMod.bloomDelta * 2);
+
         rawSteps = [
           {
             name: '中心點滴潤濕',
@@ -1314,16 +1618,20 @@
             note: '細小點滴僅潤濕中心粉芯',
             animType: 'drip_slow',
             actionTitle: '中心點滴滴水 (Drop by Drop)',
-            actionTip: '手沖壺極輕微傾斜，一滴一滴如點滴般僅滴在中心粉芯，不可形成連續水柱，讓水自然向下浸潤。'
+            actionTip: '手沖壺極輕微傾斜，一滴一滴如點滴般僅滴在中心粉芯，不可形成連續水柱。',
+            defaultAmount: bloomWater,
+            defaultDuration: 30
           },
           {
             name: '加蓋深悶蒸',
             amount: 0,
-            durationSec: 180,
-            note: '蓋上悶蒸蓋深層悶蒸 3 分鐘，排淨氣體',
+            durationSec: steamSec,
+            note: `蓋上悶蒸蓋深層悶蒸 ${Math.round(steamSec / 60)} 分鐘，排淨氣體`,
             animType: 'bloom',
-            actionTitle: '深層悶蒸膨脹 (加蓋 3 分鐘)',
-            actionTip: '加蓋鎖住熱氣與蒸氣，讓咖啡粉內部深層均勻膨脹排氣整整 180 秒，徹底釋放醇厚精華。'
+            actionTitle: `深層悶蒸膨脹 (加蓋 ${Math.round(steamSec / 60)} 分鐘)`,
+            actionTip: '加蓋鎖住熱氣與蒸氣，讓咖啡粉內部深層均勻膨脹排氣，徹底釋放醇厚精華。',
+            defaultAmount: 0,
+            defaultDuration: steamSec
           },
           {
             name: '核心萃取注水',
@@ -1332,7 +1640,9 @@
             note: '大水流僅在中心硬幣大小區域注水',
             animType: 'steady_center',
             actionTitle: '中心 50 圓大水流萃取',
-            actionTip: '大水流僅在中心 50 圓硬幣大小範圍穩定注水，迅速萃取出中段濃厚精華。'
+            actionTip: '大水流僅在中心 50 圓硬幣大小範圍穩定注水，迅速萃取出中段濃厚精華。',
+            defaultAmount: extractWater,
+            defaultDuration: 45
           },
           {
             name: '熱水稀釋 (Bypass)',
@@ -1341,39 +1651,50 @@
             note: '移開濾杯，向分享壺直接加入純淨熱水',
             animType: 'bypass_pot',
             actionTitle: '移開濾杯直接加熱水 (Bypass)',
-            actionTip: '立刻移開濾杯避免萃出尾段苦澀雜味，直接向分享壺加入純熱水稀釋至目標總克數！'
+            actionTip: '立刻移開濾杯避免萃出尾段苦澀雜味，直接向分享壺加入純熱水稀釋至目標總克數！',
+            defaultAmount: bypassWater,
+            defaultDuration: 15
           }
         ];
       } else if (method === 'immersion') {
         const bloomWater = Math.round(totalWater * 0.4);
         const remaining = totalWater - bloomWater;
+        const bloomSec = Math.max(25, 35 + tMod.bloomDelta);
+        const steepSec = Math.max(60, 85 + tMod.stepDelta * 3);
+
         rawSteps = [
           {
             name: '開閥初浸透',
             amount: bloomWater,
-            durationSec: 35,
-            note: '開閥注水滴出底層明亮酸甜，35 秒時關閉止水閥',
+            durationSec: bloomSec,
+            note: `開閥注水滴出底層明亮酸甜，${bloomSec} 秒時關閉止水閥`,
             animType: 'bloom',
             actionTitle: '開閥初浸透排氣 (初悶蒸)',
-            actionTip: '注入初段熱水潤濕粉層，釋放花果酸香並充分排氣膨脹，35 秒時撥起止水閥門。'
+            actionTip: '注入初段熱水潤濕粉層，釋放花果酸香並充分排氣膨脹，時間到時撥起止水閥門。',
+            defaultAmount: bloomWater,
+            defaultDuration: bloomSec
           },
           {
             name: '關閥全浸泡',
             amount: remaining,
-            durationSec: 85,
-            note: '一口氣注滿全部熱水，關閥均勻浸泡萃取至 2:00',
+            durationSec: steepSec,
+            note: '一口氣注滿全部熱水，關閥均勻浸泡萃取',
             animType: 'switch_closed',
             actionTitle: '關閉止水閥全浸泡 (閥門關閉)',
-            actionTip: '撥起開關關閉閥門，一口氣注入全部剩餘熱水，粉粒完全浸泡均勻萃取至 2:00。'
+            actionTip: '撥起開關關閉閥門，一口氣注入全部剩餘熱水，粉粒完全浸泡均勻萃取。',
+            defaultAmount: remaining,
+            defaultDuration: steepSec
           },
           {
             name: '開閥釋放滴濾',
             amount: 0,
             durationSec: 30,
-            note: '按下開關，重力自然過濾落水，於 2:30 完成',
+            note: '按下開關，重力自然過濾落水完成',
             animType: 'switch_open',
             actionTitle: '按下開關釋放咖啡液 (開閥落水)',
-            actionTip: '按下 Switch 開關，重力讓濃郁咖啡液瞬間過濾釋放至分享壺！'
+            actionTip: '按下 Switch 開關，重力讓濃郁咖啡液瞬間過濾釋放至分享壺！',
+            defaultAmount: 0,
+            defaultDuration: 30
           }
         ];
       }
@@ -1413,43 +1734,71 @@
       const methodConf = METHOD_CONFIGS[state.method];
       const flavorConf = FLAVOR_CONFIGS[state.flavor];
 
+      // 1. 水溫計算 (基準 + 風味微調 + 使用者手動自定義微調)
       let finalTemp = roastConf.baseTemp + flavorConf.tempDelta + state.tempAdjust;
-      if (finalTemp > 97) finalTemp = 97;
-      if (finalTemp < 80) finalTemp = 80;
+      if (finalTemp > 98) finalTemp = 98;
+      if (finalTemp < 75) finalTemp = 75;
 
+      // 2. 粉水比計算 (基準 + 風味微調 + 手法倍率 + 使用者自定義微調)
       let baseRatio = roastConf.baseRatio + flavorConf.ratioDelta;
-      let finalRatioVal = baseRatio * methodConf.ratioMultiplier;
+      let finalRatioVal = (baseRatio * methodConf.ratioMultiplier) + state.ratioAdjust;
       finalRatioVal = Math.round(finalRatioVal * 10) / 10;
       let ratioStr = `1:${finalRatioVal}`;
 
+      // 3. 總水量計算
       let totalWater = Math.round(state.dose * finalRatioVal);
 
-      let finalGrind = methodConf.grindModifier || roastConf.grind;
-      let grindNote = methodConf.grindNote || roastConf.grindNote;
+      // 4. 研磨度計算 (使用者自訂優先，否則採用手法/烘焙度推薦)
+      let finalGrind = state.customGrind || methodConf.grindModifier || roastConf.grind;
+      let grindNote = state.customGrind ? '使用者自訂研磨度' : (methodConf.grindNote || roastConf.grindNote);
 
+      // 更新水溫 UI
       document.getElementById('param-temp').textContent = `${finalTemp}°C`;
-      document.getElementById('param-temp-note').textContent = state.tempAdjust !== 0 ? `基準 ${roastConf.baseTemp}°C (微調 ${state.tempAdjust > 0 ? '+' : ''}${state.tempAdjust}°C)` : `${roastConf.name}標準水溫`;
+      document.getElementById('param-temp-note').textContent = state.tempAdjust !== 0 ? `基準 ${roastConf.baseTemp}°C (已自訂 ${state.tempAdjust > 0 ? '+' : ''}${state.tempAdjust}°C)` : `${roastConf.name}標準水溫`;
+      const resetTempBtn = document.getElementById('reset-temp-btn');
+      if (resetTempBtn) resetTempBtn.classList.toggle('hidden', state.tempAdjust === 0);
 
-      document.getElementById('param-grind').textContent = finalGrind;
+      // 更新研磨度 UI
+      const grindSelect = document.getElementById('param-grind-select');
+      if (grindSelect) {
+        grindSelect.value = finalGrind;
+      }
       document.getElementById('param-grind-note').textContent = grindNote;
+      const resetGrindBtn = document.getElementById('reset-grind-btn');
+      if (resetGrindBtn) resetGrindBtn.classList.toggle('hidden', state.customGrind === null);
 
+      // 更新粉水比 UI
       document.getElementById('param-ratio').textContent = ratioStr;
-      document.getElementById('param-ratio-note').textContent = `${flavorConf.name}比例`;
+      document.getElementById('param-ratio-note').textContent = state.ratioAdjust !== 0 ? `已自訂 (${flavorConf.name}基準)` : `${flavorConf.name}比例`;
+      const resetRatioBtn = document.getElementById('reset-ratio-btn');
+      if (resetRatioBtn) resetRatioBtn.classList.toggle('hidden', state.ratioAdjust === 0);
 
-      document.getElementById('param-water').textContent = `${totalWater}g`;
-      document.getElementById('param-water-note').textContent = `依 ${state.dose}g 粉計算`;
+      // 更新風味偏好說明卡片 (位於風味偏好下方)
+      const flavorTipElem = document.getElementById('flavor-adjustment-tip');
+      if (flavorTipElem) flavorTipElem.textContent = flavorConf.note;
+      const flavorTimingElem = document.getElementById('flavor-timing-adjustment-note');
+      if (flavorTimingElem) flavorTimingElem.textContent = flavorConf.timingNote;
 
-      const steps = generateSteps(state.method, state.dose, totalWater);
+      // 5. 步驟計算與快取
+      let steps;
+      if (state.isCustomSteps && state.customStepsData) {
+        steps = state.customStepsData;
+        totalWater = steps.reduce((sum, s) => sum + s.amount, 0);
+      } else {
+        steps = generateSteps(state.method, state.dose, totalWater, state.flavor);
+      }
       currentStepsCache = steps;
 
       totalBrewSeconds = steps.reduce((sum, s) => sum + s.durationSec, 0);
 
+      document.getElementById('param-water').textContent = `${totalWater}g`;
+      document.getElementById('param-water-note').textContent = state.isCustomSteps ? '依自訂步驟加總' : `依 ${state.dose}g 粉計算`;
+      document.getElementById('timer-total-water-goal').textContent = totalWater;
+
       document.getElementById('guide-method-name').textContent = methodConf.name;
       document.getElementById('total-time-estimate').textContent = `約 ${formatTime(totalBrewSeconds)}`;
-      document.getElementById('total-seconds-count').textContent = `共 ${totalBrewSeconds} 秒 (各步秒數加總)`;
-      document.getElementById('flavor-adjustment-tip').textContent = flavorConf.note;
+      document.getElementById('total-seconds-count').textContent = state.isCustomSteps ? `共 ${totalBrewSeconds} 秒 (自訂步驟加總)` : `共 ${totalBrewSeconds} 秒 (各步秒數加總)`;
 
-      document.getElementById('timer-total-water-goal').textContent = totalWater;
       if (!timerRunning && timerSeconds === 0) resetStepAnimationCue();
 
       const rateParamsElem = document.getElementById('rate-form-current-params');
@@ -1457,23 +1806,61 @@
         rateParamsElem.textContent = `${state.dose}g · ${finalTemp}°C · ${ratioStr} · ${totalWater}g`;
       }
 
+      renderStepsTable();
+      updateCustomStepControlsUI();
+    }
+
+    function renderStepsTable() {
       const tbody = document.getElementById('steps-tbody');
+      if (!tbody || !currentStepsCache) return;
       tbody.innerHTML = '';
 
-      steps.forEach((st, idx) => {
+      currentStepsCache.forEach((st, idx) => {
         const tr = document.createElement('tr');
         tr.id = `step-row-${idx}`;
         tr.className = 'hover:bg-[#FAF9F7] transition-colors';
-        tr.innerHTML = `
-          <td class="py-3.5 pr-3 font-medium text-[#2C2521]">${st.name}</td>
-          <td class="py-3.5 px-3 text-[#3D3028] font-mono-num font-semibold">${st.amount > 0 ? '+' + st.amount + 'g' : '-'}</td>
-          <td class="py-3.5 px-3 text-[#2C2521] font-mono-num font-bold">${st.cumulative}g</td>
-          <td class="py-3.5 px-3 text-[#3D3028] whitespace-nowrap">
-            <span class="font-mono-num font-semibold">${st.durationSec} 秒</span>
-            <span class="block text-[11px] text-[#9B8D83] font-mono-num font-normal mt-0.5">${st.timeRangeStr}</span>
-          </td>
-          <td class="py-3.5 pl-3 text-[#7C6E64] text-xs">${st.note}</td>
-        `;
+
+        if (state.isCustomSteps) {
+          // 自訂模式：注水量與注水秒數轉為直接可編輯之輸入框
+          tr.innerHTML = `
+            <td class="py-3 pr-3 font-medium text-[#2C2521] text-xs">${escapeHtml(st.name)}</td>
+            <td class="py-3 px-3">
+              <div class="flex items-center gap-1">
+                <input type="number" min="0" max="800" value="${st.amount}" 
+                       onchange="onCustomStepAmountChange(${idx}, this.value)"
+                       class="w-16 px-1.5 py-1 text-center font-mono-num font-bold rounded-lg border border-[#D8CCC4] bg-white text-xs text-[#2C2521] focus:border-[#654D3F] outline-none shadow-2xs">
+                <span class="text-xs text-[#8C7E75]">g</span>
+              </div>
+            </td>
+            <td class="py-3 px-3 text-[#2C2521] font-mono-num font-bold text-xs">${st.cumulative}g</td>
+            <td class="py-3 px-3">
+              <div class="flex items-center gap-1.5">
+                <input type="number" min="3" max="300" value="${st.durationSec}" 
+                       onchange="onCustomStepDurationChange(${idx}, this.value)"
+                       class="w-14 px-1.5 py-1 text-center font-mono-num font-bold rounded-lg border border-[#D8CCC4] bg-white text-xs text-[#2C2521] focus:border-[#654D3F] outline-none shadow-2xs">
+                <span class="text-xs text-[#8C7E75]">秒</span>
+                <span class="text-[11px] text-[#9B8D83] font-mono-num">(${st.timeRangeStr})</span>
+              </div>
+            </td>
+            <td class="py-3 pl-3">
+              <input type="text" value="${escapeHtml(st.note)}" 
+                     onchange="onCustomStepNoteChange(${idx}, this.value)"
+                     class="w-full px-2 py-1 rounded-lg border border-[#E6E0D8] bg-white text-xs text-[#685B52] focus:border-[#654D3F] outline-none">
+            </td>
+          `;
+        } else {
+          // 推薦瀏覽模式：優雅排版，清晰標示
+          tr.innerHTML = `
+            <td class="py-3.5 pr-3 font-medium text-[#2C2521]">${escapeHtml(st.name)}</td>
+            <td class="py-3.5 px-3 text-[#3D3028] font-mono-num font-semibold">${st.amount > 0 ? '+' + st.amount + 'g' : '-'}</td>
+            <td class="py-3.5 px-3 text-[#2C2521] font-mono-num font-bold">${st.cumulative}g</td>
+            <td class="py-3.5 px-3 text-[#3D3028] whitespace-nowrap">
+              <span class="font-mono-num font-semibold">${st.durationSec} 秒</span>
+              <span class="block text-[11px] text-[#9B8D83] font-mono-num font-normal mt-0.5">${st.timeRangeStr}</span>
+            </td>
+            <td class="py-3.5 pl-3 text-[#7C6E64] text-xs">${escapeHtml(st.note)}</td>
+          `;
+        }
         tbody.appendChild(tr);
       });
     }
@@ -2399,7 +2786,7 @@
                         <span>比例: <strong>${escapeHtml(ratio)}</strong></span>
                         <span>總水: <strong>${escapeHtml(water)}</strong></span>
                       </div>
-                      <button onclick="applyMethodRatingParams('${escapeHtml(rate.methodKey)}', ${dose})" class="text-[11px] text-[#654D3F] hover:underline font-semibold">
+                      <button onclick="applyMethodRatingParams('${bean.id}', '${rate.id}')" class="text-[11px] text-[#654D3F] hover:underline font-semibold">
                         套用此參數 ▶
                       </button>
                     </div>
@@ -2465,9 +2852,34 @@
       openRatingModalForCurrentBrew();
     }
 
-    function applyMethodRatingParams(methodKey, doseVal) {
-      selectMethod(methodKey);
-      if (doseVal) onDoseChange(doseVal);
+        function applyMethodRatingParams(beanId, ratingId) {
+      const beans = getSavedBeans();
+      const bean = beans.find(b => b.id === beanId);
+      if (!bean) return;
+      const rate = bean.methodRatings ? bean.methodRatings.find(r => r.id === ratingId) : null;
+      if (!rate) return;
+
+      if (rate.methodKey) selectMethod(rate.methodKey);
+      if (rate.params) {
+        if (rate.params.roast) selectRoast(rate.params.roast);
+        if (rate.params.flavor) selectFlavor(rate.params.flavor);
+        if (rate.params.dose) onDoseCommit(rate.params.dose);
+
+        if (rate.params.tempAdjust !== undefined) state.tempAdjust = rate.params.tempAdjust;
+        if (rate.params.ratioAdjust !== undefined) state.ratioAdjust = rate.params.ratioAdjust;
+        if (rate.params.customGrind !== undefined) state.customGrind = rate.params.customGrind;
+
+        if (rate.params.isCustomSteps && rate.params.customSteps && rate.params.customSteps.length > 0) {
+          state.isCustomSteps = true;
+          state.customStepsData = JSON.parse(JSON.stringify(rate.params.customSteps));
+        } else {
+          state.isCustomSteps = false;
+          state.customStepsData = null;
+        }
+      }
+
+      calculateAndRender();
+      if (timerRunning) resetTimer();
       closeRecipeVaultModal();
     }
 
@@ -2493,7 +2905,7 @@
       }
     }
 
-    // 儲存手法評分到指定咖啡豆
+    // 儲存手法評分到指定咖啡豆 (支援保存自訂參數與各階段步驟)
     function submitMethodRating() {
       const beanSelect = document.getElementById('rate-target-bean-select');
       const beanId = beanSelect.value;
@@ -2509,18 +2921,28 @@
       const commentInput = document.getElementById('rate-comment-input');
       const comment = commentInput.value.trim();
 
+      const isCustomParams = state.isCustomSteps || state.tempAdjust !== 0 || state.ratioAdjust !== 0 || state.customGrind !== null;
+
       const newRating = {
         id: 'rate_' + Date.now(),
         methodKey: methodKey,
         methodName: methodName,
         rating: currentLogRating,
         date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isCustom: isCustomParams,
         params: {
           dose: state.dose,
           temp: document.getElementById('param-temp').textContent,
           ratio: document.getElementById('param-ratio').textContent,
           water: document.getElementById('param-water').textContent,
-          grind: document.getElementById('param-grind').textContent,
+          grind: document.getElementById('param-grind-select') ? document.getElementById('param-grind-select').value : (state.customGrind || '標準研磨'),
+          tempAdjust: state.tempAdjust,
+          ratioAdjust: state.ratioAdjust,
+          customGrind: state.customGrind,
+          isCustomSteps: state.isCustomSteps,
+          customSteps: state.isCustomSteps && state.customStepsData ? JSON.parse(JSON.stringify(state.customStepsData)) : null,
+          flavor: state.flavor,
+          roast: state.roast
         },
         tags: [...currentLogTags],
         comment: comment || '（未填寫文字心得）'
@@ -2540,13 +2962,13 @@
       // 清空表單
       commentInput.value = '';
       currentLogTags = [];
-      document.querySelectorAll('#flavor-tag-picker .log-tag-btn').forEach(btn => {
-        btn.classList.remove('bg-[#ECE3DC]', 'text-[#3D3028]', 'border-[#CFC2B7]', 'font-semibold');
-        btn.classList.add('bg-white', 'text-[#685B52]', 'border-[#E6E0D8]');
+      document.querySelectorAll('#flavor-tag-picker button').forEach(b => {
+        b.className = 'log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]';
       });
-      setLogRating(4);
+      setLogRating(5);
 
-      // 切換回咖啡豆列表查看
+      updateVaultBadges();
+      renderBeansList();
       switchVaultTab('beans');
     }
 
