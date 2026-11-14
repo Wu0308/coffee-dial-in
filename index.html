@@ -1266,28 +1266,6 @@
             </div>
             
             <div class="flex flex-wrap items-center gap-2 text-xs">
-              <!-- 視圖切換器：時間軸 vs 數據表格 -->
-              <span class="inline-flex p-0.5 rounded-lg bg-[#FAF8F5] border border-[#E6E0D8]">
-                <button id="view-mode-timeline-btn" onclick="switchStepsViewMode('timeline')" 
-                        class="px-2.5 py-1 rounded-md bg-[#3D2C22] text-[#FAF6F2] font-semibold transition shadow-2xs flex items-center gap-1.5 cursor-pointer">
-                  <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                  </svg>
-                  <span>時間軌視圖</span>
-                </button>
-                <button id="view-mode-table-btn" onclick="switchStepsViewMode('table')" 
-                        class="px-2.5 py-1 rounded-md text-[#7C6E64] hover:text-[#2C2521] transition flex items-center gap-1.5 cursor-pointer">
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="3" y1="9" x2="21" y2="9"></line>
-                    <line x1="3" y1="15" x2="21" y2="15"></line>
-                    <line x1="9" y1="3" x2="9" y2="21"></line>
-                  </svg>
-                  <span>數據表格</span>
-                </button>
-              </span>
-
               <button id="toggle-custom-steps-btn" onclick="toggleCustomStepsMode()" class="px-2.5 py-1 rounded-lg border border-[#E6E0D8] bg-white hover:border-[#CFC2B7] text-[#654D3F] font-medium transition flex items-center gap-1.5 shadow-2xs">
                 <span id="custom-steps-btn-icon">
                   <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1307,27 +1285,9 @@
             </div>
           </div>
 
-          <!-- 視圖 1: 注水階段時間軌 (Step Timeline Rail) -->
+          <!-- 注水階段時間軌 (Step Timeline Rail) -->
           <div id="steps-timeline-container" class="relative pl-6 sm:pl-8 before:absolute before:left-3 sm:before:left-3.5 before:top-4 before:bottom-4 before:w-0.5 before:bg-[#EAE2D8] space-y-3.5 my-3">
             <!-- 動態注入時間軌節點卡片 -->
-          </div>
-
-          <!-- 視圖 2: 表格結構 (步驟 / 注水量 / 累計水量 / 注水秒數區間 / 注水操作簡記) -->
-          <div id="steps-table-container" class="hidden overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="border-b border-[#F0EAE3] text-[11px] sm:text-xs text-[#8C7E75] font-medium">
-                  <th class="py-2.5 pr-3 font-normal">步驟</th>
-                  <th class="py-2.5 px-3 font-normal">注水量</th>
-                  <th class="py-2.5 px-3 font-normal">累計水量</th>
-                  <th class="py-2.5 px-3 font-normal">注水秒數 / 時間區間</th>
-                  <th class="py-2.5 pl-3 font-normal">注水操作簡記</th>
-                </tr>
-              </thead>
-              <tbody id="steps-tbody" class="text-xs sm:text-sm divide-y divide-[#F7F4F0]">
-                <!-- 動態注入步驟資料 -->
-              </tbody>
-            </table>
           </div>
 
           <!-- 表格底端：預估總時間 (與上方所有步驟秒數之和完全一致) -->
@@ -1734,8 +1694,7 @@
       customGrind: null,
       isCustomSteps: false,
       isEditingSteps: false,
-      customStepsData: null,
-      stepsViewMode: 'timeline' // 'timeline' or 'table'
+      customStepsData: null
     };
 
     // 烘焙度基礎參數表
@@ -1992,10 +1951,10 @@
       calculateAndRender();
 
       // 視覺微反饋提示已還原並重新計算
-      const tbody = document.getElementById('steps-tbody');
-      if (tbody) {
-        tbody.style.opacity = '0.4';
-        setTimeout(() => { tbody.style.opacity = '1'; }, 150);
+      const timelineElem = document.getElementById('steps-timeline-container');
+      if (timelineElem) {
+        timelineElem.style.opacity = '0.4';
+        setTimeout(() => { timelineElem.style.opacity = '1'; }, 150);
       }
     }
 
@@ -2094,6 +2053,7 @@
       if (state.isEditingSteps) {
         state.isEditingSteps = false;
         state.isCustomSteps = true;
+        recalculateCustomStepsMetrics();
       } else {
         state.isEditingSteps = true;
         state.isCustomSteps = true;
@@ -2101,8 +2061,9 @@
           state.customStepsData = JSON.parse(JSON.stringify(currentStepsCache));
         }
       }
-      renderStepsTable();
+      renderStepTimeline();
       updateCustomStepControlsUI();
+      updateZenBaristaUI();
     }
 
     function resetToRecommendedSteps() {
@@ -2139,7 +2100,7 @@
         state.customStepsData = JSON.parse(JSON.stringify(currentStepsCache));
       }
       if (!state.customStepsData[idx]) return;
-      let num = parseInt(val);
+      let num = parseInt(val, 10);
       if (isNaN(num) || num < 0) num = 0;
       state.customStepsData[idx].amount = num;
       state.isCustomSteps = true;
@@ -2151,8 +2112,8 @@
         state.customStepsData = JSON.parse(JSON.stringify(currentStepsCache));
       }
       if (!state.customStepsData[idx]) return;
-      let sec = parseInt(val);
-      if (isNaN(sec) || sec < 3) sec = 3;
+      let sec = parseInt(val, 10);
+      if (isNaN(sec) || sec < 1) sec = 1;
       state.customStepsData[idx].durationSec = sec;
       state.isCustomSteps = true;
       recalculateCustomStepsMetrics();
@@ -2184,11 +2145,7 @@
         curStart = st.endSec;
         st.timeRangeStr = `${formatTime(st.startSec)} - ${formatTime(st.endSec)}`;
 
-        // 即時局部更新表格內的累計水量與時間區間標籤，不摧毀輸入框以保持打字焦點
-        const cumElem = document.getElementById(`step-cum-${i}`);
-        if (cumElem) cumElem.textContent = `${st.cumulative}g`;
-        const rangeElem = document.getElementById(`step-range-${i}`);
-        if (rangeElem) rangeElem.textContent = `(${st.timeRangeStr})`;
+        // 即時局部更新時間軌內的累計水量與時間區間標籤，不摧毀輸入框以保持打字焦點
         const timelineCumElem = document.getElementById(`timeline-step-cum-${i}`);
         if (timelineCumElem) timelineCumElem.textContent = `${st.cumulative}g`;
         const timelineRangeElem = document.getElementById(`timeline-step-range-${i}`);
@@ -2220,6 +2177,7 @@
 
       updateSensoryRadar();
       updateCustomStepControlsUI();
+      updateZenBaristaUI();
       if (timerRunning) resetTimer();
     }
 
@@ -2659,116 +2617,15 @@
         rateParamsElem.textContent = `${state.dose}g · ${finalTemp}°C · ${ratioStr} · ${totalWater}g`;
       }
 
-      renderStepsTable();
       renderStepTimeline();
       updateSensoryRadar();
       updateZenBaristaUI();
       updateCustomStepControlsUI();
     }
 
-    function renderStepsTable() {
-      const tbody = document.getElementById('steps-tbody');
-      if (!tbody || !currentStepsCache) return;
-      tbody.innerHTML = '';
-
-      currentStepsCache.forEach((st, idx) => {
-        const tr = document.createElement('tr');
-        tr.id = `step-row-${idx}`;
-        tr.className = 'hover:bg-[#FAF9F7] transition-colors';
-
-        if (state.isEditingSteps) {
-          // 編輯模式：注水量、注水秒數、注水操作簡記均為直接可編輯之輸入框
-          tr.innerHTML = `
-            <td class="py-3 pr-3 font-medium text-[#2C2521] text-xs">${escapeHtml(st.name)}</td>
-            <td class="py-3 px-3">
-              <div class="flex items-center gap-1">
-                <input type="number" id="custom-step-amt-${idx}" min="0" max="800" value="${st.amount}" 
-                       oninput="onCustomStepAmountChange(${idx}, this.value)"
-                       class="w-16 px-1.5 py-1 text-center font-mono-num font-bold rounded-lg border border-[#D8CCC4] bg-white text-xs text-[#2C2521] focus:border-[#654D3F] outline-none shadow-2xs">
-                <span class="text-xs text-[#8C7E75]">g</span>
-              </div>
-            </td>
-            <td class="py-3 px-3 text-[#2C2521] font-mono-num font-bold text-xs" id="step-cum-${idx}">${st.cumulative}g</td>
-            <td class="py-3 px-3">
-              <div class="flex items-center gap-1.5">
-                <input type="number" id="custom-step-dur-${idx}" min="3" max="300" value="${st.durationSec}" 
-                       oninput="onCustomStepDurationChange(${idx}, this.value)"
-                       class="w-14 px-1.5 py-1 text-center font-mono-num font-bold rounded-lg border border-[#D8CCC4] bg-white text-xs text-[#2C2521] focus:border-[#654D3F] outline-none shadow-2xs">
-                <span class="text-xs text-[#8C7E75]">秒</span>
-                <span class="text-[11px] text-[#9B8D83] font-mono-num" id="step-range-${idx}">(${st.timeRangeStr})</span>
-              </div>
-            </td>
-            <td class="py-3 pl-3">
-              <input type="text" id="custom-step-note-${idx}" value="${escapeHtml(st.note)}" 
-                     oninput="onCustomStepNoteChange(${idx}, this.value)"
-                     placeholder="自訂此階段注水操作簡記..."
-                     class="w-full px-2 py-1 rounded-lg border border-[#E6E0D8] bg-white text-xs text-[#685B52] focus:border-[#654D3F] outline-none">
-            </td>
-          `;
-        } else {
-          // 瀏覽與沖煮模式：優雅排版，呈現自訂或推薦步驟與操作簡記
-          const stepIcon = STEP_ICONS[st.animType] || STEP_ICONS.pour;
-          tr.innerHTML = `
-            <td class="py-3.5 pr-3 font-medium text-[#2C2521]">
-              <div class="flex items-center gap-2">
-                <span class="w-6 h-6 rounded-md bg-[#FAF7F2] border border-[#EBE3D7] flex items-center justify-center flex-shrink-0">
-                  ${stepIcon}
-                </span>
-                <span>${escapeHtml(st.name)}</span>
-              </div>
-            </td>
-            <td class="py-3.5 px-3 text-[#3D3028] font-mono-num font-semibold">${st.amount > 0 ? '+' + st.amount + 'g' : '-'}</td>
-            <td class="py-3.5 px-3 text-[#2C2521] font-mono-num font-bold">${st.cumulative}g</td>
-            <td class="py-3.5 px-3 text-[#3D3028] whitespace-nowrap">
-              <span class="font-mono-num font-semibold">${st.durationSec} 秒</span>
-              <span class="block text-[11px] text-[#9B8D83] font-mono-num font-normal mt-0.5">${st.timeRangeStr}</span>
-            </td>
-            <td class="py-3.5 pl-3 text-[#7C6E64] text-xs">${escapeHtml(st.note)}</td>
-          `;
-        }
-        tbody.appendChild(tr);
-      });
-    }
-
     // ========================================================
-    // 升級方向 3: 注水階段時間軌 (Step Timeline Rail 引擎)
+    // 注水階段時間軌 (Step Timeline Rail 引擎)
     // ========================================================
-
-    function switchStepsViewMode(mode) {
-      state.stepsViewMode = mode;
-      const timelineContainer = document.getElementById('steps-timeline-container');
-      const tableContainer = document.getElementById('steps-table-container');
-      const timelineBtn = document.getElementById('view-mode-timeline-btn');
-      const tableBtn = document.getElementById('view-mode-table-btn');
-
-      if (mode === 'timeline') {
-        if (timelineContainer) timelineContainer.classList.remove('hidden');
-        if (tableContainer) tableContainer.classList.add('hidden');
-        if (timelineBtn) {
-          timelineBtn.className = 'px-2.5 py-1 rounded-md bg-[#3D2C22] text-[#FAF6F2] font-semibold transition shadow-2xs flex items-center gap-1.5 cursor-pointer';
-          const icon = timelineBtn.querySelector('svg');
-          if (icon) icon.className = 'w-3.5 h-3.5 text-amber-400';
-        }
-        if (tableBtn) {
-          tableBtn.className = 'px-2.5 py-1 rounded-md text-[#7C6E64] hover:text-[#2C2521] transition flex items-center gap-1.5 cursor-pointer';
-          const icon = tableBtn.querySelector('svg');
-          if (icon) icon.className = 'w-3.5 h-3.5 text-[#7C6E64]';
-        }
-      } else {
-        if (timelineContainer) timelineContainer.classList.add('hidden');
-        if (tableContainer) tableContainer.classList.remove('hidden');
-        if (tableBtn) {
-          tableBtn.className = 'px-2.5 py-1 rounded-md bg-[#3D2C22] text-[#FAF6F2] font-semibold transition shadow-2xs flex items-center gap-1.5 cursor-pointer';
-          const icon = tableBtn.querySelector('svg');
-          if (icon) icon.className = 'w-3.5 h-3.5 text-amber-400';
-        }
-        if (timelineBtn) {
-          timelineBtn.className = 'px-2.5 py-1 rounded-md text-[#7C6E64] hover:text-[#2C2521] transition flex items-center gap-1.5 cursor-pointer';
-          const icon = timelineBtn.querySelector('svg');
-          if (icon) icon.className = 'w-3.5 h-3.5 text-[#7C6E64]';
-        }
-      }
-    }
 
     function renderStepTimeline() {
       const container = document.getElementById('steps-timeline-container');
@@ -2785,37 +2642,46 @@
         if (state.isEditingSteps) {
           // 編輯模式：時間軸卡片內嵌即時可調之注水量、秒數與筆記
           node.innerHTML = `
-            <div id="timeline-bullet-${idx}" class="absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#FAF8F5] border border-[#DDD3CA] text-[#7C6E64] flex items-center justify-center text-xs font-mono-num font-bold shadow-2xs">
+            <div id="timeline-bullet-${idx}" class="absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-amber-100 border border-amber-300 text-amber-900 flex items-center justify-center text-xs font-mono-num font-bold shadow-2xs">
               ${idx + 1}
             </div>
-            <div id="timeline-card-${idx}" class="p-3.5 rounded-xl border border-[#DDD3CA] bg-white shadow-2xs space-y-2.5">
+            <div id="timeline-card-${idx}" class="p-3.5 sm:p-4 rounded-xl border border-amber-300/80 bg-[#FFFDF9] shadow-2xs space-y-3">
               <div class="flex items-center justify-between gap-2">
-                <span class="font-bold text-xs text-[#2C2521]">${escapeHtml(st.name)}</span>
-                <span class="text-[11px] text-[#9B8D83] font-mono-num" id="timeline-step-range-${idx}">(${st.timeRangeStr})</span>
-              </div>
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                <div class="flex items-center gap-1">
-                  <span class="text-xs text-[#8C7E75]">水量:</span>
-                  <input type="number" min="0" max="800" value="${st.amount}" 
-                         oninput="onCustomStepAmountChange(${idx}, this.value)"
-                         class="w-16 px-1.5 py-0.5 text-center font-mono-num font-bold rounded-lg border border-[#D8CCC4] bg-white text-xs text-[#2C2521] focus:border-[#654D3F] outline-none shadow-2xs">
-                  <span class="text-xs text-[#8C7E75]">g</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                  <span class="font-bold text-xs sm:text-sm text-[#2C2521]">${escapeHtml(st.name)}</span>
                 </div>
-                <div class="flex items-center gap-1">
-                  <span class="text-xs text-[#8C7E75]">時長:</span>
-                  <input type="number" min="3" max="300" value="${st.durationSec}" 
-                         oninput="onCustomStepDurationChange(${idx}, this.value)"
-                         class="w-14 px-1.5 py-0.5 text-center font-mono-num font-bold rounded-lg border border-[#D8CCC4] bg-white text-xs text-[#2C2521] focus:border-[#654D3F] outline-none shadow-2xs">
-                  <span class="text-xs text-[#8C7E75]">秒</span>
+                <span class="text-[11px] text-[#8C7E75] font-mono-num font-medium" id="timeline-step-range-${idx}">(${st.timeRangeStr})</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs text-[#8C7E75] font-medium">水量:</span>
+                  <div class="relative flex items-center">
+                    <input type="number" min="0" max="800" step="5" value="${st.amount}" 
+                           oninput="onCustomStepAmountChange(${idx}, this.value)"
+                           class="w-18 px-2 py-1 text-center font-mono-num font-bold rounded-lg border border-[#D8CCC4] bg-white text-xs text-[#2C2521] focus:border-[#654D3F] focus:ring-1 focus:ring-[#654D3F] outline-none shadow-2xs">
+                    <span class="ml-1 text-xs text-[#8C7E75] font-medium">g</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs text-[#8C7E75] font-medium">時長:</span>
+                  <div class="relative flex items-center">
+                    <input type="number" min="1" max="600" step="5" value="${st.durationSec}" 
+                           oninput="onCustomStepDurationChange(${idx}, this.value)"
+                           class="w-16 px-2 py-1 text-center font-mono-num font-bold rounded-lg border border-[#D8CCC4] bg-white text-xs text-[#2C2521] focus:border-[#654D3F] focus:ring-1 focus:ring-[#654D3F] outline-none shadow-2xs">
+                    <span class="ml-1 text-xs text-[#8C7E75] font-medium">秒</span>
+                  </div>
                 </div>
                 <div class="text-xs text-[#2C2521] font-mono-num font-bold flex items-center col-span-2 sm:col-span-1">
-                  累計: <span id="timeline-step-cum-${idx}" class="ml-1">${st.cumulative}g</span>
+                  累計: <span id="timeline-step-cum-${idx}" class="ml-1.5 text-amber-900 font-bold">${st.cumulative}g</span>
                 </div>
               </div>
-              <input type="text" value="${escapeHtml(st.note)}" 
-                     oninput="onCustomStepNoteChange(${idx}, this.value)"
-                     placeholder="自訂此階段注水操作簡記..."
-                     class="w-full px-2 py-1 rounded-lg border border-[#E6E0D8] bg-white text-xs text-[#685B52] focus:border-[#654D3F] outline-none">
+              <div>
+                <input type="text" value="${escapeHtml(st.note)}" 
+                       oninput="onCustomStepNoteChange(${idx}, this.value)"
+                       placeholder="自訂此階段注水操作簡記與手法提示..."
+                       class="w-full px-2.5 py-1.5 rounded-lg border border-[#E6E0D8] bg-white text-xs text-[#2C2521] placeholder-[#A09388] focus:border-[#654D3F] focus:ring-1 focus:ring-[#654D3F] outline-none">
+              </div>
             </div>
           `;
         } else {
@@ -2989,6 +2855,27 @@
         profile.cleanliness -= Math.min(0.3, Math.abs(state.ratioAdjust) * 0.15);
       }
 
+      // 6. 研磨粗細微調 (接觸面積與萃取動力學)
+      const effectiveGrind = state.customGrind || (METHOD_CONFIGS[method] && METHOD_CONFIGS[method].grindModifier) || (ROAST_CONFIGS[roast] && ROAST_CONFIGS[roast].grind) || '中細研磨';
+      const GRIND_EFFECTS = {
+        '極細研磨': { body: +0.6, sweetness: +0.3, aftertaste: +0.3, acidity: -0.4, cleanliness: -0.6 },
+        '細研磨':   { body: +0.4, sweetness: +0.3, aftertaste: +0.2, acidity: -0.2, cleanliness: -0.4 },
+        '中細偏細': { body: +0.2, sweetness: +0.2, aftertaste: +0.1, acidity: -0.1, cleanliness: -0.2 },
+        '中細研磨': { body: +0.0, sweetness: +0.1, aftertaste: +0.0, acidity: +0.0, cleanliness: +0.1 },
+        '中度研磨': { body: -0.1, sweetness: +0.0, aftertaste: +0.0, acidity: +0.1, cleanliness: +0.2 },
+        '中粗研磨': { body: -0.3, sweetness: -0.1, aftertaste: -0.1, acidity: +0.3, cleanliness: +0.3 },
+        '偏粗研磨': { body: -0.4, sweetness: -0.1, aftertaste: -0.2, acidity: +0.4, cleanliness: +0.4 },
+        '粗研磨':   { body: -0.6, sweetness: -0.2, aftertaste: -0.3, acidity: +0.5, cleanliness: +0.6 }
+      };
+      const grindEffect = GRIND_EFFECTS[effectiveGrind] || GRIND_EFFECTS['中細研磨'];
+      if (grindEffect) {
+        profile.acidity += grindEffect.acidity;
+        profile.sweetness += grindEffect.sweetness;
+        profile.body += grindEffect.body;
+        profile.aftertaste += grindEffect.aftertaste;
+        profile.cleanliness += grindEffect.cleanliness;
+      }
+
       // 數值鉗制 1.0 ~ 5.0，四捨五入至小數點一位
       Object.keys(profile).forEach(k => {
         profile[k] = Math.max(1.0, Math.min(5.0, Math.round(profile[k] * 10) / 10));
@@ -3014,23 +2901,35 @@
       const badgeDot = document.getElementById('radar-balance-dot');
       const diagElem = document.getElementById('radar-barista-diagnosis');
 
+      let diagText = '';
       if (profile.acidity >= 4.4) {
         if (badgeText) badgeText.textContent = '明亮果酸傾向';
         if (badgeDot) badgeDot.className = 'w-2 h-2 rounded-full bg-amber-500';
-        if (diagElem) diagElem.textContent = '果酸表現清脆明亮，富含柑橘花果香氣。若希望口感更圓潤，可提高水溫 1°C 或稍收細研磨度。';
+        diagText = '果酸表現清脆明亮，富含柑橘花果香氣。若希望口感更圓潤，可提高水溫 1°C 或稍收細研磨度。';
       } else if (profile.body >= 4.4) {
         if (badgeText) badgeText.textContent = '濃郁醇厚傾向';
         if (badgeDot) badgeDot.className = 'w-2 h-2 rounded-full bg-amber-800';
-        if (diagElem) diagElem.textContent = '咖啡油脂滑順，焦糖可可調性強烈。若尾段帶有微澀感，可加快尾段注水或提早移開濾杯。';
+        diagText = '咖啡油脂滑順，焦糖可可調性強烈。若尾段帶有微澀感，可加快尾段注水或提早移開濾杯。';
       } else if (profile.sweetness >= 4.5) {
         if (badgeText) badgeText.textContent = '極致甜感傾向';
         if (badgeDot) badgeDot.className = 'w-2 h-2 rounded-full bg-amber-600';
-        if (diagElem) diagElem.textContent = '熟果與蜜糖焦糖甜感飽滿突出，回甘悠長，層次柔和順口。';
+        diagText = '熟果與蜜糖焦糖甜感飽滿突出，回甘悠長，層次柔和順口。';
       } else {
         if (badgeText) badgeText.textContent = '金杯平衡萃取';
         if (badgeDot) badgeDot.className = 'w-2 h-2 rounded-full bg-emerald-500';
-        if (diagElem) diagElem.textContent = '酸、甜、醇厚與乾淨度達到黃金比例對稱，五大維度均衡展現，呈現咖啡豆產區最完整的本真風味。';
+        diagText = '酸、甜、醇厚與乾淨度達到黃金比例對稱，五大維度均衡展現，呈現咖啡豆產區最完整的本真風味。';
       }
+
+      if (state.customGrind) {
+        if (state.customGrind === '極細研磨' || state.customGrind === '細研磨') {
+          diagText += ` 目前自訂「${state.customGrind}」，顆粒極細萃取率高，顯著提升醇厚度與餘韻。`;
+        } else if (state.customGrind === '偏粗研磨' || state.customGrind === '粗研磨') {
+          diagText += ` 目前自訂「${state.customGrind}」，水流阻力小、保留清脆果酸與透亮的高乾淨度。`;
+        } else {
+          diagText += ` 目前自訂「${state.customGrind}」，顆粒均勻分佈，有助維持萃取穩定度。`;
+        }
+      }
+      if (diagElem) diagElem.textContent = diagText;
 
       // 繪製 SVG 雷達圖
       renderRadarSvg(profile);
@@ -3520,7 +3419,6 @@
       document.getElementById('timer-log-btn').classList.add('hidden');
       resetStepAnimationCue();
 
-      document.querySelectorAll('#steps-tbody tr').forEach(tr => tr.classList.remove('step-row-active'));
       updateTimelineStepHighlight(-1);
       updateZenBaristaUI();
     }
@@ -3582,9 +3480,6 @@
           currentStepsCache[currentStepsCache.length - 1].cumulative
         );
 
-        document.querySelectorAll('#steps-tbody tr').forEach((tr, idx) => {
-          tr.classList.toggle('step-row-active', idx === currentStepsCache.length - 1);
-        });
         updateTimelineStepHighlight(currentStepsCache.length - 1);
         updateZenBaristaUI();
         return;
@@ -3623,9 +3518,6 @@
         activeStep.cumulative
       );
 
-      document.querySelectorAll('#steps-tbody tr').forEach((tr, idx) => {
-        tr.classList.toggle('step-row-active', idx === activeIndex);
-      });
       updateTimelineStepHighlight(activeIndex);
       updateZenBaristaUI();
     }
