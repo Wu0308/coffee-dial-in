@@ -2559,7 +2559,13 @@
 
       // 更新水溫 UI
       document.getElementById('param-temp').textContent = `${finalTemp}°C`;
-      document.getElementById('param-temp-note').textContent = state.tempAdjust !== 0 ? `基準 ${roastConf.baseTemp}°C (已自訂 ${state.tempAdjust > 0 ? '+' : ''}${state.tempAdjust}°C)` : `${roastConf.name}標準水溫`;
+      let tempNoteText = `${roastConf.name}標準水溫`;
+      if (state.tempAdjust !== 0) {
+        tempNoteText = `自訂水溫 (${state.tempAdjust > 0 ? '+' : ''}${state.tempAdjust}°C)`;
+      } else if (flavorConf.tempDelta !== 0) {
+        tempNoteText = `${flavorConf.name}推薦 (${flavorConf.tempDelta > 0 ? '+' : ''}${flavorConf.tempDelta}°C)`;
+      }
+      document.getElementById('param-temp-note').textContent = tempNoteText;
       const resetTempBtn = document.getElementById('reset-temp-btn');
       if (resetTempBtn) resetTempBtn.classList.toggle('hidden', state.tempAdjust === 0);
 
@@ -2574,7 +2580,13 @@
 
       // 更新粉水比 UI
       document.getElementById('param-ratio').textContent = ratioStr;
-      document.getElementById('param-ratio-note').textContent = state.ratioAdjust !== 0 ? `已自訂 (${flavorConf.name}基準)` : `${flavorConf.name}比例`;
+      let ratioNoteText = `${flavorConf.name}比例`;
+      if (state.ratioAdjust !== 0) {
+        ratioNoteText = `自訂比例 (${state.ratioAdjust > 0 ? '+' : ''}${state.ratioAdjust})`;
+      } else if (flavorConf.ratioDelta !== 0) {
+        ratioNoteText = `${flavorConf.name}推薦 (${flavorConf.ratioDelta > 0 ? '+' : ''}${flavorConf.ratioDelta})`;
+      }
+      document.getElementById('param-ratio-note').textContent = ratioNoteText;
       const resetRatioBtn = document.getElementById('reset-ratio-btn');
       if (resetRatioBtn) resetRatioBtn.classList.toggle('hidden', state.ratioAdjust === 0);
 
@@ -2813,49 +2825,37 @@
         profile.cleanliness -= 0.4;
       }
 
-      // 3. 目標風味按鈕偏好微調
-      if (flavor === 'acid') {
-        profile.acidity += 0.6;
-        profile.sweetness -= 0.2;
-        profile.body -= 0.3;
-      } else if (flavor === 'sweet') {
-        profile.sweetness += 0.6;
-        profile.acidity -= 0.2;
-        profile.aftertaste += 0.2;
-      } else if (flavor === 'body') {
-        profile.body += 0.6;
-        profile.cleanliness -= 0.2;
-        profile.sweetness += 0.2;
-      } else if (flavor === 'balance') {
-        profile.acidity += 0.1;
-        profile.sweetness += 0.2;
-        profile.body += 0.1;
-        profile.cleanliness += 0.2;
+      // 3. 真實水溫總溫差微調 (無論來自風味推薦還是手動微調，每度水溫的物理效應完全一致)
+      const flavorConf = FLAVOR_CONFIGS[flavor] || { tempDelta: 0, ratioDelta: 0 };
+      const totalTempDelta = (flavorConf.tempDelta || 0) + (state.tempAdjust || 0);
+
+      if (totalTempDelta > 0) {
+        // 水溫提高 (+1°C ~ +3°C)：提升分子熱運動能量，促進揮發性花果酸香與清甜溶解
+        profile.acidity += Math.min(0.4, totalTempDelta * 0.15);
+        profile.sweetness += Math.min(0.3, totalTempDelta * 0.10);
+        profile.body += Math.min(0.2, totalTempDelta * 0.05);
+      } else if (totalTempDelta < 0) {
+        // 水溫降低 (-1°C ~ -3°C)：低溫萃取溫和，抑制苦澀，展現純淨乾淨度
+        profile.cleanliness += Math.min(0.35, Math.abs(totalTempDelta) * 0.12);
+        profile.body -= Math.min(0.3, Math.abs(totalTempDelta) * 0.08);
       }
 
-      // 4. 水溫自訂微調
-      if (state.tempAdjust > 0) {
-        profile.body += Math.min(0.4, state.tempAdjust * 0.08);
-        profile.sweetness += Math.min(0.3, state.tempAdjust * 0.05);
-        profile.acidity -= Math.min(0.3, state.tempAdjust * 0.05);
-      } else if (state.tempAdjust < 0) {
-        profile.acidity += Math.min(0.4, Math.abs(state.tempAdjust) * 0.08);
-        profile.cleanliness += Math.min(0.3, Math.abs(state.tempAdjust) * 0.05);
-        profile.body -= Math.min(0.4, Math.abs(state.tempAdjust) * 0.08);
+      // 4. 真實粉水比總比率微調 (無論來自風味推薦還是手動微調，每階比例效應完全一致)
+      const totalRatioDelta = (flavorConf.ratioDelta || 0) + (state.ratioAdjust || 0);
+      if (totalRatioDelta > 0) {
+        // 寬粉水比 (如 1:15.5 ~ 1:17)：水量充沛，拉升乾淨度與酸質通透度，降低濃稠感
+        profile.cleanliness += Math.min(0.35, totalRatioDelta * 0.25);
+        profile.acidity += Math.min(0.2, totalRatioDelta * 0.12);
+        profile.body -= Math.min(0.35, totalRatioDelta * 0.25);
+      } else if (totalRatioDelta < 0) {
+        // 窄粉水比 (如 1:13.5 ~ 1:14)：濃度提高，微乳化油脂感強烈，提升醇厚度與餘韻
+        profile.body += Math.min(0.45, Math.abs(totalRatioDelta) * 0.3);
+        profile.aftertaste += Math.min(0.25, Math.abs(totalRatioDelta) * 0.15);
+        profile.sweetness += Math.min(0.2, Math.abs(totalRatioDelta) * 0.12);
+        profile.cleanliness -= Math.min(0.35, Math.abs(totalRatioDelta) * 0.2);
       }
 
-      // 5. 粉水比微調
-      if (state.ratioAdjust > 0) {
-        profile.cleanliness += Math.min(0.3, state.ratioAdjust * 0.15);
-        profile.acidity += Math.min(0.2, state.ratioAdjust * 0.1);
-        profile.body -= Math.min(0.4, state.ratioAdjust * 0.2);
-      } else if (state.ratioAdjust < 0) {
-        profile.body += Math.min(0.4, Math.abs(state.ratioAdjust) * 0.2);
-        profile.sweetness += Math.min(0.2, Math.abs(state.ratioAdjust) * 0.1);
-        profile.cleanliness -= Math.min(0.3, Math.abs(state.ratioAdjust) * 0.15);
-      }
-
-      // 6. 研磨粗細微調 (接觸面積與萃取動力學)
+      // 5. 研磨粗細微調 (接觸面積與萃取動力學)
       const effectiveGrind = state.customGrind || (METHOD_CONFIGS[method] && METHOD_CONFIGS[method].grindModifier) || (ROAST_CONFIGS[roast] && ROAST_CONFIGS[roast].grind) || '中細研磨';
       const GRIND_EFFECTS = {
         '極細研磨': { body: +0.6, sweetness: +0.3, aftertaste: +0.3, acidity: -0.4, cleanliness: -0.6 },
@@ -2874,6 +2874,44 @@
         profile.body += grindEffect.body;
         profile.aftertaste += grindEffect.aftertaste;
         profile.cleanliness += grindEffect.cleanliness;
+      }
+
+      // 6. 注水結構與時間動力學 (Kasuya 4:6 前段注水分配比率與悶蒸/萃取時長)
+      if (currentStepsCache && currentStepsCache.length > 0) {
+        const totalW = currentStepsCache.reduce((sum, s) => sum + s.amount, 0);
+        const p1Ratio = totalW > 0 ? (currentStepsCache[0].amount / totalW) : 0.20;
+        const bloomSec = currentStepsCache[0].durationSec || 45;
+        const totalSec = currentStepsCache.reduce((sum, s) => sum + s.durationSec, 0);
+
+        // Kasuya 4:6 前段水量配比影響：前大注水萃出更多酸質，前小注水萃出更多甜感
+        if (p1Ratio > 0.21) {
+          // 前注偏大 (如 24% vs 20%)：第一注大水量萃出更多前段果酸
+          profile.acidity += Math.min(0.35, (p1Ratio - 0.20) * 5.0);
+          profile.sweetness -= Math.min(0.2, (p1Ratio - 0.20) * 2.5);
+        } else if (p1Ratio < 0.19) {
+          // 前注偏小 (如 16% vs 20%)：第一注少第二注多，充分萃出焦糖甜感
+          profile.sweetness += Math.min(0.35, (0.20 - p1Ratio) * 5.0);
+          profile.acidity -= Math.min(0.2, (0.20 - p1Ratio) * 2.5);
+        }
+
+        // 悶蒸與接觸時間影響：短悶蒸 (<=38s) 避苦提酸，長悶蒸 (>=50s) 增甜增醇
+        if (bloomSec <= 38) {
+          profile.acidity += 0.15;
+          profile.cleanliness += 0.15;
+          profile.body -= 0.1;
+        } else if (bloomSec >= 50) {
+          profile.sweetness += 0.15;
+          profile.body += 0.1;
+        }
+
+        // 總萃取時間影響：快流速避開後段澀感，長浸泡增加厚實度
+        if (totalSec < 150) {
+          profile.cleanliness += 0.15;
+          profile.body -= 0.1;
+        } else if (totalSec > 180) {
+          profile.body += 0.15;
+          profile.aftertaste += 0.15;
+        }
       }
 
       // 數值鉗制 1.0 ~ 5.0，四捨五入至小數點一位
@@ -2918,6 +2956,26 @@
         if (badgeText) badgeText.textContent = '金杯平衡萃取';
         if (badgeDot) badgeDot.className = 'w-2 h-2 rounded-full bg-emerald-500';
         diagText = '酸、甜、醇厚與乾淨度達到黃金比例對稱，五大維度均衡展現，呈現咖啡豆產區最完整的本真風味。';
+      }
+
+      const flavorConf = FLAVOR_CONFIGS[state.flavor] || { tempDelta: 0 };
+      const totalTempDelta = (flavorConf.tempDelta || 0) + (state.tempAdjust || 0);
+      if (totalTempDelta !== 0) {
+        if (totalTempDelta > 0) {
+          diagText += ` 水溫提高 ${totalTempDelta}°C，有效活化花果芳香揮發酸與清甜。`;
+        } else {
+          diagText += ` 水溫降低 ${Math.abs(totalTempDelta)}°C，溫和萃取避開後段苦澀雜味。`;
+        }
+      }
+
+      if (currentStepsCache && currentStepsCache.length > 0) {
+        const totalW = currentStepsCache.reduce((sum, s) => sum + s.amount, 0);
+        const p1Ratio = totalW > 0 ? (currentStepsCache[0].amount / totalW) : 0.20;
+        if (p1Ratio > 0.21) {
+          diagText += ` 4:6 法前段採前大注水 (${Math.round(p1Ratio * 100)}%)，第一注提取豐富明亮果酸。`;
+        } else if (p1Ratio < 0.19) {
+          diagText += ` 4:6 法前段採前小注水 (${Math.round(p1Ratio * 100)}%)，第二注大水量充分釋放焦糖甜感。`;
+        }
       }
 
       if (state.customGrind) {
