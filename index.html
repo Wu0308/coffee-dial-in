@@ -553,7 +553,9 @@
         <div class="flex-1 w-full text-left space-y-1.5">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span id="step-anim-icon" class="text-sm">💧</span>
+              <span id="step-anim-icon" class="w-5 h-5 flex items-center justify-center text-[#654D3F]">
+                <svg class="w-4 h-4 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+              </span>
               <h4 id="step-anim-action-title" class="text-sm sm:text-base font-bold text-[#2C2521]">
                 準備開始沖煮
               </h4>
@@ -1063,26 +1065,44 @@
             <!-- 星等評分 (1-5 星) -->
             <div class="flex items-center gap-3">
               <span class="text-xs font-semibold text-[#2C2521]">此手法風味表現評分：</span>
-              <div class="flex items-center gap-1 text-2xl cursor-pointer" id="star-rating-container">
-                <span onclick="setLogRating(1)" class="star-item text-amber-500">★</span>
-                <span onclick="setLogRating(2)" class="star-item text-amber-500">★</span>
-                <span onclick="setLogRating(3)" class="star-item text-amber-500">★</span>
-                <span onclick="setLogRating(4)" class="star-item text-amber-500">★</span>
-                <span onclick="setLogRating(5)" class="star-item text-stone-300">★</span>
+              <div class="flex items-center gap-1.5 cursor-pointer" id="star-rating-container">
+                <svg onclick="setLogRating(1)" class="w-5 h-5 star-item text-amber-500 fill-current hover:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <svg onclick="setLogRating(2)" class="w-5 h-5 star-item text-amber-500 fill-current hover:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <svg onclick="setLogRating(3)" class="w-5 h-5 star-item text-amber-500 fill-current hover:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <svg onclick="setLogRating(4)" class="w-5 h-5 star-item text-amber-500 fill-current hover:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <svg onclick="setLogRating(5)" class="w-5 h-5 star-item text-stone-300 fill-current hover:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               </div>
               <span id="star-rating-label" class="text-xs font-bold text-[#654D3F]">4.0 分</span>
             </div>
 
-            <!-- 風味標籤快速點選 -->
+            <!-- 風味標籤快速點選 (自製向量小圖示) -->
             <div>
               <span class="text-[11px] text-[#8C7E75] block mb-1.5">此手法呈現之主要風味（可複選）：</span>
               <div class="flex flex-wrap gap-1.5" id="flavor-tag-picker">
-                <button type="button" onclick="toggleLogTag(this, '明亮果酸')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]">🍋 明亮果酸</button>
-                <button type="button" onclick="toggleLogTag(this, '柑橘清香')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]">🌸 柑橘清香</button>
-                <button type="button" onclick="toggleLogTag(this, '焦糖甜感')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]">🍯 焦糖甜感</button>
-                <button type="button" onclick="toggleLogTag(this, '堅果可可')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]">🌰 堅果可可</button>
-                <button type="button" onclick="toggleLogTag(this, '厚實濃郁')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]">☕ 厚實濃郁</button>
-                <button type="button" onclick="toggleLogTag(this, '乾淨清爽')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]">🍃 乾淨清爽</button>
+                <button type="button" onclick="toggleLogTag(this, '明亮果酸')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition">
+                  <svg class="w-3.5 h-3.5 text-amber-500 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 12 7.5 4.5"></path><path d="M12 12 16.5 4.5"></path><path d="M12 12 21 10.5"></path><path d="M12 12 19 16.5"></path><path d="M12 12 12 21"></path><path d="M12 12 5 16.5"></path><path d="M12 12 3 10.5"></path></svg>
+                  <span>明亮果酸</span>
+                </button>
+                <button type="button" onclick="toggleLogTag(this, '柑橘清香')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition">
+                  <svg class="w-3.5 h-3.5 text-rose-400 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 1 3 3c0 1.5-1.5 3-3 4-1.5-1-3-2.5-3-4a3 3 0 0 1 3-3z"></path><path d="M22 12a3 3 0 0 1-3 3c-1.5 0-3-1.5-4-3 1-1.5 2.5-3 4-3a3 3 0 0 1 3 3z"></path><path d="M12 22a3 3 0 0 1-3-3c0-1.5 1.5-3 3-4 1.5 1 3 2.5 3 4a3 3 0 0 1-3 3z"></path><path d="M2 12a3 3 0 0 1 3-3c1.5 0 3 1.5 4 3-1 1.5-2.5 3-4 3a3 3 0 0 1-3-3z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
+                  <span>柑橘清香</span>
+                </button>
+                <button type="button" onclick="toggleLogTag(this, '焦糖甜感')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition">
+                  <svg class="w-3.5 h-3.5 text-amber-600 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path><circle cx="12" cy="14" r="2"></circle></svg>
+                  <span>焦糖甜感</span>
+                </button>
+                <button type="button" onclick="toggleLogTag(this, '堅果可可')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition">
+                  <svg class="w-3.5 h-3.5 text-amber-800 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v3"></path><path d="M6 8a6 6 0 0 0 12 0c0-1.5-2.5-3-6-3s-6 1.5-6 3z"></path><path d="M6 8c0 5 3 11 6 13 3-2 6-8 6-13"></path></svg>
+                  <span>堅果可可</span>
+                </button>
+                <button type="button" onclick="toggleLogTag(this, '厚實濃郁')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition">
+                  <svg class="w-3.5 h-3.5 text-[#654D3F] inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
+                  <span>厚實濃郁</span>
+                </button>
+                <button type="button" onclick="toggleLogTag(this, '乾淨清爽')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition">
+                  <svg class="w-3.5 h-3.5 text-emerald-600 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 4 13c0-6 7-10 16-10 0 9-4 17-9 17Z"></path><path d="M11 13c2.5-2.5 5.5-4 9-4"></path></svg>
+                  <span>乾淨清爽</span>
+                </button>
               </div>
             </div>
 
@@ -2321,8 +2341,8 @@
 
         const overtimeSec = timerSeconds - totalBrewSeconds;
         document.getElementById('timer-status-title').textContent = overtimeSec === 0 
-          ? '✨ 達到預估總時間 · 靜待完全滴乾 ☕' 
-          : `☕ 萃取完成 · 滴漏等待中 (+ ${overtimeSec} 秒)`;
+          ? '達到預估總時間 · 靜待完全滴乾' 
+          : `萃取完成 · 滴漏等待中 (+ ${overtimeSec} 秒)`;
         document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
         document.getElementById('timer-current-target').textContent = `滴濾收尾 (目標 ${currentStepsCache[currentStepsCache.length - 1].cumulative}g)`;
         document.getElementById('timer-step-countdown').textContent = overtimeSec > 0 ? `(超時 +${overtimeSec} 秒，滴盡移開濾杯)` : '(滴淨即可移開濾杯)';
@@ -2438,7 +2458,7 @@
           </g>
           <circle cx="80" cy="98" r="1.8" fill="none" stroke="#B87B52" stroke-width="1" class="anim-drip-splash"/>
 
-          <text x="80" y="16" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#654D3F">咖啡粉層膨脹排氣 · 漢堡包 ♨</text>
+          <text x="80" y="16" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#654D3F">咖啡粉層膨脹排氣 · 漢堡包</text>
         </svg>
       `,
       idle: `
@@ -2572,7 +2592,7 @@
           <path d="M70 14 Q74 6 68 0" fill="none" stroke="#B3A69C" stroke-width="1.5" stroke-linecap="round" class="anim-steam-1"/>
           <path d="M80 12 Q85 4 79 -2" fill="none" stroke="#B3A69C" stroke-width="1.8" stroke-linecap="round" class="anim-steam-2"/>
           <path d="M90 14 Q86 6 92 0" fill="none" stroke="#B3A69C" stroke-width="1.5" stroke-linecap="round" class="anim-steam-3"/>
-          <text x="80" y="58" text-anchor="middle" font-size="9" font-weight="bold" fill="#654D3F">加蓋聚溫深悶蒸 ♨</text>
+          <text x="80" y="58" text-anchor="middle" font-size="9" font-weight="bold" fill="#654D3F">加蓋聚溫深悶蒸</text>
         </svg>
       `,
 
@@ -2588,7 +2608,7 @@
           <rect x="74" y="68" width="12" height="6" rx="2" fill="#D97706"/>
           <circle cx="80" cy="71" r="2" fill="#FFFFFF"/>
           <line x1="86" y1="71" x2="96" y2="65" stroke="#D97706" stroke-width="2.5" stroke-linecap="round"/>
-          <text x="80" y="18" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#D97706">🔒 止水閥關閉 · 全浸泡中</text>
+          <text x="80" y="18" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#D97706">止水閥關閉 · 全浸泡中</text>
         </svg>
       `,
 
@@ -2602,7 +2622,7 @@
           <rect x="74" y="68" width="12" height="6" rx="2" fill="#059669"/>
           <line x1="86" y1="71" x2="98" y2="74" stroke="#059669" stroke-width="2.5" stroke-linecap="round"/>
           <path d="M77 74 L77 102 L83 102 L83 74 Z" fill="#B87B52" class="anim-stream-rush"/>
-          <text x="80" y="18" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#059669">⚡ 按下開關 · 快速釋放過濾</text>
+          <text x="80" y="18" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#059669">按下開關 · 快速釋放過濾</text>
         </svg>
       `,
 
@@ -2633,7 +2653,7 @@
             <ellipse cx="80" cy="82" rx="1.5" ry="2.2" fill="#B87B52"/>
           </g>
           <circle cx="80" cy="96" r="2" fill="none" stroke="#B87B52" stroke-width="1" class="anim-drip-splash"/>
-          <text x="80" y="20" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#8C7E75">靜待咖啡液滴淨落乾 ⏳</text>
+          <text x="80" y="20" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#8C7E75">靜待咖啡液滴淨落乾</text>
         </svg>
       `,
 
@@ -2646,11 +2666,26 @@
           <path d="M74 44 Q70 30 76 18" fill="none" stroke="#654D3F" stroke-width="1.8" stroke-linecap="round" class="anim-steam-1"/>
           <path d="M80 42 Q86 28 80 14" fill="none" stroke="#654D3F" stroke-width="2" stroke-linecap="round" class="anim-steam-2"/>
           <path d="M86 44 Q82 30 88 18" fill="none" stroke="#654D3F" stroke-width="1.8" stroke-linecap="round" class="anim-steam-3"/>
-          <text x="46" y="36" font-size="13" class="anim-sparkle-1">✨</text>
-          <text x="110" y="40" font-size="13" class="anim-sparkle-2">✨</text>
+          <path d="M46 29 Q46 36 39 36 Q46 36 46 43 Q46 36 53 36 Q46 36 46 29 Z" fill="#D97706" class="anim-sparkle-1"/>
+          <path d="M110 33 Q110 40 103 40 Q110 40 110 47 Q110 40 117 40 Q110 40 110 33 Z" fill="#D97706" class="anim-sparkle-2"/>
           <text x="80" y="116" text-anchor="middle" font-size="9" font-weight="bold" fill="#654D3F">風味圓滿萃取 · 請享用</text>
         </svg>
       `
+    };
+
+    const STEP_ICONS = {
+      idle: `<svg class="w-4 h-4 text-[#8C7E75]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>`,
+      bloom: `<svg class="w-4 h-4 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 19c1-1.5 1-3 0-4.5s-1-3 0-4.5"></path><path d="M12 19c1-1.5 1-3 0-4.5s-1-3 0-4.5"></path><path d="M18 19c1-1.5 1-3 0-4.5s-1-3 0-4.5"></path></svg>`,
+      swirl: `<svg class="w-4 h-4 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19"></path></svg>`,
+      drip_slow: `<svg class="w-4 h-4 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>`,
+      pour: `<svg class="w-4 h-4 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>`,
+      steam_cover: `<svg class="w-4 h-4 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v4"></path><path d="M2 14c0-4.4 4.5-8 10-8s10 3.6 10 8H2z"></path><line x1="2" y1="14" x2="22" y2="14"></line></svg>`,
+      switch_closed: `<svg class="w-4 h-4 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
+      switch_open: `<svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`,
+      bypass_pot: `<svg class="w-4 h-4 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 11V4h-5"></path><path d="M5 19h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2z"></path><path d="M9 13v-2"></path></svg>`,
+      drain_rest: `<svg class="w-4 h-4 text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>`,
+      finish: `<svg class="w-4 h-4 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>`,
+      default: `<svg class="w-4 h-4 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c2.5-2.5 5.5-2.5 8 0s5.5 2.5 8 0 5.5-2.5 8 0"></path><path d="M2 17c2.5-2.5 5.5-2.5 8 0s5.5 2.5 8 0 5.5-2.5 8 0"></path></svg>`
     };
 
     let currentRenderedAnimType = null;
@@ -2712,16 +2747,7 @@
 
       // Update Icon
       if (icon) {
-        if (animType === 'bloom') icon.textContent = '♨️';
-      else if (animType === 'swirl') icon.textContent = '🔄';
-        else if (animType === 'drip_slow') icon.textContent = '💧';
-        else if (animType === 'steam_cover') icon.textContent = '♨️';
-        else if (animType === 'switch_closed') icon.textContent = '🔒';
-        else if (animType === 'switch_open') icon.textContent = '⚡';
-        else if (animType === 'bypass_pot') icon.textContent = '🫗';
-        else if (animType === 'drain_rest') icon.textContent = '⏳';
-        else if (animType === 'finish') icon.textContent = '☕';
-        else icon.textContent = '🌊';
+        icon.innerHTML = STEP_ICONS[animType] || STEP_ICONS.default;
       }
     }
 
@@ -2806,7 +2832,7 @@
               water: '225g',
               grind: '偏粗研磨'
             },
-            tags: ['🍋 明亮果酸', '🌸 柑橘清香', '🍯 焦糖甜感'],
+            tags: ['明亮果酸', '柑橘清香', '焦糖甜感'],
             comment: '前段果酸炸裂，帶有濃郁草莓與柑橘甜感，層次非常分明！'
           },
           {
@@ -2822,12 +2848,39 @@
               water: '220g',
               grind: '中細研磨'
             },
-            tags: ['🌸 柑橘清香', '🍃 乾淨清爽'],
+            tags: ['柑橘清香', '乾淨清爽'],
             comment: '花香清雅純淨無雜質，但尾韻焦糖甜度略微少於四六法。'
           }
         ]
       }
     ];
+
+    // 自製專屬風味標籤向量圖示 (Minimalist Vector Flavor Icons)
+    const FLAVOR_TAG_ICONS = {
+      '明亮果酸': `<svg class="w-3.5 h-3.5 text-amber-500 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 12 7.5 4.5"></path><path d="M12 12 16.5 4.5"></path><path d="M12 12 21 10.5"></path><path d="M12 12 19 16.5"></path><path d="M12 12 12 21"></path><path d="M12 12 5 16.5"></path><path d="M12 12 3 10.5"></path></svg>`,
+      '柑橘清香': `<svg class="w-3.5 h-3.5 text-rose-400 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 1 3 3c0 1.5-1.5 3-3 4-1.5-1-3-2.5-3-4a3 3 0 0 1 3-3z"></path><path d="M22 12a3 3 0 0 1-3 3c-1.5 0-3-1.5-4-3 1-1.5 2.5-3 4-3a3 3 0 0 1 3 3z"></path><path d="M12 22a3 3 0 0 1-3-3c0-1.5 1.5-3 3-4 1.5 1 3 2.5 3 4a3 3 0 0 1-3 3z"></path><path d="M2 12a3 3 0 0 1 3-3c1.5 0 3 1.5 4 3-1 1.5-2.5 3-4 3a3 3 0 0 1-3-3z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>`,
+      '焦糖甜感': `<svg class="w-3.5 h-3.5 text-amber-600 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path><circle cx="12" cy="14" r="2"></circle></svg>`,
+      '堅果可可': `<svg class="w-3.5 h-3.5 text-amber-800 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v3"></path><path d="M6 8a6 6 0 0 0 12 0c0-1.5-2.5-3-6-3s-6 1.5-6 3z"></path><path d="M6 8c0 5 3 11 6 13 3-2 6-8 6-13"></path></svg>`,
+      '厚實濃郁': `<svg class="w-3.5 h-3.5 text-[#654D3F] inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>`,
+      '乾淨清爽': `<svg class="w-3.5 h-3.5 text-emerald-600 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 4 13c0-6 7-10 16-10 0 9-4 17-9 17Z"></path><path d="M11 13c2.5-2.5 5.5-4 9-4"></path></svg>`
+    };
+
+    function renderFlavorTag(rawTag) {
+      const cleanName = rawTag.replace(/^[^\w\u4e00-\u9fa5]+\s*/, '');
+      const iconSvg = FLAVOR_TAG_ICONS[cleanName] || `<svg class="w-3.5 h-3.5 text-[#8C7E75] inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle></svg>`;
+      return `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white border border-[#E6E0D8] text-[#685B52] text-[10px] font-medium">${iconSvg}<span>${escapeHtml(cleanName)}</span></span>`;
+    }
+
+    function renderStarRating(rating, max = 5) {
+      const safeRating = Math.min(Math.max(Math.round(rating || 5), 1), max);
+      let html = '<div class="inline-flex items-center gap-0.5">';
+      for (let i = 1; i <= max; i++) {
+        const isFilled = i <= safeRating;
+        html += `<svg class="w-3.5 h-3.5 inline-block ${isFilled ? 'text-amber-500' : 'text-stone-300'} fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+      }
+      html += '</div>';
+      return html;
+    }
 
     let currentLogRating = 4;
     let currentLogTags = [];
@@ -2840,7 +2893,18 @@
           localStorage.setItem(STORAGE_KEY_BEANS, JSON.stringify(DEFAULT_BEANS_DATA));
           return DEFAULT_BEANS_DATA;
         }
-        return JSON.parse(stored) || [];
+        const parsed = JSON.parse(stored) || [];
+        // 清理任何既有歷史舊資料中殘留的 emoji 前綴
+        parsed.forEach(bean => {
+          if (bean.methodRatings) {
+            bean.methodRatings.forEach(rate => {
+              if (rate.tags) {
+                rate.tags = rate.tags.map(t => t.replace(/^[^\w\u4e00-\u9fa5]+\s*/, ''));
+              }
+            });
+          }
+        });
+        return parsed;
       } catch (e) {
         return DEFAULT_BEANS_DATA;
       }
@@ -2991,11 +3055,16 @@
             <div class="flex items-start justify-between gap-3 border-b border-[#F0EAE3] pb-3">
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="text-sm">🫘</span>
+                  <span class="w-4 h-4 text-[#654D3F] flex items-center justify-center">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.2 17.8c-2.4-3.1-2.4-6.5 0-9.6 1.8-2.3 2.1-4.8 1.4-6.2 3.8 1.5 5.4 5.3 5.4 8 0 4.2-2.8 7.8-6.8 7.8zM5 12c0-2.7 1.6-6.5 5.4-8-.7 1.4-.4 3.9 1.4 6.2 2.4 3.1 2.4 6.5 0 9.6-4 0-6.8-3.6-6.8-7.8z"/>
+                    </svg>
+                  </span>
                   <h4 class="text-sm font-bold text-[#2C2521]">${escapedBeanName}</h4>
                   ${ratingsCount > 0 ? `
-                    <span class="px-2 py-0.5 rounded-full bg-[#FAF9F7] border border-[#E6E0D8] text-[11px] font-bold text-amber-600 flex items-center gap-0.5 font-mono-num">
-                      ★ ${avgRating}
+                    <span class="px-2 py-0.5 rounded-full bg-[#FAF9F7] border border-[#E6E0D8] text-[11px] font-bold text-amber-600 flex items-center gap-1 font-mono-num">
+                      <svg class="w-3 h-3 text-amber-500 fill-current inline-block" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                      <span>${avgRating}</span>
                     </span>
                   ` : ''}
                 </div>
@@ -3007,10 +3076,12 @@
               <!-- 評分新手沖手法按鈕 -->
               <div class="flex items-center gap-1.5">
                 <button onclick="openRateModalForSpecificBean('${bean.id}')" class="px-2.5 py-1.5 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] hover:border-[#CFC2B7] text-[#654D3F] text-xs font-semibold transition flex items-center gap-1 shadow-2xs">
-                  <span>＋</span>
+                  <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                   <span>評分新手沖法</span>
                 </button>
-                <button onclick="deleteBean('${bean.id}')" class="text-stone-300 hover:text-red-500 text-xs transition p-1" title="刪除咖啡豆">✕</button>
+                <button onclick="deleteBean('${bean.id}')" class="text-stone-300 hover:text-red-500 text-xs transition p-1" title="刪除咖啡豆">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
               </div>
             </div>
 
@@ -3026,7 +3097,6 @@
                 const ratio = (rate.params && rate.params.ratio) || '1:15';
                 const water = (rate.params && rate.params.water) || '225g';
                 const grind = (rate.params && rate.params.grind) || '標準研磨';
-                const safeRating = Math.min(Math.max(Math.round(rate.rating || 5), 1), 5);
                 const stepsList = (rate.params && rate.params.customSteps) || rate.steps || null;
                 const isCustom = rate.isCustom || (rate.params && rate.params.isCustomSteps);
 
@@ -3039,13 +3109,15 @@
                           ${escapeHtml(rate.methodName)}
                         </span>
                         ${isCustom ? `<span class="px-1.5 py-0.5 rounded bg-[#E6E0D8] text-[#654D3F] text-[10px] font-semibold">自訂步驟與參數</span>` : ''}
-                        <span class="text-amber-500 font-bold text-xs">${'★'.repeat(safeRating)}</span>
+                        ${renderStarRating(rate.rating)}
                         <span class="text-xs font-bold text-[#2C2521]">${rate.rating}.0 分</span>
                       </div>
                       
                       <div class="flex items-center gap-2">
                         <span class="text-[10px] text-[#9B8D83]">${escapeHtml(rate.date)}</span>
-                        <button onclick="deleteMethodRating('${bean.id}', '${rate.id}')" class="text-stone-300 hover:text-red-500 text-xs transition" title="刪除評分">🗑️</button>
+                        <button onclick="deleteMethodRating('${bean.id}', '${rate.id}')" class="text-stone-300 hover:text-red-500 text-xs transition p-1" title="刪除評分">
+                          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
                       </div>
                     </div>
 
@@ -3058,8 +3130,9 @@
                         <span>比例: <strong>${escapeHtml(ratio)}</strong></span>
                         <span>總水: <strong>${escapeHtml(water)}</strong></span>
                       </div>
-                      <button onclick="applyMethodRatingParams('${bean.id}', '${rate.id}')" class="text-[11px] text-[#654D3F] hover:underline font-semibold">
-                        套用此參數 ▶
+                      <button onclick="applyMethodRatingParams('${bean.id}', '${rate.id}')" class="text-[11px] text-[#654D3F] hover:underline font-semibold flex items-center gap-1">
+                        <span>套用此參數</span>
+                        <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
                       </button>
                     </div>
 
@@ -3068,9 +3141,10 @@
                       <details class="text-[11px] bg-white rounded-lg border border-[#E6E0D8] p-2 select-none group">
                         <summary class="font-semibold text-[#654D3F] flex items-center justify-between cursor-pointer outline-none text-xs">
                           <span class="flex items-center gap-1.5">
-                            <span>📋 沖煮步驟細節 (${stepsList.length} 段${isCustom ? ' · 已自訂' : ''})</span>
+                            <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            <span>沖煮步驟細節 (${stepsList.length} 段${isCustom ? ' · 已自訂' : ''})</span>
                           </span>
-                          <span class="text-[10px] text-[#8C7E75] font-normal group-open:rotate-180 transition-transform">▾</span>
+                          <svg class="w-3.5 h-3.5 text-[#8C7E75] group-open:rotate-180 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </summary>
                         <div class="mt-2 space-y-1.5 pt-2 border-t border-[#F0EAE3]">
                           ${stepsList.map(st => `
@@ -3090,10 +3164,10 @@
                       </details>
                     ` : ''}
 
-                    <!-- 風味標籤 -->
+                    <!-- 風味標籤 (自製向量小圖示) -->
                     ${rate.tags && rate.tags.length > 0 ? `
-                      <div class="flex flex-wrap gap-1">
-                        ${rate.tags.map(t => `<span class="px-2 py-0.5 rounded-md bg-white border border-[#E6E0D8] text-[#685B52] text-[10px]">${escapeHtml(t)}</span>`).join('')}
+                      <div class="flex flex-wrap gap-1.5">
+                        ${rate.tags.map(t => renderFlavorTag(t)).join('')}
                       </div>
                     ` : ''}
 
@@ -3219,7 +3293,8 @@
       currentLogRating = rating;
       const stars = document.querySelectorAll('#star-rating-container .star-item');
       stars.forEach((star, idx) => {
-        star.className = idx < rating ? 'star-item text-amber-500' : 'star-item text-stone-300';
+        star.classList.toggle('text-amber-500', idx < rating);
+        star.classList.toggle('text-stone-300', idx >= rating);
       });
       document.getElementById('star-rating-label').textContent = `${rating}.0 分`;
     }
