@@ -1043,9 +1043,9 @@
               </div>
               <div class="mt-2">
                 <div class="flex items-center gap-1.5">
-                  <button onclick="stepCustomTemp(-1)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#E8E4DF] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="-1°C">-</button>
-                  <span class="text-2xl font-bold text-[#2C2521] font-mono-num cursor-pointer hover:underline" id="param-temp" title="點擊自訂水溫" onclick="editCustomTempPrompt()">92°C</span>
-                  <button onclick="stepCustomTemp(1)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#E8E4DF] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="+1°C">+</button>
+                  <button id="btn-temp-minus" onclick="stepCustomTemp(-1)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#E8E4DF] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="減少 1°C (下限 80°C)">-</button>
+                  <span class="text-2xl font-bold text-[#2C2521] font-mono-num cursor-pointer hover:underline" id="param-temp" title="點擊自訂水溫 (範圍 80°C - 98°C)" onclick="editCustomTempPrompt()">92°C</span>
+                  <button id="btn-temp-plus" onclick="stepCustomTemp(1)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#E8E4DF] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="增加 1°C (上限 98°C)">+</button>
                 </div>
                 <div class="text-[11px] text-[#9B8D83] mt-0.5 truncate" id="param-temp-note">標準萃取水溫</div>
               </div>
@@ -1095,9 +1095,9 @@
               </div>
               <div class="mt-2">
                 <div class="flex items-center gap-1.5">
-                  <button onclick="stepCustomRatio(-0.5)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#E8E4DF] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="-0.5">-</button>
-                  <span class="text-2xl font-bold text-[#2C2521] font-mono-num cursor-pointer hover:underline" id="param-ratio" title="點擊自訂粉水比" onclick="editCustomRatioPrompt()">1:15</span>
-                  <button onclick="stepCustomRatio(0.5)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#E8E4DF] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="+0.5">+</button>
+                  <button id="btn-ratio-minus" onclick="stepCustomRatio(-0.5)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#E8E4DF] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="減少 0.5 (下限 1:10)">-</button>
+                  <span class="text-2xl font-bold text-[#2C2521] font-mono-num cursor-pointer hover:underline" id="param-ratio" title="點擊自訂粉水比 (範圍 1:10 - 1:20)" onclick="editCustomRatioPrompt()">1:15</span>
+                  <button id="btn-ratio-plus" onclick="stepCustomRatio(0.5)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#E8E4DF] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="增加 0.5 (上限 1:20)">+</button>
                 </div>
                 <div class="text-[11px] text-[#9B8D83] mt-0.5 truncate" id="param-ratio-note">金杯平衡萃取</div>
               </div>
@@ -1273,6 +1273,12 @@
               </h2>
               <span class="text-[#8C7E75] text-xs hidden md:inline">手法：<span id="guide-method-name" class="font-semibold text-[#654D3F]">四六法</span></span>
               <span id="custom-steps-badge" class="hidden px-2 py-0.5 rounded-full bg-[#E8E4DF] text-[#654D3F] text-[10px] font-bold">已自訂各段參數</span>
+              <span id="steps-all-complete-badge" class="hidden px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1 shadow-2xs">
+                <svg class="w-3 h-3 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>所有步驟已全部完成</span>
+              </span>
             </div>
             
             <div class="flex flex-wrap items-center gap-2 text-xs">
@@ -1694,6 +1700,12 @@
 
   <!-- JavaScript 核心調配邏輯、時間精準換算、Web Audio 與 咖啡豆多手法評分模組 -->
   <script>
+    // 專業手沖參數物理上下限 (嚴格防呆)
+    const MIN_TEMP = 80;    // 水溫下限 80°C (低於 80°C 萃取動能不足)
+    const MAX_TEMP = 98;    // 水溫上限 98°C (高於 98°C 易燙傷咖啡粉萃出焦苦雜味)
+    const MIN_RATIO = 10.0; // 粉水比下限 1:10 (濃縮/冰手沖極限)
+    const MAX_RATIO = 20.0; // 粉水比上限 1:20 (極致清澈茶感極限)
+
     // 系統狀態
     const state = {
       method: 'four_six',   // four_six, single_pour, three_stage, hoffmann, matsuya, immersion
@@ -1994,7 +2006,14 @@
     // ========================================================
 
     function stepCustomTemp(delta) {
-      state.tempAdjust += delta;
+      const roastConf = ROAST_CONFIGS[state.roast];
+      const flavorConf = FLAVOR_CONFIGS[state.flavor];
+      const base = roastConf.baseTemp + flavorConf.tempDelta;
+      let current = base + state.tempAdjust;
+      let target = current + delta;
+      if (target < MIN_TEMP) target = MIN_TEMP;
+      if (target > MAX_TEMP) target = MAX_TEMP;
+      state.tempAdjust = target - base;
       calculateAndRender();
       if (timerRunning) resetTimer();
     }
@@ -2007,14 +2026,15 @@
 
     function editCustomTempPrompt() {
       const current = parseInt(document.getElementById('param-temp').textContent) || 92;
-      const input = prompt('請輸入自訂萃取水溫 (°C，建議範圍 80 - 98)：', current);
+      const input = prompt(`請輸入自訂萃取水溫 (°C，範圍 ${MIN_TEMP} - ${MAX_TEMP})：`, current);
       if (input !== null) {
         const val = parseInt(input);
-        if (!isNaN(val) && val >= 75 && val <= 100) {
+        if (!isNaN(val)) {
+          const clamped = Math.max(MIN_TEMP, Math.min(MAX_TEMP, val));
           const roastConf = ROAST_CONFIGS[state.roast];
           const flavorConf = FLAVOR_CONFIGS[state.flavor];
           const base = roastConf.baseTemp + flavorConf.tempDelta;
-          state.tempAdjust = val - base;
+          state.tempAdjust = clamped - base;
           calculateAndRender();
           if (timerRunning) resetTimer();
         }
@@ -2032,7 +2052,15 @@
     }
 
     function stepCustomRatio(delta) {
-      state.ratioAdjust = Math.round((state.ratioAdjust + delta) * 10) / 10;
+      const roastConf = ROAST_CONFIGS[state.roast];
+      const methodConf = METHOD_CONFIGS[state.method];
+      const flavorConf = FLAVOR_CONFIGS[state.flavor];
+      const baseRatio = (roastConf.baseRatio + flavorConf.ratioDelta) * methodConf.ratioMultiplier;
+      let current = Math.round((baseRatio + state.ratioAdjust) * 10) / 10;
+      let target = Math.round((current + delta) * 10) / 10;
+      if (target < MIN_RATIO) target = MIN_RATIO;
+      if (target > MAX_RATIO) target = MAX_RATIO;
+      state.ratioAdjust = Math.round((target - baseRatio) * 10) / 10;
       calculateAndRender();
       if (timerRunning) resetTimer();
     }
@@ -2045,15 +2073,16 @@
 
     function editCustomRatioPrompt() {
       const current = parseFloat(document.getElementById('param-ratio').textContent.replace('1:', '')) || 15;
-      const input = prompt('請輸入自訂粉水比 (例：15 代表 1:15，建議範圍 10 - 22)：', current);
+      const input = prompt(`請輸入自訂粉水比 (例：15 代表 1:15，範圍 ${MIN_RATIO} - ${MAX_RATIO})：`, current);
       if (input !== null) {
         const val = parseFloat(input);
-        if (!isNaN(val) && val >= 8 && val <= 25) {
+        if (!isNaN(val)) {
+          const clamped = Math.round(Math.max(MIN_RATIO, Math.min(MAX_RATIO, val)) * 10) / 10;
           const roastConf = ROAST_CONFIGS[state.roast];
           const methodConf = METHOD_CONFIGS[state.method];
           const flavorConf = FLAVOR_CONFIGS[state.flavor];
           const baseRatio = (roastConf.baseRatio + flavorConf.ratioDelta) * methodConf.ratioMultiplier;
-          state.ratioAdjust = Math.round((val - baseRatio) * 10) / 10;
+          state.ratioAdjust = Math.round((clamped - baseRatio) * 10) / 10;
           calculateAndRender();
           if (timerRunning) resetTimer();
         }
@@ -2550,15 +2579,29 @@
       const methodConf = METHOD_CONFIGS[state.method];
       const flavorConf = FLAVOR_CONFIGS[state.flavor];
 
-      // 1. 水溫計算 (基準 + 風味微調 + 使用者手動自定義微調)
+      // 1. 水溫計算 (基準 + 風味微調 + 使用者手動自定義微調，嚴格限制 MIN_TEMP ~ MAX_TEMP)
       let finalTemp = roastConf.baseTemp + flavorConf.tempDelta + state.tempAdjust;
-      if (finalTemp > 98) finalTemp = 98;
-      if (finalTemp < 75) finalTemp = 75;
+      if (finalTemp > MAX_TEMP) {
+        finalTemp = MAX_TEMP;
+        state.tempAdjust = MAX_TEMP - (roastConf.baseTemp + flavorConf.tempDelta);
+      }
+      if (finalTemp < MIN_TEMP) {
+        finalTemp = MIN_TEMP;
+        state.tempAdjust = MIN_TEMP - (roastConf.baseTemp + flavorConf.tempDelta);
+      }
 
-      // 2. 粉水比計算 (基準 + 風味微調 + 手法倍率 + 使用者自定義微調)
+      // 2. 粉水比計算 (基準 + 風味微調 + 手法倍率 + 使用者自定義微調，嚴格限制 MIN_RATIO ~ MAX_RATIO)
       let baseRatio = roastConf.baseRatio + flavorConf.ratioDelta;
       let finalRatioVal = (baseRatio * methodConf.ratioMultiplier) + state.ratioAdjust;
       finalRatioVal = Math.round(finalRatioVal * 10) / 10;
+      if (finalRatioVal > MAX_RATIO) {
+        finalRatioVal = MAX_RATIO;
+        state.ratioAdjust = Math.round((MAX_RATIO - (baseRatio * methodConf.ratioMultiplier)) * 10) / 10;
+      }
+      if (finalRatioVal < MIN_RATIO) {
+        finalRatioVal = MIN_RATIO;
+        state.ratioAdjust = Math.round((MIN_RATIO - (baseRatio * methodConf.ratioMultiplier)) * 10) / 10;
+      }
       let ratioStr = `1:${finalRatioVal}`;
 
       // 3. 總水量計算
@@ -2579,6 +2622,18 @@
       document.getElementById('param-temp-note').textContent = tempNoteText;
       const resetTempBtn = document.getElementById('reset-temp-btn');
       if (resetTempBtn) resetTempBtn.classList.toggle('hidden', state.tempAdjust === 0);
+      const btnTempMinus = document.getElementById('btn-temp-minus');
+      const btnTempPlus = document.getElementById('btn-temp-plus');
+      if (btnTempMinus) {
+        btnTempMinus.disabled = finalTemp <= MIN_TEMP;
+        btnTempMinus.classList.toggle('opacity-30', finalTemp <= MIN_TEMP);
+        btnTempMinus.classList.toggle('cursor-not-allowed', finalTemp <= MIN_TEMP);
+      }
+      if (btnTempPlus) {
+        btnTempPlus.disabled = finalTemp >= MAX_TEMP;
+        btnTempPlus.classList.toggle('opacity-30', finalTemp >= MAX_TEMP);
+        btnTempPlus.classList.toggle('cursor-not-allowed', finalTemp >= MAX_TEMP);
+      }
 
       // 更新研磨度 UI
       const grindSelect = document.getElementById('param-grind-select');
@@ -2600,6 +2655,18 @@
       document.getElementById('param-ratio-note').textContent = ratioNoteText;
       const resetRatioBtn = document.getElementById('reset-ratio-btn');
       if (resetRatioBtn) resetRatioBtn.classList.toggle('hidden', state.ratioAdjust === 0);
+      const btnRatioMinus = document.getElementById('btn-ratio-minus');
+      const btnRatioPlus = document.getElementById('btn-ratio-plus');
+      if (btnRatioMinus) {
+        btnRatioMinus.disabled = finalRatioVal <= MIN_RATIO;
+        btnRatioMinus.classList.toggle('opacity-30', finalRatioVal <= MIN_RATIO);
+        btnRatioMinus.classList.toggle('cursor-not-allowed', finalRatioVal <= MIN_RATIO);
+      }
+      if (btnRatioPlus) {
+        btnRatioPlus.disabled = finalRatioVal >= MAX_RATIO;
+        btnRatioPlus.classList.toggle('opacity-30', finalRatioVal >= MAX_RATIO);
+        btnRatioPlus.classList.toggle('cursor-not-allowed', finalRatioVal >= MAX_RATIO);
+      }
 
       // 更新風味偏好說明卡片 (位於風味偏好下方)
       const flavorTipElem = document.getElementById('flavor-adjustment-tip');
@@ -2723,6 +2790,7 @@
                   <span class="font-bold text-xs sm:text-sm text-[#2C2521]">${escapeHtml(st.name)}</span>
                 </div>
                 <div class="flex items-center gap-2 text-xs font-mono-num">
+                  <span id="timeline-status-${idx}" class="hidden"></span>
                   <span class="px-2 py-0.5 rounded-md bg-white border border-[#E8E2D9] font-semibold text-[#654D3F]">${st.timeRangeStr}</span>
                   <span class="text-[#8C7E75]">(${st.durationSec}s)</span>
                 </div>
@@ -2757,9 +2825,14 @@
 
     function updateTimelineStepHighlight(activeIndex) {
       if (!currentStepsCache) return;
+      const isAllDone = activeIndex >= currentStepsCache.length;
+      const allCompleteBadge = document.getElementById('steps-all-complete-badge');
+      if (allCompleteBadge) allCompleteBadge.classList.toggle('hidden', !isAllDone);
+
       currentStepsCache.forEach((st, idx) => {
         const bullet = document.getElementById(`timeline-bullet-${idx}`);
         const card = document.getElementById(`timeline-card-${idx}`);
+        const statusSpan = document.getElementById(`timeline-status-${idx}`);
         if (!bullet || !card) return;
 
         if (activeIndex === -1) {
@@ -2767,25 +2840,51 @@
           bullet.className = 'absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#FAF8F5] border border-[#DDD3CA] text-[#7C6E64] flex items-center justify-center text-xs font-mono-num font-bold shadow-2xs transition-all duration-200';
           bullet.textContent = idx + 1;
           card.className = 'p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7] hover:bg-white transition-all duration-200 shadow-2xs space-y-2';
-        } else if (idx < activeIndex) {
-          // 已完成步驟：深焙實心圓標 + 翡翠綠勾勾
-          bullet.className = 'absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#3D2C22] text-emerald-400 border border-[#3D2C22] flex items-center justify-center shadow-2xs transition-all duration-200';
+          if (statusSpan) {
+            statusSpan.className = 'hidden';
+            statusSpan.innerHTML = '';
+          }
+        } else if (isAllDone || idx < activeIndex) {
+          // 已完成步驟：翡翠綠實心標記 + 勾勾圖標，顯示「已完成」徽章
+          bullet.className = 'absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-emerald-700 text-white border-2 border-emerald-600 flex items-center justify-center shadow-2xs transition-all duration-200';
           bullet.innerHTML = `
-            <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
           `;
-          card.className = 'p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7]/70 opacity-75 transition-all duration-200 shadow-2xs space-y-2';
+          card.className = isAllDone
+            ? 'p-3.5 sm:p-4 rounded-xl border border-emerald-300/80 bg-emerald-50/30 transition-all duration-200 shadow-2xs space-y-2'
+            : 'p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7]/70 opacity-80 transition-all duration-200 shadow-2xs space-y-2';
+          if (statusSpan) {
+            statusSpan.className = 'inline-flex items-center gap-1 text-emerald-800 bg-emerald-50 border border-emerald-300/80 px-2 py-0.5 rounded-md text-[11px] font-bold shadow-2xs';
+            statusSpan.innerHTML = `
+              <svg class="w-3 h-3 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>已完成</span>
+            `;
+          }
         } else if (idx === activeIndex) {
           // 當前活躍步驟：深焙高亮邊框 + 琥珀脈衝外環
           bullet.className = 'absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#3D2C22] text-[#FAF6F2] ring-4 ring-amber-500/30 border border-amber-500 flex items-center justify-center text-xs font-mono-num font-bold shadow-md scale-110 transition-all duration-200';
           bullet.textContent = idx + 1;
           card.className = 'p-3.5 sm:p-4 rounded-xl border-2 border-amber-600/70 bg-white ring-2 ring-amber-500/20 shadow-md transition-all duration-200 space-y-2';
+          if (statusSpan) {
+            statusSpan.className = 'inline-flex items-center gap-1 text-amber-800 bg-amber-50 border border-amber-400/60 px-2 py-0.5 rounded-md text-[11px] font-bold animate-pulse shadow-2xs';
+            statusSpan.innerHTML = `
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              <span>注水中</span>
+            `;
+          }
         } else {
           // 尚未開始之未來步驟
           bullet.className = 'absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#FAF8F5] border border-[#DDD3CA] text-[#7C6E64] flex items-center justify-center text-xs font-mono-num font-bold shadow-2xs transition-all duration-200';
           bullet.textContent = idx + 1;
           card.className = 'p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7] hover:bg-white transition-all duration-200 shadow-2xs space-y-2';
+          if (statusSpan) {
+            statusSpan.className = 'hidden';
+            statusSpan.innerHTML = '';
+          }
         }
       });
     }
@@ -3172,7 +3271,7 @@
         document.getElementById('zen-step-countdown').textContent = '完全滴淨即可移開濾杯';
         document.getElementById('zen-step-title').textContent = '滴濾收尾 (Drawdown)';
         document.getElementById('zen-step-note').textContent = '請觀察濾杯水位平整滴乾，完全落盡後即可移開濾杯，品嚐美味咖啡。';
-        renderZenStepSegments(currentStepsCache.length - 1);
+        renderZenStepSegments(currentStepsCache.length);
         return;
       }
 
@@ -3221,6 +3320,13 @@
       if (activeIndex < currentStepsCache.length - 1) {
         const nextStep = currentStepsCache[activeIndex + 1];
         timerSeconds = nextStep.startSec;
+        timerStartTime = Date.now() - (timerSeconds * 1000);
+        document.getElementById('timer-digits').textContent = formatTimerDigits(timerSeconds);
+        updateTimerStepHighlight();
+        updateZenBaristaUI();
+        playStepChangeSound();
+      } else if (activeIndex === currentStepsCache.length - 1 && timerSeconds < totalBrewSeconds) {
+        timerSeconds = totalBrewSeconds;
         timerStartTime = Date.now() - (timerSeconds * 1000);
         document.getElementById('timer-digits').textContent = formatTimerDigits(timerSeconds);
         updateTimerStepHighlight();
@@ -3549,7 +3655,7 @@
           currentStepsCache[currentStepsCache.length - 1].cumulative
         );
 
-        updateTimelineStepHighlight(currentStepsCache.length - 1);
+        updateTimelineStepHighlight(currentStepsCache.length);
         updateZenBaristaUI();
         return;
       }
