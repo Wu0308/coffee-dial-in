@@ -1,35 +1,121 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
+    <!-- Deep Obsidian Espresso Gradient Background -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#3D2B22" />
-      <stop offset="100%" stop-color="#241711" />
+      <stop offset="0%" stop-color="#241B15" />
+      <stop offset="45%" stop-color="#17110E" />
+      <stop offset="100%" stop-color="#090605" />
     </linearGradient>
+
+    <!-- Warm Amber Ambient Backlight Glow -->
+    <radialGradient id="ambientGlow" cx="50%" cy="52%" r="50%">
+      <stop offset="0%" stop-color="#B86A2E" stop-opacity="0.4" />
+      <stop offset="42%" stop-color="#5E3114" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#090605" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Metallic Champagne & Rose Gold Bezel -->
+    <linearGradient id="rimGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5E8DC" stop-opacity="0.7" />
+      <stop offset="28%" stop-color="#C99E74" stop-opacity="0.3" />
+      <stop offset="70%" stop-color="#6E4224" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#E8BE90" stop-opacity="0.6" />
+    </linearGradient>
+
+    <!-- Precision Dripper Cone Frosted Gradient -->
+    <linearGradient id="coneFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.16" />
+      <stop offset="50%" stop-color="#EFE5DB" stop-opacity="0.07" />
+      <stop offset="100%" stop-color="#C9A384" stop-opacity="0.02" />
+    </linearGradient>
+
+    <!-- Dripper Rim Luminous Champagne Stroke -->
+    <linearGradient id="dripperRimGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#C89F77" />
+      <stop offset="30%" stop-color="#FFFDF9" />
+      <stop offset="70%" stop-color="#EDCEAF" />
+      <stop offset="100%" stop-color="#A57348" />
+    </linearGradient>
+
+    <!-- Golden Extraction Liquid Gradient -->
+    <linearGradient id="goldenDropGrad" x1="25%" y1="0%" x2="75%" y2="100%">
+      <stop offset="0%" stop-color="#FFF9EC" />
+      <stop offset="20%" stop-color="#F8C76B" />
+      <stop offset="65%" stop-color="#DE8223" />
+      <stop offset="100%" stop-color="#7A3305" />
+    </linearGradient>
+
+    <!-- Ripple Gold Gradient -->
+    <linearGradient id="rippleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E5A84B" stop-opacity="0.05" />
+      <stop offset="50%" stop-color="#FFE5B0" stop-opacity="0.75" />
+      <stop offset="100%" stop-color="#E5A84B" stop-opacity="0.05" />
+    </linearGradient>
+
+    <!-- Golden Droplet Soft Bloom Filter -->
+    <filter id="dropGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
   </defs>
-  <!-- Background squircle -->
-  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
-  <rect x="8" y="8" width="496" height="496" rx="104" fill="none" stroke="#ECE3DC" stroke-opacity="0.18" stroke-width="6" />
 
-  <!-- Steam lines -->
-  <path d="M230 110 C215 130 215 150 230 170" fill="none" stroke="#D4A373" stroke-width="12" stroke-linecap="round" opacity="0.85" />
-  <path d="M275 95 C260 120 260 145 275 170" fill="none" stroke="#D4A373" stroke-width="12" stroke-linecap="round" opacity="0.85" />
+  <!-- Squircle Base for Modern OS Icons -->
+  <rect width="512" height="512" rx="116" fill="url(#bgGrad)" />
+  <!-- Center Ambient Extraction Warmth -->
+  <rect width="512" height="512" rx="116" fill="url(#ambientGlow)" />
+  <!-- Micro Hairline Metallic Rim -->
+  <rect x="5" y="5" width="502" height="502" rx="112" fill="none" stroke="url(#rimGrad)" stroke-width="2.5" />
 
-  <!-- Dripper Cone (V60) -->
-  <polygon points="140,185 372,185 292,305 220,305" fill="#FFFFFF" fill-opacity="0.12" stroke="#FAF7F2" stroke-width="14" stroke-linejoin="round" />
-  <!-- Internal Ribs -->
-  <line x1="256" y1="195" x2="256" y2="295" stroke="#FAF7F2" stroke-width="8" stroke-linecap="round" />
-  <line x1="198" y1="195" x2="238" y2="295" stroke="#FAF7F2" stroke-width="7" stroke-linecap="round" opacity="0.75" />
-  <line x1="314" y1="195" x2="274" y2="295" stroke="#FAF7F2" stroke-width="7" stroke-linecap="round" opacity="0.75" />
+  <!-- Dial-In Calibration Circles (Subtle Geometrical Watermark) -->
+  <circle cx="256" cy="236" r="186" fill="none" stroke="#FAF0E6" stroke-opacity="0.04" stroke-width="1.5" stroke-dasharray="4 8" />
+  <circle cx="256" cy="236" r="146" fill="none" stroke="#E2B788" stroke-opacity="0.07" stroke-width="1" />
 
-  <!-- Dripper Base Plate -->
-  <rect x="130" y="305" width="252" height="18" rx="9" fill="#FAF7F2" />
+  <!-- Dial-In Precision Calibration Ticks (Top Rim Dial) -->
+  <line x1="256" y1="90" x2="256" y2="106" stroke="#E5B278" stroke-width="2.5" stroke-linecap="round" opacity="0.85" />
+  <line x1="218" y1="95" x2="222" y2="108" stroke="#E5B278" stroke-width="1.8" stroke-linecap="round" opacity="0.45" />
+  <line x1="294" y1="95" x2="290" y2="108" stroke="#E5B278" stroke-width="1.8" stroke-linecap="round" opacity="0.45" />
+  <line x1="184" y1="108" x2="190" y2="119" stroke="#E5B278" stroke-width="1.5" stroke-linecap="round" opacity="0.35" />
+  <line x1="328" y1="108" x2="322" y2="119" stroke="#E5B278" stroke-width="1.5" stroke-linecap="round" opacity="0.35" />
 
-  <!-- Coffee Drop -->
-  <circle cx="256" cy="336" r="10" fill="#D4A373" />
+  <!-- V60 Dripper Top Rim (Perspective Ellipse) -->
+  <ellipse cx="256" cy="150" rx="140" ry="25" fill="none" stroke="url(#dripperRimGrad)" stroke-width="5" />
+  <ellipse cx="256" cy="150" rx="140" ry="25" fill="url(#coneFill)" />
 
-  <!-- Server Body -->
-  <polygon points="185,348 327,348 355,432 157,432" fill="#FFFFFF" fill-opacity="0.08" stroke="#FAF7F2" stroke-width="14" stroke-linejoin="round" />
-  <!-- Coffee Liquid in Server -->
-  <polygon points="172,392 340,392 350,426 162,426" fill="#D4A373" />
-  <!-- Server Handle -->
-  <path d="M327 356 C375 356 375 422 348 422" fill="none" stroke="#FAF7F2" stroke-width="14" stroke-linecap="round" />
+  <!-- V60 Cone Body Fill & Contour -->
+  <path d="M118 153 C130 234 200 314 228 333 L284 333 C312 314 382 234 394 153" 
+        fill="url(#coneFill)" stroke="url(#dripperRimGrad)" stroke-width="4.5" stroke-linejoin="round" />
+
+  <!-- V60 Signature Spiral Vortex Ribs (Authentic Specialty Coffee Spiral Ribs) -->
+  <!-- Outer Left Spiral Rib -->
+  <path d="M146 161 C135 210 188 285 235 329" fill="none" stroke="#F5ECE5" stroke-opacity="0.45" stroke-width="2.8" stroke-linecap="round" />
+  <!-- Mid Left Spiral Rib -->
+  <path d="M190 168 C178 222 216 288 247 331" fill="none" stroke="#F5ECE5" stroke-opacity="0.75" stroke-width="3.2" stroke-linecap="round" />
+  <!-- Center Main Spiral Rib (Golden Spine) -->
+  <path d="M256 174 C250 226 254 286 256 333" fill="none" stroke="url(#dripperRimGrad)" stroke-opacity="0.95" stroke-width="3.8" stroke-linecap="round" />
+  <!-- Mid Right Spiral Rib -->
+  <path d="M322 168 C334 222 296 288 265 331" fill="none" stroke="#F5ECE5" stroke-opacity="0.75" stroke-width="3.2" stroke-linecap="round" />
+  <!-- Outer Right Spiral Rib -->
+  <path d="M366 161 C377 210 324 285 277 329" fill="none" stroke="#F5ECE5" stroke-opacity="0.45" stroke-width="2.8" stroke-linecap="round" />
+
+  <!-- Dripper Collar Base (Horizontal Supporting Ring) -->
+  <rect x="212" y="334" width="88" height="9" rx="4.5" fill="#E2C29B" opacity="0.85" />
+  <rect x="224" y="343" width="64" height="4" rx="2" fill="#C2966E" opacity="0.65" />
+
+  <!-- Concentric Extraction Ripples (Aura of Freshly Extracted Coffee) -->
+  <ellipse cx="256" cy="434" rx="104" ry="18" fill="none" stroke="url(#rippleGrad)" stroke-width="2" />
+  <ellipse cx="256" cy="434" rx="68" ry="12" fill="none" stroke="url(#rippleGrad)" stroke-width="2.4" />
+  <ellipse cx="256" cy="434" rx="32" ry="6.5" fill="none" stroke="#FFF7E6" stroke-opacity="0.85" stroke-width="2.6" />
+
+  <!-- The Golden Extraction Droplet (Centrally Suspended Jewel) -->
+  <g filter="url(#dropGlow)">
+    <!-- Droplet Body -->
+    <path d="M256 358 C256 358 240 382 240 397 C240 405.8 247.2 413 256 413 C264.8 413 272 405.8 272 397 C272 382 256 358 256 358 Z" 
+          fill="url(#goldenDropGrad)" />
+    <!-- Specular Highlight Curve -->
+    <ellipse cx="251.5" cy="396" rx="3.2" ry="5.8" transform="rotate(-20 251.5 396)" fill="#FFFFFF" opacity="0.85" />
+    <circle cx="258" cy="402.5" r="1.6" fill="#FFFFFF" opacity="0.65" />
+  </g>
 </svg>

@@ -1,11 +1,11 @@
 {
   "name": "BrewCraft 手沖參數調配器",
   "short_name": "BrewCraft",
-  "description": "專業手沖咖啡參數調配系統與即時注水指引計時器",
+  "description": "專業精品手沖咖啡參數調配系統、注水流速指引與萃取筆記庫",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#FAF9F7",
-  "theme_color": "#654D3F",
+  "background_color": "#17110E",
+  "theme_color": "#241B16",
   "orientation": "portrait-primary",
   "icons": [
     {
