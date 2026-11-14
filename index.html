@@ -2999,8 +2999,13 @@
             </div>
           `;
         } else {
-          // 瀏覽與沖煮時間軸卡片模式
-          const flowRate = st.durationSec > 0 && st.amount > 0 ? (st.amount / (st.durationSec * 0.4)).toFixed(1) : '3.0';
+          // 瀏覽與沖煮時間軸卡片模式 (與注水曲線物理動力學引擎 100% 統一對齊)
+          const tPour = getStepPourDuration(st);
+          const flowRate = (tPour > 0 && st.amount > 0) ? (st.amount / tPour).toFixed(1) : '0.0';
+          const flowRateDisplay = (st.amount > 0 && tPour > 0)
+            ? `~${flowRate} g/s <span class="text-[#9B8D83] text-[10px] font-normal hidden sm:inline">(約 ${tPour}s 注完)</span>`
+            : `<span class="text-[#8C7E75]">靜置滴漏 (~0.0 g/s)</span>`;
+
           node.innerHTML = `
             <div id="timeline-bullet-${idx}" class="absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#FAF8F5] border border-[#DDD3CA] text-[#7C6E64] flex items-center justify-center text-xs font-mono-num font-bold shadow-2xs transition-all duration-200">
               ${idx + 1}
@@ -3031,9 +3036,9 @@
                     <span class="font-bold text-amber-800 text-sm">${st.cumulative}g</span>
                   </div>
                 </div>
-                <div class="text-[11px] text-[#8C7E75] flex items-center gap-1">
+                <div class="text-[11px] text-[#8C7E75] flex items-center gap-1 font-mono-num">
                   <span>建議流速：</span>
-                  <span class="font-semibold text-[#654D3F] font-mono-num">~${flowRate} g/s</span>
+                  <span class="font-semibold text-[#654D3F]">${flowRateDisplay}</span>
                 </div>
               </div>
 
