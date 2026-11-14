@@ -92,6 +92,28 @@
       overscroll-behavior: contain;
     }
 
+    /* Zen Barista Fullscreen HUD Dialog */
+    dialog#zen-barista-modal {
+      border: none;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      width: 100vw;
+      max-width: 100vw;
+      height: 100vh;
+      max-height: 100vh;
+    }
+    dialog#zen-barista-modal:modal {
+      overscroll-behavior: contain;
+    }
+    dialog#zen-barista-modal::backdrop {
+      background: rgba(18, 13, 11, 0.95);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      overflow: hidden;
+      overscroll-behavior: contain;
+    }
+
     /* Accessible focus indicator */
     button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
       outline: 2px solid #654D3F;
@@ -599,7 +621,7 @@
           </button>
 
           <!-- 提示音開關按鈕 -->
-          <button onclick="toggleAudio()" id="audio-btn" class="px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-xs hover:border-[#CFC2B7] text-[#685B52] transition flex items-center gap-1.5" title="點擊開關步驟提示音">
+          <button onclick="toggleAudio()" id="audio-btn" class="px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-xs hover:border-[#CFC2B7] text-[#685B52] transition flex items-center gap-1.5 cursor-pointer" title="點擊開關步驟提示音">
             <span id="audio-icon">
               <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -608,6 +630,16 @@
               </svg>
             </span>
             <span id="audio-text" class="text-[11px] font-medium hidden sm:inline">提示音開啟</span>
+          </button>
+
+          <!-- 吧台專注模式 (Zen HUD) 按鈕 -->
+          <button onclick="openZenBaristaMode()" id="open-zen-btn" 
+                  class="px-3 py-2 rounded-xl bg-[#2D231D] hover:bg-[#1E1713] text-amber-300 text-xs font-semibold transition flex items-center gap-1.5 shadow-2xs border border-[#42332A] cursor-pointer" 
+                  title="開啟吧台大字專注模式 (遠距清晰 HUD)">
+            <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+            </svg>
+            <span class="font-medium">專注模式</span>
           </button>
         </div>
       </div>
@@ -1078,17 +1110,184 @@
           </div>
         </div>
 
-        <!-- 詳細沖煮步驟 (秒數與總時間 100% 精準對齊) -->
-        <div class="brew-card p-5 sm:p-6">
+        <!-- 風味雷達與萃取感官光譜 (Sensory Flavor Radar) -->
+        <div class="brew-card p-5 sm:p-6" id="sensory-radar-card">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-[#FAF4EE] text-amber-800 flex items-center justify-center flex-shrink-0">
+                <!-- Bespoke Diamond/Radar Icon -->
+                <svg class="w-4 h-4 text-amber-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polygon points="12 2 22 8.5 18 21 6 21 2 8.5 12 2"></polygon>
+                </svg>
+              </span>
+              <div>
+                <h2 class="text-base font-bold text-[#2C2521] leading-tight">
+                  風味雷達與萃取光譜
+                </h2>
+                <div class="text-[11px] text-[#8C7E75]">
+                  依烘焙度、器具流速、研磨度與水溫即時模擬五大感官維度
+                </div>
+              </div>
+            </div>
+            
+            <!-- 萃取傾向評估狀態標籤 -->
+            <span id="radar-balance-badge" class="px-2.5 py-1 rounded-full bg-[#FAF7F2] border border-[#DDD3CA] text-xs font-semibold text-[#5C4A3E] inline-flex items-center gap-1.5 self-start sm:self-auto">
+              <span id="radar-balance-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span id="radar-balance-text">金杯平衡萃取</span>
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-6 items-center">
+            
+            <!-- 左側：SVG 五邊形雷達圖 -->
+            <div class="md:col-span-5 flex items-center justify-center py-1">
+              <div class="relative w-full max-w-[270px] aspect-square flex items-center justify-center">
+                <svg id="sensory-radar-svg" viewBox="0 0 280 280" class="w-full h-full overflow-visible">
+                  <defs>
+                    <linearGradient id="radarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#D97706" stop-opacity="0.45" />
+                      <stop offset="100%" stop-color="#654D3F" stop-opacity="0.25" />
+                    </linearGradient>
+                  </defs>
+                  <!-- 網格與軸線透過 JS 動態注入繪製 -->
+                  <g id="radar-grid-group"></g>
+                  <polygon id="radar-polygon" points="" fill="url(#radarGradient)" stroke="#8C5338" stroke-width="2.2" class="transition-all duration-300"></polygon>
+                  <g id="radar-points-group"></g>
+                  <g id="radar-labels-group"></g>
+                </svg>
+              </div>
+            </div>
+
+            <!-- 右側：感官維度分解長條與吧台調味診斷 -->
+            <div class="md:col-span-7 space-y-2.5">
+              
+              <!-- 5 大感官條 -->
+              <div class="space-y-2 text-xs">
+                <!-- 1. 酸質 -->
+                <div>
+                  <div class="flex items-center justify-between text-[#2C2521] font-medium mb-1">
+                    <span class="flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                      <span>酸質 (Acidity)</span>
+                      <span class="text-[10px] text-[#9B8D83]">· 明亮柑橘花果</span>
+                    </span>
+                    <span id="dim-score-acidity" class="font-mono-num font-bold text-[#654D3F]">4.2</span>
+                  </div>
+                  <div class="h-1.5 w-full bg-[#EFE8DF] rounded-full overflow-hidden">
+                    <div id="dim-bar-acidity" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 84%"></div>
+                  </div>
+                </div>
+
+                <!-- 2. 甜感 -->
+                <div>
+                  <div class="flex items-center justify-between text-[#2C2521] font-medium mb-1">
+                    <span class="flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+                      <span>甜感 (Sweetness)</span>
+                      <span class="text-[10px] text-[#9B8D83]">· 熟果蜜糖焦糖</span>
+                    </span>
+                    <span id="dim-score-sweetness" class="font-mono-num font-bold text-[#654D3F]">4.4</span>
+                  </div>
+                  <div class="h-1.5 w-full bg-[#EFE8DF] rounded-full overflow-hidden">
+                    <div id="dim-bar-sweetness" class="h-full bg-amber-600 rounded-full transition-all duration-300" style="width: 88%"></div>
+                  </div>
+                </div>
+
+                <!-- 3. 醇厚度 -->
+                <div>
+                  <div class="flex items-center justify-between text-[#2C2521] font-medium mb-1">
+                    <span class="flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#654D3F]"></span>
+                      <span>醇厚度 (Body)</span>
+                      <span class="text-[10px] text-[#9B8D83]">· 質地油脂滑順</span>
+                    </span>
+                    <span id="dim-score-body" class="font-mono-num font-bold text-[#654D3F]">3.8</span>
+                  </div>
+                  <div class="h-1.5 w-full bg-[#EFE8DF] rounded-full overflow-hidden">
+                    <div id="dim-bar-body" class="h-full bg-[#654D3F] rounded-full transition-all duration-300" style="width: 76%"></div>
+                  </div>
+                </div>
+
+                <!-- 4. 餘韻 -->
+                <div>
+                  <div class="flex items-center justify-between text-[#2C2521] font-medium mb-1">
+                    <span class="flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-stone-600"></span>
+                      <span>餘韻 (Aftertaste)</span>
+                      <span class="text-[10px] text-[#9B8D83]">· 生津悠長回甘</span>
+                    </span>
+                    <span id="dim-score-aftertaste" class="font-mono-num font-bold text-[#654D3F]">4.3</span>
+                  </div>
+                  <div class="h-1.5 w-full bg-[#EFE8DF] rounded-full overflow-hidden">
+                    <div id="dim-bar-aftertaste" class="h-full bg-stone-600 rounded-full transition-all duration-300" style="width: 86%"></div>
+                  </div>
+                </div>
+
+                <!-- 5. 乾淨度 -->
+                <div>
+                  <div class="flex items-center justify-between text-[#2C2521] font-medium mb-1">
+                    <span class="flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                      <span>乾淨度 (Cleanliness)</span>
+                      <span class="text-[10px] text-[#9B8D83]">· 澄澈透明無澀</span>
+                    </span>
+                    <span id="dim-score-cleanliness" class="font-mono-num font-bold text-[#654D3F]">4.5</span>
+                  </div>
+                  <div class="h-1.5 w-full bg-[#EFE8DF] rounded-full overflow-hidden">
+                    <div id="dim-bar-cleanliness" class="h-full bg-emerald-600 rounded-full transition-all duration-300" style="width: 90%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 吧台調味萃取診斷提示 -->
+              <div class="mt-2.5 pt-2 border-t border-[#F0EAE3] text-xs text-[#685B52] flex items-start gap-2">
+                <svg class="w-4 h-4 text-[#654D3F] flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                </svg>
+                <div class="leading-relaxed text-pretty flex-1" id="radar-barista-diagnosis">
+                  五大維度呈現極佳平衡，既有細膩果酸，又有飽滿甜感與乾淨尾韻。
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 詳細沖煮步驟 (秒數與總時間 100% 精準對齊) -->
+        <div class="brew-card p-5 sm:p-6" id="steps-card">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div class="flex items-center gap-2">
               <h2 class="text-base font-bold text-[#2C2521]">
                 詳細沖煮步驟
               </h2>
+              <span class="text-[#8C7E75] text-xs hidden md:inline">手法：<span id="guide-method-name" class="font-semibold text-[#654D3F]">四六法</span></span>
               <span id="custom-steps-badge" class="hidden px-2 py-0.5 rounded-full bg-[#E8E4DF] text-[#654D3F] text-[10px] font-bold">已自訂各段參數</span>
             </div>
-            <div class="flex items-center gap-2 text-xs">
-              <span class="text-[#8C7E75] hidden md:inline">手法指引：<span id="guide-method-name" class="font-semibold text-[#654D3F]">四六法 (粕谷哲)</span></span>
+            
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <!-- 視圖切換器：時間軸 vs 數據表格 -->
+              <span class="inline-flex p-0.5 rounded-lg bg-[#FAF8F5] border border-[#E6E0D8]">
+                <button id="view-mode-timeline-btn" onclick="switchStepsViewMode('timeline')" 
+                        class="px-2.5 py-1 rounded-md bg-[#3D2C22] text-[#FAF6F2] font-semibold transition shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                  <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span>時間軌視圖</span>
+                </button>
+                <button id="view-mode-table-btn" onclick="switchStepsViewMode('table')" 
+                        class="px-2.5 py-1 rounded-md text-[#7C6E64] hover:text-[#2C2521] transition flex items-center gap-1.5 cursor-pointer">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="3" y1="15" x2="21" y2="15"></line>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                  </svg>
+                  <span>數據表格</span>
+                </button>
+              </span>
+
               <button id="toggle-custom-steps-btn" onclick="toggleCustomStepsMode()" class="px-2.5 py-1 rounded-lg border border-[#E6E0D8] bg-white hover:border-[#CFC2B7] text-[#654D3F] font-medium transition flex items-center gap-1.5 shadow-2xs">
                 <span id="custom-steps-btn-icon">
                   <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1108,8 +1307,13 @@
             </div>
           </div>
 
-          <!-- 表格結構 (步驟 / 注水量 / 累計水量 / 注水秒數區間 / 注水操作簡記) -->
-          <div class="overflow-x-auto">
+          <!-- 視圖 1: 注水階段時間軌 (Step Timeline Rail) -->
+          <div id="steps-timeline-container" class="relative pl-6 sm:pl-8 before:absolute before:left-3 sm:before:left-3.5 before:top-4 before:bottom-4 before:w-0.5 before:bg-[#EAE2D8] space-y-3.5 my-3">
+            <!-- 動態注入時間軌節點卡片 -->
+          </div>
+
+          <!-- 視圖 2: 表格結構 (步驟 / 注水量 / 累計水量 / 注水秒數區間 / 注水操作簡記) -->
+          <div id="steps-table-container" class="hidden overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="border-b border-[#F0EAE3] text-[11px] sm:text-xs text-[#8C7E75] font-medium">
@@ -1167,6 +1371,163 @@
     </footer>
 
   </div>
+
+  <!-- ========================================== -->
+  <!-- 吧台全螢幕專注模式 HUD (Zen Barista Mode - Native <dialog>) -->
+  <!-- ========================================== -->
+  <dialog id="zen-barista-modal" aria-labelledby="zen-modal-title" class="p-0 border-0 bg-transparent w-screen h-screen max-w-none max-h-none m-0 overflow-hidden z-50">
+    <div class="w-full h-full bg-[#16100D] text-[#FAF6F2] flex flex-col justify-between p-4 sm:p-8 select-none overflow-y-auto">
+      
+      <!-- 頂部資訊與控制列 -->
+      <div class="flex items-center justify-between gap-4 border-b border-[#2E241E] pb-3 sm:pb-4 flex-shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-[#2E231C] text-amber-400 flex items-center justify-center border border-[#42332A] shadow-sm">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 6h16l-3.5 11h-9L4 6z"></path>
+              <path d="M10 2v2"></path>
+              <path d="M14 2v2"></path>
+              <line x1="2" y1="6" x2="22" y2="6"></line>
+              <circle cx="12" cy="20.5" r="1.5" fill="currentColor"></circle>
+            </svg>
+          </div>
+          <div>
+            <div class="text-[10px] sm:text-[11px] font-bold tracking-[0.2em] uppercase text-amber-400/80 mb-0.5" id="zen-modal-title">
+              ZEN BARISTA HUD · 吧台專注模式
+            </div>
+            <div class="text-xs sm:text-sm font-semibold text-[#EDE4DC] flex items-center gap-1.5" id="zen-recipe-summary">
+              四六法 · 15g · 90°C · 225g
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- 提示音切換鈕 -->
+          <button onclick="toggleAudio()" id="zen-audio-btn" 
+                  class="h-9 px-3 rounded-xl bg-[#281F1A] hover:bg-[#342922] border border-[#3D3028] text-xs text-[#D8CCC4] transition flex items-center gap-1.5 cursor-pointer" 
+                  title="開關提示音">
+            <span id="zen-audio-icon">
+              <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+              </svg>
+            </span>
+            <span id="zen-audio-text" class="hidden sm:inline">提示音開啟</span>
+          </button>
+
+          <!-- 關閉按鈕 -->
+          <button onclick="closeZenBaristaMode()" aria-label="退出專注模式" 
+                  class="h-9 px-3 rounded-xl bg-[#281F1A] hover:bg-[#342922] border border-[#3D3028] text-xs font-medium text-[#EDE4DC] transition flex items-center gap-1.5 cursor-pointer">
+            <svg class="w-4 h-4 text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            <span class="hidden sm:inline">退出專注 (Esc)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 中間核心舞台：遠距超大字號注水指示 (60-100cm 清晰可讀) -->
+      <div class="my-auto py-4 sm:py-6 flex flex-col items-center justify-center text-center space-y-4 sm:space-y-6 max-w-3xl mx-auto w-full">
+        
+        <!-- 巨大碼錶數字 -->
+        <div class="relative">
+          <div id="zen-timer-digits" class="text-7xl sm:text-9xl md:text-[124px] font-mono-num font-black text-[#FAF6F2] tracking-tight leading-none drop-shadow-lg select-none">
+            00:00
+          </div>
+          <div id="zen-timer-substatus" class="text-xs sm:text-sm font-semibold tracking-wider text-amber-400/90 mt-2 flex items-center justify-center gap-2">
+            <span id="zen-status-dot" class="w-2.5 h-2.5 rounded-full bg-stone-500"></span>
+            <span id="zen-status-title">準備沖煮</span>
+          </div>
+        </div>
+
+        <!-- 巨大目標水量展示卡 (扁平深焙色) -->
+        <div class="w-full bg-[#241C17] border border-[#3D3028] rounded-2xl p-4 sm:p-5 shadow-xl relative overflow-hidden">
+          <div class="text-[11px] sm:text-xs font-bold tracking-[0.16em] uppercase text-amber-400/80 mb-1">
+            當前累計注水目標 · TARGET WEIGHT
+          </div>
+          <div class="flex items-baseline justify-center gap-1.5 my-1">
+            <span id="zen-target-water" class="text-6xl sm:text-8xl md:text-9xl font-mono-num font-black text-amber-400 leading-none tracking-tight">0</span>
+            <span class="text-2xl sm:text-4xl font-mono-num font-bold text-amber-500/80">g</span>
+          </div>
+          <div class="mt-2 pt-2 border-t border-[#382C24] flex items-center justify-center gap-4 text-xs sm:text-sm text-[#A8988C] font-mono-num">
+            <span>本段注入：<strong id="zen-step-water" class="text-[#FAF6F2] font-bold">+0g</strong></span>
+            <span class="w-1 h-1 rounded-full bg-[#4D3C31]"></span>
+            <span>總水量：<strong id="zen-total-water" class="text-[#FAF6F2] font-bold">0g</strong></span>
+          </div>
+        </div>
+
+        <!-- 當前注水手法要訣與倒數 -->
+        <div class="w-full max-w-xl space-y-1.5">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs sm:text-sm font-bold">
+            <span id="zen-step-indicator">第 1 段 / 共 5 段</span>
+            <span class="w-1 h-1 rounded-full bg-amber-400"></span>
+            <span id="zen-step-countdown">剩餘 45 秒</span>
+          </div>
+          <h2 id="zen-step-title" class="text-xl sm:text-2xl md:text-3xl font-bold text-[#FDFCFB] tracking-tight">
+            準備開始沖煮
+          </h2>
+          <p id="zen-step-note" class="text-xs sm:text-sm text-[#B3A59A] leading-relaxed max-w-lg mx-auto">
+            確認水溫與手沖器具就緒，點擊下方「開始沖煮」即可啟動提示音與換段倒數。
+          </p>
+        </div>
+
+        <!-- 階段軌道進度條 (Segmented Progress Bar) -->
+        <div class="w-full max-w-md">
+          <div id="zen-step-segments" class="flex gap-1.5 h-2 w-full rounded-full overflow-hidden bg-[#2C221B]">
+            <!-- 動態生成各段進度長條 -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 底部巨大觸控操作列 (專為吧台濕手指防誤觸優化) -->
+      <div class="pt-3 border-t border-[#2E241E] flex items-center justify-center gap-3 sm:gap-4 flex-shrink-0">
+        <!-- 重設 -->
+        <button onclick="resetTimer()" 
+                class="h-12 px-4 rounded-xl bg-[#281F1A] hover:bg-[#342922] border border-[#3D3028] text-xs font-semibold text-[#D8CCC4] transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
+          <svg class="w-4 h-4 text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+          </svg>
+          <span class="hidden sm:inline">重設</span>
+        </button>
+
+        <!-- 上一段 -->
+        <button onclick="skipToPreviousStep()" 
+                class="h-12 px-4 rounded-xl bg-[#281F1A] hover:bg-[#342922] border border-[#3D3028] text-xs font-semibold text-[#D8CCC4] transition flex items-center gap-1.5 active:scale-95 cursor-pointer"
+                title="跳回上一段">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="19 20 9 12 19 4 19 20"></polygon>
+            <line x1="5" y1="19" x2="5" y2="5"></line>
+          </svg>
+          <span class="hidden sm:inline">上一段</span>
+        </button>
+
+        <!-- 核心播放/暫停鍵 (巨大高對比琥珀按鈕) -->
+        <button id="zen-run-btn" onclick="toggleTimer()" 
+                class="h-14 px-8 sm:px-12 rounded-2xl bg-amber-500 hover:bg-amber-400 text-[#1E1713] font-bold text-base transition-all shadow-lg flex items-center gap-2 active:scale-95 cursor-pointer">
+          <span id="zen-run-icon">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+          </span>
+          <span id="zen-run-text">開始沖煮 (Space)</span>
+        </button>
+
+        <!-- 下一段 -->
+        <button onclick="skipToNextStep()" 
+                class="h-12 px-4 rounded-xl bg-[#281F1A] hover:bg-[#342922] border border-[#3D3028] text-xs font-semibold text-[#D8CCC4] transition flex items-center gap-1.5 active:scale-95 cursor-pointer"
+                title="提前跳至下一段">
+          <span class="hidden sm:inline">下一段</span>
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="5 4 15 12 5 20 5 4"></polygon>
+            <line x1="19" y1="5" x2="19" y2="19"></line>
+          </svg>
+        </button>
+
+      </div>
+
+    </div>
+  </dialog>
 
   <!-- ========================================== -->
   <!-- 咖啡豆評分庫 彈跳視窗 (Modern Web Guidance: Native <dialog>) -->
@@ -1373,7 +1734,8 @@
       customGrind: null,
       isCustomSteps: false,
       isEditingSteps: false,
-      customStepsData: null
+      customStepsData: null,
+      stepsViewMode: 'timeline' // 'timeline' or 'table'
     };
 
     // 烘焙度基礎參數表
@@ -1827,6 +2189,10 @@
         if (cumElem) cumElem.textContent = `${st.cumulative}g`;
         const rangeElem = document.getElementById(`step-range-${i}`);
         if (rangeElem) rangeElem.textContent = `(${st.timeRangeStr})`;
+        const timelineCumElem = document.getElementById(`timeline-step-cum-${i}`);
+        if (timelineCumElem) timelineCumElem.textContent = `${st.cumulative}g`;
+        const timelineRangeElem = document.getElementById(`timeline-step-range-${i}`);
+        if (timelineRangeElem) timelineRangeElem.textContent = `(${st.timeRangeStr})`;
       });
 
       currentStepsCache = JSON.parse(JSON.stringify(state.customStepsData));
@@ -1852,6 +2218,7 @@
       const totalSecCount = document.getElementById('total-seconds-count');
       if (totalSecCount) totalSecCount.textContent = `共 ${totalBrewSeconds} 秒 (自訂步驟加總)`;
 
+      updateSensoryRadar();
       updateCustomStepControlsUI();
       if (timerRunning) resetTimer();
     }
@@ -2271,13 +2638,19 @@
 
       totalBrewSeconds = steps.reduce((sum, s) => sum + s.durationSec, 0);
 
-      document.getElementById('param-water').textContent = `${totalWater}g`;
-      document.getElementById('param-water-note').textContent = state.isCustomSteps ? '依自訂步驟加總' : `依 ${state.dose}g 粉計算`;
-      document.getElementById('timer-total-water-goal').textContent = totalWater;
+      const paramWaterElem = document.getElementById('param-water');
+      if (paramWaterElem) paramWaterElem.textContent = `${totalWater}g`;
+      const paramWaterNoteElem = document.getElementById('param-water-note');
+      if (paramWaterNoteElem) paramWaterNoteElem.textContent = state.isCustomSteps ? '依自訂步驟加總' : `依 ${state.dose}g 粉計算`;
+      const timerTotalWaterGoalElem = document.getElementById('timer-total-water-goal');
+      if (timerTotalWaterGoalElem) timerTotalWaterGoalElem.textContent = totalWater;
 
-      document.getElementById('guide-method-name').textContent = methodConf.name;
-      document.getElementById('total-time-estimate').textContent = `約 ${formatTime(totalBrewSeconds)}`;
-      document.getElementById('total-seconds-count').textContent = state.isCustomSteps ? `共 ${totalBrewSeconds} 秒 (自訂步驟加總)` : `共 ${totalBrewSeconds} 秒 (各步秒數加總)`;
+      const guideMethodElem = document.getElementById('guide-method-name');
+      if (guideMethodElem) guideMethodElem.textContent = methodConf.name;
+      const totalTimeElem = document.getElementById('total-time-estimate');
+      if (totalTimeElem) totalTimeElem.textContent = `約 ${formatTime(totalBrewSeconds)}`;
+      const totalSecCountElem = document.getElementById('total-seconds-count');
+      if (totalSecCountElem) totalSecCountElem.textContent = state.isCustomSteps ? `共 ${totalBrewSeconds} 秒 (自訂步驟加總)` : `共 ${totalBrewSeconds} 秒 (各步秒數加總)`;
 
       if (!timerRunning && timerSeconds === 0) resetStepAnimationCue();
 
@@ -2287,6 +2660,9 @@
       }
 
       renderStepsTable();
+      renderStepTimeline();
+      updateSensoryRadar();
+      updateZenBaristaUI();
       updateCustomStepControlsUI();
     }
 
@@ -2353,6 +2729,575 @@
         tbody.appendChild(tr);
       });
     }
+
+    // ========================================================
+    // 升級方向 3: 注水階段時間軌 (Step Timeline Rail 引擎)
+    // ========================================================
+
+    function switchStepsViewMode(mode) {
+      state.stepsViewMode = mode;
+      const timelineContainer = document.getElementById('steps-timeline-container');
+      const tableContainer = document.getElementById('steps-table-container');
+      const timelineBtn = document.getElementById('view-mode-timeline-btn');
+      const tableBtn = document.getElementById('view-mode-table-btn');
+
+      if (mode === 'timeline') {
+        if (timelineContainer) timelineContainer.classList.remove('hidden');
+        if (tableContainer) tableContainer.classList.add('hidden');
+        if (timelineBtn) {
+          timelineBtn.className = 'px-2.5 py-1 rounded-md bg-[#3D2C22] text-[#FAF6F2] font-semibold transition shadow-2xs flex items-center gap-1.5 cursor-pointer';
+          const icon = timelineBtn.querySelector('svg');
+          if (icon) icon.className = 'w-3.5 h-3.5 text-amber-400';
+        }
+        if (tableBtn) {
+          tableBtn.className = 'px-2.5 py-1 rounded-md text-[#7C6E64] hover:text-[#2C2521] transition flex items-center gap-1.5 cursor-pointer';
+          const icon = tableBtn.querySelector('svg');
+          if (icon) icon.className = 'w-3.5 h-3.5 text-[#7C6E64]';
+        }
+      } else {
+        if (timelineContainer) timelineContainer.classList.add('hidden');
+        if (tableContainer) tableContainer.classList.remove('hidden');
+        if (tableBtn) {
+          tableBtn.className = 'px-2.5 py-1 rounded-md bg-[#3D2C22] text-[#FAF6F2] font-semibold transition shadow-2xs flex items-center gap-1.5 cursor-pointer';
+          const icon = tableBtn.querySelector('svg');
+          if (icon) icon.className = 'w-3.5 h-3.5 text-amber-400';
+        }
+        if (timelineBtn) {
+          timelineBtn.className = 'px-2.5 py-1 rounded-md text-[#7C6E64] hover:text-[#2C2521] transition flex items-center gap-1.5 cursor-pointer';
+          const icon = timelineBtn.querySelector('svg');
+          if (icon) icon.className = 'w-3.5 h-3.5 text-[#7C6E64]';
+        }
+      }
+    }
+
+    function renderStepTimeline() {
+      const container = document.getElementById('steps-timeline-container');
+      if (!container || !currentStepsCache) return;
+      container.innerHTML = '';
+
+      currentStepsCache.forEach((st, idx) => {
+        const node = document.createElement('div');
+        node.id = `timeline-node-${idx}`;
+        node.className = 'relative transition-all duration-300';
+
+        const stepIcon = STEP_ICONS[st.animType] || STEP_ICONS.pour;
+
+        if (state.isEditingSteps) {
+          // 編輯模式：時間軸卡片內嵌即時可調之注水量、秒數與筆記
+          node.innerHTML = `
+            <div id="timeline-bullet-${idx}" class="absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#FAF8F5] border border-[#DDD3CA] text-[#7C6E64] flex items-center justify-center text-xs font-mono-num font-bold shadow-2xs">
+              ${idx + 1}
+            </div>
+            <div id="timeline-card-${idx}" class="p-3.5 rounded-xl border border-[#DDD3CA] bg-white shadow-2xs space-y-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-bold text-xs text-[#2C2521]">${escapeHtml(st.name)}</span>
+                <span class="text-[11px] text-[#9B8D83] font-mono-num" id="timeline-step-range-${idx}">(${st.timeRangeStr})</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <div class="flex items-center gap-1">
+                  <span class="text-xs text-[#8C7E75]">水量:</span>
+                  <input type="number" min="0" max="800" value="${st.amount}" 
+                         oninput="onCustomStepAmountChange(${idx}, this.value)"
+                         class="w-16 px-1.5 py-0.5 text-center font-mono-num font-bold rounded-lg border border-[#D8CCC4] bg-white text-xs text-[#2C2521] focus:border-[#654D3F] outline-none shadow-2xs">
+                  <span class="text-xs text-[#8C7E75]">g</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <span class="text-xs text-[#8C7E75]">時長:</span>
+                  <input type="number" min="3" max="300" value="${st.durationSec}" 
+                         oninput="onCustomStepDurationChange(${idx}, this.value)"
+                         class="w-14 px-1.5 py-0.5 text-center font-mono-num font-bold rounded-lg border border-[#D8CCC4] bg-white text-xs text-[#2C2521] focus:border-[#654D3F] outline-none shadow-2xs">
+                  <span class="text-xs text-[#8C7E75]">秒</span>
+                </div>
+                <div class="text-xs text-[#2C2521] font-mono-num font-bold flex items-center col-span-2 sm:col-span-1">
+                  累計: <span id="timeline-step-cum-${idx}" class="ml-1">${st.cumulative}g</span>
+                </div>
+              </div>
+              <input type="text" value="${escapeHtml(st.note)}" 
+                     oninput="onCustomStepNoteChange(${idx}, this.value)"
+                     placeholder="自訂此階段注水操作簡記..."
+                     class="w-full px-2 py-1 rounded-lg border border-[#E6E0D8] bg-white text-xs text-[#685B52] focus:border-[#654D3F] outline-none">
+            </div>
+          `;
+        } else {
+          // 瀏覽與沖煮時間軸卡片模式
+          const flowRate = st.durationSec > 0 && st.amount > 0 ? (st.amount / (st.durationSec * 0.4)).toFixed(1) : '3.0';
+          node.innerHTML = `
+            <div id="timeline-bullet-${idx}" class="absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#FAF8F5] border border-[#DDD3CA] text-[#7C6E64] flex items-center justify-center text-xs font-mono-num font-bold shadow-2xs transition-all duration-200">
+              ${idx + 1}
+            </div>
+            <div id="timeline-card-${idx}" class="p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7] hover:bg-white transition-all duration-200 shadow-2xs space-y-2">
+              <div class="flex flex-wrap items-center justify-between gap-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-md bg-white border border-[#EBE3D7] flex items-center justify-center flex-shrink-0 text-[#654D3F]">
+                    ${stepIcon}
+                  </span>
+                  <span class="font-bold text-xs sm:text-sm text-[#2C2521]">${escapeHtml(st.name)}</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs font-mono-num">
+                  <span class="px-2 py-0.5 rounded-md bg-white border border-[#E8E2D9] font-semibold text-[#654D3F]">${st.timeRangeStr}</span>
+                  <span class="text-[#8C7E75]">(${st.durationSec}s)</span>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
+                <div class="flex items-center gap-3 font-mono-num">
+                  <div>
+                    <span class="text-[#8C7E75] text-[11px]">本段注入：</span>
+                    <span class="font-bold text-[#2C2521] text-sm">${st.amount > 0 ? '+' + st.amount + 'g' : '-'}</span>
+                  </div>
+                  <div>
+                    <span class="text-[#8C7E75] text-[11px]">累計目標：</span>
+                    <span class="font-bold text-amber-800 text-sm">${st.cumulative}g</span>
+                  </div>
+                </div>
+                <div class="text-[11px] text-[#8C7E75] flex items-center gap-1">
+                  <span>建議流速：</span>
+                  <span class="font-semibold text-[#654D3F] font-mono-num">~${flowRate} g/s</span>
+                </div>
+              </div>
+
+              <div class="text-xs text-[#7C6E64] pt-1 border-t border-[#F0EAE3]/80 leading-relaxed">
+                ${escapeHtml(st.note)}
+              </div>
+            </div>
+          `;
+        }
+        container.appendChild(node);
+      });
+    }
+
+    function updateTimelineStepHighlight(activeIndex) {
+      if (!currentStepsCache) return;
+      currentStepsCache.forEach((st, idx) => {
+        const bullet = document.getElementById(`timeline-bullet-${idx}`);
+        const card = document.getElementById(`timeline-card-${idx}`);
+        if (!bullet || !card) return;
+
+        if (activeIndex === -1) {
+          // 全部未開始
+          bullet.className = 'absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#FAF8F5] border border-[#DDD3CA] text-[#7C6E64] flex items-center justify-center text-xs font-mono-num font-bold shadow-2xs transition-all duration-200';
+          bullet.textContent = idx + 1;
+          card.className = 'p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7] hover:bg-white transition-all duration-200 shadow-2xs space-y-2';
+        } else if (idx < activeIndex) {
+          // 已完成步驟：深焙實心圓標 + 翡翠綠勾勾
+          bullet.className = 'absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#3D2C22] text-emerald-400 border border-[#3D2C22] flex items-center justify-center shadow-2xs transition-all duration-200';
+          bullet.innerHTML = `
+            <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          `;
+          card.className = 'p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7]/70 opacity-75 transition-all duration-200 shadow-2xs space-y-2';
+        } else if (idx === activeIndex) {
+          // 當前活躍步驟：深焙高亮邊框 + 琥珀脈衝外環
+          bullet.className = 'absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#3D2C22] text-[#FAF6F2] ring-4 ring-amber-500/30 border border-amber-500 flex items-center justify-center text-xs font-mono-num font-bold shadow-md scale-110 transition-all duration-200';
+          bullet.textContent = idx + 1;
+          card.className = 'p-3.5 sm:p-4 rounded-xl border-2 border-amber-600/70 bg-white ring-2 ring-amber-500/20 shadow-md transition-all duration-200 space-y-2';
+        } else {
+          // 尚未開始之未來步驟
+          bullet.className = 'absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#FAF8F5] border border-[#DDD3CA] text-[#7C6E64] flex items-center justify-center text-xs font-mono-num font-bold shadow-2xs transition-all duration-200';
+          bullet.textContent = idx + 1;
+          card.className = 'p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7] hover:bg-white transition-all duration-200 shadow-2xs space-y-2';
+        }
+      });
+    }
+
+    // ========================================================
+    // 升級方向 2: 風味雷達與感官光譜 (Sensory Flavor Radar 引擎)
+    // ========================================================
+
+    function calculateSensoryProfile() {
+      const roast = state.roast || 'medium';
+      const method = state.method || 'four_six';
+      const flavor = state.flavor || 'balance';
+
+      // 1. 烘焙度基礎五維 (1.0 ~ 5.0)
+      const baseScores = {
+        light:        { acidity: 4.8, sweetness: 3.5, body: 2.3, aftertaste: 3.8, cleanliness: 4.7 },
+        medium_light: { acidity: 4.3, sweetness: 4.0, body: 3.0, aftertaste: 4.1, cleanliness: 4.5 },
+        medium:       { acidity: 3.5, sweetness: 4.4, body: 3.8, aftertaste: 4.3, cleanliness: 4.2 },
+        medium_dark:  { acidity: 2.3, sweetness: 4.1, body: 4.5, aftertaste: 4.3, cleanliness: 3.6 },
+        dark:         { acidity: 1.2, sweetness: 3.5, body: 4.9, aftertaste: 4.2, cleanliness: 3.1 }
+      }[roast] || { acidity: 3.5, sweetness: 4.4, body: 3.8, aftertaste: 4.3, cleanliness: 4.2 };
+
+      let profile = { ...baseScores };
+
+      // 2. 沖煮手法微調
+      if (method === 'four_six') {
+        profile.acidity += 0.2;
+        profile.sweetness += 0.4;
+        profile.cleanliness += 0.3;
+      } else if (method === 'single_pour') {
+        profile.cleanliness += 0.4;
+        profile.acidity += 0.2;
+        profile.body -= 0.3;
+      } else if (method === 'three_stage') {
+        profile.body += 0.3;
+        profile.sweetness += 0.2;
+        profile.aftertaste += 0.2;
+      } else if (method === 'hoffmann') {
+        profile.sweetness += 0.3;
+        profile.body += 0.2;
+        profile.aftertaste += 0.2;
+      } else if (method === 'matsuya') {
+        profile.cleanliness += 0.5;
+        profile.body -= 0.2;
+      } else if (method === 'immersion') {
+        profile.body += 0.6;
+        profile.aftertaste += 0.3;
+        profile.cleanliness -= 0.4;
+      }
+
+      // 3. 目標風味按鈕偏好微調
+      if (flavor === 'acid') {
+        profile.acidity += 0.6;
+        profile.sweetness -= 0.2;
+        profile.body -= 0.3;
+      } else if (flavor === 'sweet') {
+        profile.sweetness += 0.6;
+        profile.acidity -= 0.2;
+        profile.aftertaste += 0.2;
+      } else if (flavor === 'body') {
+        profile.body += 0.6;
+        profile.cleanliness -= 0.2;
+        profile.sweetness += 0.2;
+      } else if (flavor === 'balance') {
+        profile.acidity += 0.1;
+        profile.sweetness += 0.2;
+        profile.body += 0.1;
+        profile.cleanliness += 0.2;
+      }
+
+      // 4. 水溫自訂微調
+      if (state.tempAdjust > 0) {
+        profile.body += Math.min(0.4, state.tempAdjust * 0.08);
+        profile.sweetness += Math.min(0.3, state.tempAdjust * 0.05);
+        profile.acidity -= Math.min(0.3, state.tempAdjust * 0.05);
+      } else if (state.tempAdjust < 0) {
+        profile.acidity += Math.min(0.4, Math.abs(state.tempAdjust) * 0.08);
+        profile.cleanliness += Math.min(0.3, Math.abs(state.tempAdjust) * 0.05);
+        profile.body -= Math.min(0.4, Math.abs(state.tempAdjust) * 0.08);
+      }
+
+      // 5. 粉水比微調
+      if (state.ratioAdjust > 0) {
+        profile.cleanliness += Math.min(0.3, state.ratioAdjust * 0.15);
+        profile.acidity += Math.min(0.2, state.ratioAdjust * 0.1);
+        profile.body -= Math.min(0.4, state.ratioAdjust * 0.2);
+      } else if (state.ratioAdjust < 0) {
+        profile.body += Math.min(0.4, Math.abs(state.ratioAdjust) * 0.2);
+        profile.sweetness += Math.min(0.2, Math.abs(state.ratioAdjust) * 0.1);
+        profile.cleanliness -= Math.min(0.3, Math.abs(state.ratioAdjust) * 0.15);
+      }
+
+      // 數值鉗制 1.0 ~ 5.0，四捨五入至小數點一位
+      Object.keys(profile).forEach(k => {
+        profile[k] = Math.max(1.0, Math.min(5.0, Math.round(profile[k] * 10) / 10));
+      });
+
+      return profile;
+    }
+
+    function updateSensoryRadar() {
+      const profile = calculateSensoryProfile();
+
+      // 更新右側 5 大長條與數值
+      const dimKeys = ['acidity', 'sweetness', 'body', 'aftertaste', 'cleanliness'];
+      dimKeys.forEach(k => {
+        const scoreElem = document.getElementById(`dim-score-${k}`);
+        const barElem = document.getElementById(`dim-bar-${k}`);
+        if (scoreElem) scoreElem.textContent = profile[k].toFixed(1);
+        if (barElem) barElem.style.width = `${(profile[k] / 5.0) * 100}%`;
+      });
+
+      // 更新萃取平衡標籤與吧台診斷
+      const badgeText = document.getElementById('radar-balance-text');
+      const badgeDot = document.getElementById('radar-balance-dot');
+      const diagElem = document.getElementById('radar-barista-diagnosis');
+
+      if (profile.acidity >= 4.4) {
+        if (badgeText) badgeText.textContent = '明亮果酸傾向';
+        if (badgeDot) badgeDot.className = 'w-2 h-2 rounded-full bg-amber-500';
+        if (diagElem) diagElem.textContent = '果酸表現清脆明亮，富含柑橘花果香氣。若希望口感更圓潤，可提高水溫 1°C 或稍收細研磨度。';
+      } else if (profile.body >= 4.4) {
+        if (badgeText) badgeText.textContent = '濃郁醇厚傾向';
+        if (badgeDot) badgeDot.className = 'w-2 h-2 rounded-full bg-amber-800';
+        if (diagElem) diagElem.textContent = '咖啡油脂滑順，焦糖可可調性強烈。若尾段帶有微澀感，可加快尾段注水或提早移開濾杯。';
+      } else if (profile.sweetness >= 4.5) {
+        if (badgeText) badgeText.textContent = '極致甜感傾向';
+        if (badgeDot) badgeDot.className = 'w-2 h-2 rounded-full bg-amber-600';
+        if (diagElem) diagElem.textContent = '熟果與蜜糖焦糖甜感飽滿突出，回甘悠長，層次柔和順口。';
+      } else {
+        if (badgeText) badgeText.textContent = '金杯平衡萃取';
+        if (badgeDot) badgeDot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+        if (diagElem) diagElem.textContent = '酸、甜、醇厚與乾淨度達到黃金比例對稱，五大維度均衡展現，呈現咖啡豆產區最完整的本真風味。';
+      }
+
+      // 繪製 SVG 雷達圖
+      renderRadarSvg(profile);
+    }
+
+    function renderRadarSvg(profile) {
+      const cx = 140;
+      const cy = 140;
+      const maxR = 85;
+      const dimensions = [
+        { key: 'acidity', label: '酸質', angle: -90, lx: 140, ly: 30, anchor: 'middle' },
+        { key: 'sweetness', label: '甜感', angle: -18, lx: 236, ly: 104, anchor: 'start' },
+        { key: 'body', label: '醇厚', angle: 54, lx: 202, ly: 238, anchor: 'start' },
+        { key: 'aftertaste', label: '餘韻', angle: 126, lx: 78, ly: 238, anchor: 'end' },
+        { key: 'cleanliness', label: '乾淨', angle: 198, lx: 44, ly: 104, anchor: 'end' }
+      ];
+
+      // 1. 繪製同心五邊形網格 (20%, 40%, 60%, 80%, 100%)
+      const gridGroup = document.getElementById('radar-grid-group');
+      if (gridGroup && gridGroup.children.length === 0) {
+        let gridHtml = '';
+        [0.2, 0.4, 0.6, 0.8, 1.0].forEach(level => {
+          const points = dimensions.map(d => {
+            const rad = (d.angle * Math.PI) / 180;
+            const x = cx + maxR * level * Math.cos(rad);
+            const y = cy + maxR * level * Math.sin(rad);
+            return `${x.toFixed(1)},${y.toFixed(1)}`;
+          }).join(' ');
+          gridHtml += `<polygon points="${points}" fill="none" stroke="#E6DFD7" stroke-width="1" stroke-dasharray="${level === 1.0 ? 'none' : '2,2'}" />`;
+        });
+
+        // 繪製 5 條軸線
+        dimensions.forEach(d => {
+          const rad = (d.angle * Math.PI) / 180;
+          const x = cx + maxR * Math.cos(rad);
+          const y = cy + maxR * Math.sin(rad);
+          gridHtml += `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#DDD4CA" stroke-width="1.2" />`;
+        });
+        gridGroup.innerHTML = gridHtml;
+      }
+
+      // 2. 繪製動態多邊形
+      const polyPoints = dimensions.map(d => {
+        const val = profile[d.key] || 3.0;
+        const ratio = Math.max(0.1, val / 5.0);
+        const rad = (d.angle * Math.PI) / 180;
+        const x = cx + maxR * ratio * Math.cos(rad);
+        const y = cy + maxR * ratio * Math.sin(rad);
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(' ');
+
+      const polyElem = document.getElementById('radar-polygon');
+      if (polyElem) polyElem.setAttribute('points', polyPoints);
+
+      // 3. 頂點節點
+      const pointsGroup = document.getElementById('radar-points-group');
+      if (pointsGroup) {
+        let ptsHtml = '';
+        dimensions.forEach(d => {
+          const val = profile[d.key] || 3.0;
+          const ratio = Math.max(0.1, val / 5.0);
+          const rad = (d.angle * Math.PI) / 180;
+          const x = cx + maxR * ratio * Math.cos(rad);
+          const y = cy + maxR * ratio * Math.sin(rad);
+          ptsHtml += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="#3D2C22" stroke="#FAF5F0" stroke-width="1.5" />`;
+        });
+        pointsGroup.innerHTML = ptsHtml;
+      }
+
+      // 4. 維度標籤與即時分數
+      const labelsGroup = document.getElementById('radar-labels-group');
+      if (labelsGroup) {
+        let lblHtml = '';
+        dimensions.forEach(d => {
+          const val = (profile[d.key] || 3.0).toFixed(1);
+          lblHtml += `
+            <text x="${d.lx}" y="${d.ly}" text-anchor="${d.anchor}" class="text-[11px] font-bold fill-[#2C2521] select-none">
+              ${d.label} <tspan class="font-mono-num fill-amber-700 font-bold">${val}</tspan>
+            </text>
+          `;
+        });
+        labelsGroup.innerHTML = lblHtml;
+      }
+    }
+
+    // ========================================================
+    // 升級方向 1: 吧台專注模式 (Zen Barista Mode 引擎)
+    // ========================================================
+    let isZenModeOpen = false;
+
+    function openZenBaristaMode() {
+      const modal = document.getElementById('zen-barista-modal');
+      if (!modal) return;
+      isZenModeOpen = true;
+      initAudioContext();
+      modal.showModal();
+      updateZenBaristaUI();
+    }
+
+    function closeZenBaristaMode() {
+      const modal = document.getElementById('zen-barista-modal');
+      if (!modal) return;
+      isZenModeOpen = false;
+      modal.close();
+    }
+
+    function updateZenBaristaUI() {
+      if (!isZenModeOpen) return;
+
+      const currentDose = state.dose;
+      const currentRatio = document.getElementById('param-ratio')?.textContent || '1:15';
+      const currentTemp = document.getElementById('param-temp')?.textContent || '90°C';
+      const totalWater = document.getElementById('param-water')?.textContent || '225g';
+      const methodName = document.getElementById('guide-method-name')?.textContent || '四六法';
+      const roastName = ROAST_CONFIGS[state.roast]?.name || '中焙';
+
+      // 摘要
+      const summaryElem = document.getElementById('zen-recipe-summary');
+      if (summaryElem) {
+        summaryElem.textContent = `${roastName} · ${methodName} · ${currentDose}g · ${currentTemp} · ${currentRatio} · ${totalWater}`;
+      }
+
+      // 碼錶數字
+      const zenDigits = document.getElementById('zen-timer-digits');
+      if (zenDigits) {
+        zenDigits.textContent = formatTimerDigits(timerSeconds);
+      }
+
+      // 提示音狀態
+      const zenAudioText = document.getElementById('zen-audio-text');
+      const zenAudioIcon = document.getElementById('zen-audio-icon');
+      if (zenAudioText) {
+        zenAudioText.textContent = audioEnabled ? '提示音開啟' : '提示音靜音';
+      }
+      if (zenAudioIcon) {
+        zenAudioIcon.innerHTML = audioEnabled 
+          ? '<svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>'
+          : '<svg class="w-4 h-4 text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>';
+      }
+
+      // 播放暫停按鈕
+      const zenRunText = document.getElementById('zen-run-text');
+      const zenRunIcon = document.getElementById('zen-run-icon');
+      const zenRunBtn = document.getElementById('zen-run-btn');
+      if (zenRunBtn) {
+        if (timerRunning) {
+          zenRunText.textContent = '暫停計時 (Space)';
+          zenRunBtn.className = 'h-14 px-8 sm:px-12 rounded-2xl bg-amber-600 hover:bg-amber-500 text-[#FAF6F2] font-bold text-base transition-all shadow-lg flex items-center gap-2 active:scale-95 cursor-pointer';
+          zenRunIcon.innerHTML = '<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>';
+        } else {
+          zenRunText.textContent = timerSeconds > 0 ? '繼續沖煮 (Space)' : '開始沖煮 (Space)';
+          zenRunBtn.className = 'h-14 px-8 sm:px-12 rounded-2xl bg-amber-500 hover:bg-amber-400 text-[#1E1713] font-bold text-base transition-all shadow-lg flex items-center gap-2 active:scale-95 cursor-pointer';
+          zenRunIcon.innerHTML = '<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>';
+        }
+      }
+
+      if (!currentStepsCache || currentStepsCache.length === 0) return;
+
+      const totalWaterVal = currentStepsCache[currentStepsCache.length - 1].cumulative;
+      const zenTotalWaterElem = document.getElementById('zen-total-water');
+      if (zenTotalWaterElem) zenTotalWaterElem.textContent = `${totalWaterVal}g`;
+
+      // 超時處理
+      if (timerSeconds >= totalBrewSeconds) {
+        const overtimeSec = timerSeconds - totalBrewSeconds;
+        document.getElementById('zen-status-title').textContent = overtimeSec === 0 ? '預估總時間到 · 靜候滴乾' : `萃取收尾滴濾中 (+${overtimeSec}s)`;
+        document.getElementById('zen-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse';
+        document.getElementById('zen-target-water').textContent = totalWaterVal;
+        document.getElementById('zen-step-water').textContent = '+0g';
+        document.getElementById('zen-step-indicator').textContent = '滴濾收尾階段';
+        document.getElementById('zen-step-countdown').textContent = '完全滴淨即可移開濾杯';
+        document.getElementById('zen-step-title').textContent = '滴濾收尾 (Drawdown)';
+        document.getElementById('zen-step-note').textContent = '請觀察濾杯水位平整滴乾，完全落盡後即可移開濾杯，品嚐美味咖啡。';
+        renderZenStepSegments(currentStepsCache.length - 1);
+        return;
+      }
+
+      // 正常段落處理
+      let activeIndex = currentStepsCache.findIndex(st => timerSeconds >= st.startSec && timerSeconds < st.endSec);
+      if (activeIndex === -1) activeIndex = 0;
+      const activeStep = currentStepsCache[activeIndex];
+      const remainingSec = activeStep.endSec - timerSeconds;
+
+      document.getElementById('zen-status-title').textContent = timerRunning ? '正在注水萃取中' : '沖煮暫停中';
+      document.getElementById('zen-status-dot').className = timerRunning ? 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse' : 'w-2.5 h-2.5 rounded-full bg-amber-400';
+      document.getElementById('zen-target-water').textContent = activeStep.cumulative;
+      document.getElementById('zen-step-water').textContent = activeStep.amount > 0 ? `+${activeStep.amount}g` : '0g';
+      document.getElementById('zen-step-indicator').textContent = `第 ${activeIndex + 1} 段 / 共 ${currentStepsCache.length} 段`;
+      document.getElementById('zen-step-countdown').textContent = `本段剩餘 ${remainingSec} 秒`;
+      document.getElementById('zen-step-title').textContent = activeStep.name;
+      document.getElementById('zen-step-note').textContent = activeStep.note;
+
+      renderZenStepSegments(activeIndex);
+    }
+
+    function renderZenStepSegments(activeIndex) {
+      const container = document.getElementById('zen-step-segments');
+      if (!container || !currentStepsCache) return;
+      container.innerHTML = '';
+
+      currentStepsCache.forEach((st, idx) => {
+        const seg = document.createElement('div');
+        seg.className = 'flex-1 h-full rounded-full transition-all duration-300';
+        if (idx < activeIndex) {
+          seg.className += ' bg-emerald-500';
+        } else if (idx === activeIndex) {
+          seg.className += ' bg-amber-400 animate-pulse';
+        } else {
+          seg.className += ' bg-[#3A2D23]';
+        }
+        container.appendChild(seg);
+      });
+    }
+
+    function skipToNextStep() {
+      if (!currentStepsCache || currentStepsCache.length === 0) return;
+      let activeIndex = currentStepsCache.findIndex(st => timerSeconds >= st.startSec && timerSeconds < st.endSec);
+      if (activeIndex === -1) activeIndex = 0;
+
+      if (activeIndex < currentStepsCache.length - 1) {
+        const nextStep = currentStepsCache[activeIndex + 1];
+        timerSeconds = nextStep.startSec;
+        timerStartTime = Date.now() - (timerSeconds * 1000);
+        document.getElementById('timer-digits').textContent = formatTimerDigits(timerSeconds);
+        updateTimerStepHighlight();
+        updateZenBaristaUI();
+        playStepChangeSound();
+      }
+    }
+
+    function skipToPreviousStep() {
+      if (!currentStepsCache || currentStepsCache.length === 0) return;
+      let activeIndex = currentStepsCache.findIndex(st => timerSeconds >= st.startSec && timerSeconds < st.endSec);
+      if (activeIndex === -1) activeIndex = 0;
+
+      if (activeIndex > 0) {
+        const prevStep = currentStepsCache[activeIndex - 1];
+        timerSeconds = prevStep.startSec;
+        timerStartTime = Date.now() - (timerSeconds * 1000);
+        document.getElementById('timer-digits').textContent = formatTimerDigits(timerSeconds);
+        updateTimerStepHighlight();
+        updateZenBaristaUI();
+        playStepChangeSound();
+      } else {
+        timerSeconds = 0;
+        timerStartTime = Date.now();
+        document.getElementById('timer-digits').textContent = formatTimerDigits(timerSeconds);
+        updateTimerStepHighlight();
+        updateZenBaristaUI();
+      }
+    }
+
+    // 鍵盤快捷鍵：Space 播放/暫停，Esc 退出專注，左右方向鍵切換步驟
+    document.addEventListener('keydown', (e) => {
+      if (isZenModeOpen) {
+        if (e.code === 'Space') {
+          e.preventDefault();
+          toggleTimer();
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          skipToNextStep();
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          skipToPreviousStep();
+        }
+      }
+    });
 
     // ==========================================
     // Web Audio API 提示音合成模組
@@ -2440,6 +3385,7 @@
         if (audioIcon) audioIcon.innerHTML = ICON_SPEAKER_MUTED_SVG;
         if (audioText) audioText.textContent = '靜音模式';
       }
+      updateZenBaristaUI();
     }
 
     // ==========================================
@@ -2523,6 +3469,7 @@
         // 暫停時，微動畫平滑定格
         if (viewport) viewport.classList.add('timer-paused');
         if (tag) tag.textContent = '計時暫停';
+        updateZenBaristaUI();
       } else {
         timerRunning = true;
         requestScreenWakeLock();
@@ -2544,6 +3491,7 @@
 
         timerInterval = setInterval(onTimerTick, 500); // 500ms 檢查頻率，更加平滑準確
         updateTimerStepHighlight();
+        updateZenBaristaUI();
       }
     }
 
@@ -2573,6 +3521,8 @@
       resetStepAnimationCue();
 
       document.querySelectorAll('#steps-tbody tr').forEach(tr => tr.classList.remove('step-row-active'));
+      updateTimelineStepHighlight(-1);
+      updateZenBaristaUI();
     }
 
     function onTimerTick() {
@@ -2583,6 +3533,9 @@
         timerSeconds = exactSeconds;
         document.getElementById('timer-digits').textContent = formatTimerDigits(timerSeconds);
         updateTimerStepHighlight();
+      }
+      if (isZenModeOpen) {
+        updateZenBaristaUI();
       }
     }
 
@@ -2632,6 +3585,8 @@
         document.querySelectorAll('#steps-tbody tr').forEach((tr, idx) => {
           tr.classList.toggle('step-row-active', idx === currentStepsCache.length - 1);
         });
+        updateTimelineStepHighlight(currentStepsCache.length - 1);
+        updateZenBaristaUI();
         return;
       }
 
@@ -2671,6 +3626,8 @@
       document.querySelectorAll('#steps-tbody tr').forEach((tr, idx) => {
         tr.classList.toggle('step-row-active', idx === activeIndex);
       });
+      updateTimelineStepHighlight(activeIndex);
+      updateZenBaristaUI();
     }
 
     // ==========================================
