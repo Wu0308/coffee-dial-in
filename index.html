@@ -196,9 +196,9 @@
     /* ======================================================== */
     @keyframes kettleSpiral {
       0% { transform: translate(0, 0); }
-      25% { transform: translate(6px, -2px); }
-      50% { transform: translate(0px, 3px); }
-      75% { transform: translate(-6px, -2px); }
+      25% { transform: translate(5px, -2px); }
+      50% { transform: translate(0px, 2px); }
+      75% { transform: translate(-5px, -2px); }
       100% { transform: translate(0, 0); }
     }
     .anim-kettle-spiral {
@@ -212,11 +212,13 @@
       100% { transform: scale(1.35); opacity: 0; }
     }
     .anim-ripple-slow {
-      transform-origin: 80px 39px;
+      transform-box: fill-box;
+      transform-origin: center;
       animation: ripplePulse 2.2s infinite ease-out;
     }
     .anim-ripple-fast {
-      transform-origin: 80px 39px;
+      transform-box: fill-box;
+      transform-origin: center;
       animation: ripplePulse 1.8s infinite ease-out 0.6s;
     }
 
@@ -252,7 +254,8 @@
       50% { transform: scale(1.3); opacity: 1; }
     }
     .anim-center-dot-pulse {
-      transform-origin: 80px 39px;
+      transform-box: fill-box;
+      transform-origin: center;
       animation: centerDotPulse 1.2s infinite ease-in-out;
     }
 
@@ -279,7 +282,8 @@
       50% { transform: scale(1.15); opacity: 1; }
     }
     .anim-vigorous-wave {
-      transform-origin: 80px 39px;
+      transform-box: fill-box;
+      transform-origin: center;
       animation: vigorousWave 0.8s infinite ease-in-out;
     }
 
@@ -297,36 +301,63 @@
       100% { transform: translateY(-4px) scale(1.2); opacity: 0; }
     }
     .anim-bubble-1 {
+      transform-box: fill-box;
+      transform-origin: center;
       animation: bubblePop 1.2s infinite ease-in-out;
     }
     .anim-bubble-2 {
+      transform-box: fill-box;
+      transform-origin: center;
       animation: bubblePop 1.5s infinite ease-in-out 0.5s;
     }
 
-    @keyframes dripFall {
-      0% { transform: translateY(-10px) scale(0.4); opacity: 0; }
-      25% { transform: translateY(0px) scale(1); opacity: 1; }
-      65% { transform: translateY(14px) scale(0.9, 1.4); opacity: 1; }
-      85% { transform: translateY(16px) scale(1.4, 0.4); opacity: 0.9; }
-      100% { transform: translateY(16px) scale(1.8, 0.1); opacity: 0; }
+    /* 水滴與咖啡液滴垂直下落：精確限制在濾杯出口與下壺液面之間 */
+    @keyframes serverDripFall {
+      0% { transform: translateY(0px) scale(0.6); opacity: 0; }
+      15% { transform: translateY(2px) scale(1); opacity: 0.95; }
+      75% { transform: translateY(20px) scale(0.9, 1.3); opacity: 0.95; }
+      90% { transform: translateY(22px) scale(1.3, 0.4); opacity: 0.8; }
+      100% { transform: translateY(22px) scale(1.6, 0.1); opacity: 0; }
     }
-    .anim-drip-fall {
-      transform-origin: 80px 24px;
-      animation: dripFall 1.6s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
-    }
-    .anim-drip-fall-slow {
-      transform-origin: 80px 82px;
-      animation: dripFall 2.2s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+    .anim-drip-fall-server {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: serverDripFall 2.2s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
     }
 
+    @keyframes kettleDripFall {
+      0% { transform: translateY(0px) scale(0.6); opacity: 0; }
+      15% { transform: translateY(2px) scale(1); opacity: 0.95; }
+      75% { transform: translateY(18px) scale(0.9, 1.3); opacity: 0.95; }
+      90% { transform: translateY(20px) scale(1.3, 0.4); opacity: 0.8; }
+      100% { transform: translateY(20px) scale(1.6, 0.1); opacity: 0; }
+    }
+    .anim-kettle-drip-fall {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: kettleDripFall 1.6s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+    }
+
+    /* 水滴飛濺漣漪：使用 fill-box 確保原地自中心綻放，絕不位移超出畫布 */
     @keyframes dripSplash {
-      0% { transform: scale(0.5); opacity: 0; }
-      50% { opacity: 0.9; }
-      100% { transform: scale(2.0); opacity: 0; }
+      0% { transform: scale(0.3); opacity: 0; }
+      40% { opacity: 0.9; }
+      100% { transform: scale(2.2); opacity: 0; }
     }
     .anim-drip-splash {
-      transform-origin: 80px 39px;
+      transform-box: fill-box;
+      transform-origin: center;
       animation: dripSplash 1.6s infinite ease-out 0.8s;
+    }
+    .anim-drip-splash-server {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: dripSplash 2.2s infinite ease-out 1.5s;
+    }
+    .anim-bed-drip-splash {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: dripSplash 1.6s infinite ease-out 1.3s;
     }
 
     @keyframes steamRise {
@@ -349,7 +380,8 @@
       50% { opacity: 1; transform: scaleX(1.1); }
     }
     .anim-stream-rush {
-      transform-origin: 80px 88px;
+      transform-box: fill-box;
+      transform-origin: center;
       animation: streamRush 0.5s infinite ease-in-out;
     }
 
@@ -366,59 +398,66 @@
       50% { transform: scale(1.2) rotate(15deg); opacity: 1; }
     }
     .anim-sparkle-1 {
+      transform-box: fill-box;
+      transform-origin: center;
       animation: sparkleTwinkle 1.8s infinite ease-in-out;
     }
     .anim-sparkle-2 {
+      transform-box: fill-box;
+      transform-origin: center;
       animation: sparkleTwinkle 2.0s infinite ease-in-out 0.7s;
     }
 
-
-    /* 悶蒸專屬動畫：粉層漢堡包隆起排氣與氣泡逸出 (Coffee Bloom Burger) */
+    /* 悶蒸專屬動畫：粉層均勻隆起排氣與微氣泡逸出 (Coffee Bloom Dome) */
     @keyframes bloomRise {
       0% {
-        transform: scale(0.92, 0.6) translateY(5px);
-        filter: brightness(0.9);
+        transform: scale(0.94, 0.7) translateY(4px);
+        filter: brightness(0.92);
       }
       35% {
-        transform: scale(1.03, 1.18) translateY(-2px);
-        filter: brightness(1.05);
+        transform: scale(1.02, 1.15) translateY(-2px);
+        filter: brightness(1.04);
       }
       65% {
-        transform: scale(1.0, 1.08) translateY(-1px);
+        transform: scale(1.0, 1.06) translateY(-1px);
       }
       100% {
-        transform: scale(0.92, 0.6) translateY(5px);
-        filter: brightness(0.9);
+        transform: scale(0.94, 0.7) translateY(4px);
+        filter: brightness(0.92);
       }
     }
     .anim-bloom-dome {
-      transform-origin: 80px 43px;
+      transform-box: fill-box;
+      transform-origin: center bottom;
       animation: bloomRise 4.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     @keyframes bloomBubble {
       0% { transform: translateY(0) scale(0.3); opacity: 0; }
       35% { transform: translateY(-3px) scale(1); opacity: 0.9; }
-      70% { transform: translateY(-7px) scale(1.2); opacity: 0.5; }
-      100% { transform: translateY(-10px) scale(0); opacity: 0; }
+      70% { transform: translateY(-6px) scale(1.2); opacity: 0.5; }
+      100% { transform: translateY(-8px) scale(0); opacity: 0; }
     }
     .anim-bloom-bubble-1 {
-      transform-origin: 72px 35px;
+      transform-box: fill-box;
+      transform-origin: center;
       animation: bloomBubble 2.4s infinite ease-out 0.2s;
     }
     .anim-bloom-bubble-2 {
-      transform-origin: 81px 32px;
+      transform-box: fill-box;
+      transform-origin: center;
       animation: bloomBubble 2.8s infinite ease-out 1.0s;
     }
     .anim-bloom-bubble-3 {
-      transform-origin: 90px 36px;
+      transform-box: fill-box;
+      transform-origin: center;
       animation: bloomBubble 2.2s infinite ease-out 1.6s;
     }
     .anim-bloom-bubble-4 {
-      transform-origin: 77px 39px;
+      transform-box: fill-box;
+      transform-origin: center;
       animation: bloomBubble 3.0s infinite ease-out 0.7s;
     }
-
 
     /* 計時暫停時，微動畫平滑定格 */
     .timer-paused svg * {
@@ -586,7 +625,7 @@
               </span>
               <h2 id="step-anim-action-title" class="text-sm sm:text-base font-bold text-[#2C2521]">
                 準備開始沖煮
-              </h4>
+              </h2>
             </div>
             <span id="step-anim-step-badge" class="text-[11px] font-mono-num font-semibold text-[#8C7E75] bg-white px-2 py-0.5 rounded-md border border-[#EAE4DC]">
               Step 0 / 0
@@ -724,35 +763,35 @@
             <div class="grid grid-cols-5 gap-1.5 text-xs">
               <button onclick="selectRoast('light')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-roast="light">
                 <div class="w-6 h-6 rounded-md bg-[#FAF4EE] flex items-center justify-center text-[#C99E75] transition group-[.active]:scale-110">
-                  <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.2 17.8c-2.4-3.1-2.4-6.5 0-9.6 1.8-2.3 2.1-4.8 1.4-6.2 3.8 1.5 5.4 5.3 5.4 8 0 4.2-2.8 7.8-6.8 7.8z"/></svg>
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/><path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/></svg>
                 </div>
                 <span class="text-[11px] font-semibold">淺焙</span>
               </button>
 
               <button onclick="selectRoast('medium_light')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-roast="medium_light">
                 <div class="w-6 h-6 rounded-md bg-[#F6EDE4] flex items-center justify-center text-[#B57C4C] transition group-[.active]:scale-110">
-                  <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.2 17.8c-2.4-3.1-2.4-6.5 0-9.6 1.8-2.3 2.1-4.8 1.4-6.2 3.8 1.5 5.4 5.3 5.4 8 0 4.2-2.8 7.8-6.8 7.8z"/></svg>
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/><path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/></svg>
                 </div>
                 <span class="text-[11px] font-semibold">中淺</span>
               </button>
 
               <button onclick="selectRoast('medium')" class="dial-btn active py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-roast="medium">
                 <div class="w-6 h-6 rounded-md bg-[#F2E5D9] flex items-center justify-center text-[#8C5D3B] transition group-[.active]:scale-110">
-                  <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.2 17.8c-2.4-3.1-2.4-6.5 0-9.6 1.8-2.3 2.1-4.8 1.4-6.2 3.8 1.5 5.4 5.3 5.4 8 0 4.2-2.8 7.8-6.8 7.8z"/></svg>
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/><path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/></svg>
                 </div>
                 <span class="text-[11px] font-semibold">中焙</span>
               </button>
 
               <button onclick="selectRoast('medium_dark')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-roast="medium_dark">
                 <div class="w-6 h-6 rounded-md bg-[#EFE0D3] flex items-center justify-center text-[#633F26] transition group-[.active]:scale-110">
-                  <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.2 17.8c-2.4-3.1-2.4-6.5 0-9.6 1.8-2.3 2.1-4.8 1.4-6.2 3.8 1.5 5.4 5.3 5.4 8 0 4.2-2.8 7.8-6.8 7.8z"/></svg>
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/><path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/></svg>
                 </div>
                 <span class="text-[11px] font-semibold">中深</span>
               </button>
 
               <button onclick="selectRoast('dark')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-roast="dark">
                 <div class="w-6 h-6 rounded-md bg-[#EAD8CA] flex items-center justify-center text-[#3B2213] transition group-[.active]:scale-110">
-                  <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.2 17.8c-2.4-3.1-2.4-6.5 0-9.6 1.8-2.3 2.1-4.8 1.4-6.2 3.8 1.5 5.4 5.3 5.4 8 0 4.2-2.8 7.8-6.8 7.8z"/></svg>
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/><path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/></svg>
                 </div>
                 <span class="text-[11px] font-semibold">深焙</span>
               </button>
@@ -2575,34 +2614,44 @@
     const STEP_ANIMATION_SVGS = {
 
       bloom: `
-        <svg viewBox="0 0 160 120" class="w-full h-full">
+        <svg viewBox="0 0 160 120" class="w-full h-full overflow-hidden">
           <defs>
-            <radialGradient id="bloomBurgerGrad" cx="50%" cy="38%" r="55%">
+            <radialGradient id="bloomDomeGrad" cx="50%" cy="38%" r="55%">
               <stop offset="0%" stop-color="#8A5636"/>
               <stop offset="55%" stop-color="#5E3821"/>
               <stop offset="100%" stop-color="#3A2012"/>
             </radialGradient>
+            <clipPath id="serverClipBloom">
+              <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z"/>
+            </clipPath>
           </defs>
+
           <!-- 下壺 Glass Server -->
-          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
-          <path d="M58 106 C66 104 94 104 102 106 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.75"/>
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#FDFCFA" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M57 82 C56 90 57 98 60 105" fill="none" stroke="#FFFFFF" stroke-width="1.3" opacity="0.8" stroke-linecap="round"/>
+          <line x1="99" y1="88" x2="103" y2="88" stroke="#D8CCC4" stroke-width="1" stroke-linecap="round"/>
+          <line x1="98" y1="94" x2="103" y2="94" stroke="#D8CCC4" stroke-width="1" stroke-linecap="round"/>
+          <line x1="97" y1="100" x2="103" y2="100" stroke="#D8CCC4" stroke-width="1" stroke-linecap="round"/>
           <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+          <path d="M58 104 C66 102 94 102 102 104 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.85"/>
 
           <!-- 濾杯 V60 Cone -->
-          <path d="M50 36 L110 36 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
-          <ellipse cx="80" cy="36" rx="30" ry="5" fill="#EDE8E2" stroke="#CFC2B7" stroke-width="1.5"/>
-          <ellipse cx="80" cy="43" rx="24" ry="4" fill="#3A2012" opacity="0.5"/>
+          <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
+          <path d="M58 40 Q 64 54 70 70" fill="none" stroke="#F0EAE3" stroke-width="1" stroke-linecap="round"/>
+          <path d="M102 40 Q 96 54 90 70" fill="none" stroke="#F0EAE3" stroke-width="1" stroke-linecap="round"/>
+          <ellipse cx="80" cy="34" rx="30" ry="5" fill="#EDE8E2" stroke="#CFC2B7" stroke-width="1.5"/>
+          <ellipse cx="80" cy="42" rx="24" ry="4" fill="#3A2012" opacity="0.4"/>
 
-          <!-- 咖啡粉層動態漢堡包膨脹 (Blooming Burger Dome) -->
+          <!-- 咖啡粉層動態膨脹排氣 (Blooming Coffee Bed) -->
           <g class="anim-bloom-dome">
-            <path d="M53 43 C53 43 65 29 80 29 C95 29 107 43 107 43 C107 43 95 49 80 49 C65 49 53 43 53 43 Z" fill="url(#bloomBurgerGrad)" stroke="#4A2C18" stroke-width="0.8"/>
+            <path d="M53 43 C53 43 65 29 80 29 C95 29 107 43 107 43 C107 43 95 49 80 49 C65 49 53 43 53 43 Z" fill="url(#bloomDomeGrad)" stroke="#4A2C18" stroke-width="0.8"/>
             <path d="M64 39 Q 74 34 84 37" fill="none" stroke="#A66D46" stroke-width="1.2" opacity="0.7" stroke-linecap="round"/>
             <path d="M76 43 Q 86 41 94 43" fill="none" stroke="#A66D46" stroke-width="1" opacity="0.6" stroke-linecap="round"/>
             
-            <!-- CO2 釋放氣泡 -->
-            <circle cx="72" cy="35" r="1.8" fill="#FAF9F7" class="anim-bloom-bubble-1"/>
-            <circle cx="81" cy="32" r="2.2" fill="#FAF9F7" class="anim-bloom-bubble-2"/>
-            <circle cx="90" cy="36" r="1.5" fill="#FAF9F7" class="anim-bloom-bubble-3"/>
+            <!-- CO2 釋放微氣泡 -->
+            <circle cx="72" cy="35" r="1.6" fill="#FAF9F7" class="anim-bloom-bubble-1"/>
+            <circle cx="81" cy="32" r="2.0" fill="#FAF9F7" class="anim-bloom-bubble-2"/>
+            <circle cx="90" cy="36" r="1.4" fill="#FAF9F7" class="anim-bloom-bubble-3"/>
             <circle cx="77" cy="39" r="1.2" fill="#FAF9F7" class="anim-bloom-bubble-4"/>
           </g>
 
@@ -2611,75 +2660,90 @@
           <path d="M80 25 Q 86 15 80 6" fill="none" stroke="#8C7E75" stroke-width="1.8" stroke-linecap="round" class="anim-steam-2"/>
           <path d="M89 27 Q 84 17 91 8" fill="none" stroke="#8C7E75" stroke-width="1.6" stroke-linecap="round" class="anim-steam-3"/>
 
-          <!-- 底部緩慢精華滴落 (Slow drop) -->
-          <g class="anim-drip-fall-slow">
-            <ellipse cx="80" cy="82" rx="1.5" ry="2.2" fill="#B87B52"/>
+          <!-- 底部緩慢精華滴落 (受嚴密座標與 clipPath 保護，絕不跑出畫面) -->
+          <g clip-path="url(#serverClipBloom)">
+            <g class="anim-drip-fall-server">
+              <path d="M80 73 C78.8 74.8 78 76.5 78 78 A2 2 0 0 0 82 78 C82 76.5 81.2 74.8 80 73 Z" fill="#B87B52"/>
+            </g>
+            <circle cx="80" cy="98" r="1.8" fill="none" stroke="#B87B52" stroke-width="1.2" class="anim-drip-splash-server"/>
           </g>
-          <circle cx="80" cy="98" r="1.8" fill="none" stroke="#B87B52" stroke-width="1" class="anim-drip-splash"/>
 
-          <text x="80" y="16" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#654D3F">咖啡粉層膨脹排氣 · 漢堡包</text>
+          <text x="80" y="15" text-anchor="middle" font-size="8.5" font-weight="600" fill="#786B63" letter-spacing="0.5">咖啡粉層膨脹排氣</text>
         </svg>
       `,
+
       idle: `
-        <svg viewBox="0 0 160 120" class="w-full h-full">
+        <svg viewBox="0 0 160 120" class="w-full h-full overflow-hidden">
           <path d="M56 50 L104 50 L98 96 C98 104 92 108 80 108 C68 108 62 104 62 96 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="2"/>
-          <path d="M102 58 C114 58 116 82 100 86" fill="none" stroke="#CFC2B7" stroke-width="3" stroke-linecap="round"/>
+          <path d="M102 58 C114 58 116 82 100 86" fill="none" stroke="#CFC2B7" stroke-width="2.5" stroke-linecap="round"/>
           <ellipse cx="80" cy="108" rx="42" ry="5" fill="#EDE8E2" stroke="#D8CCC4" stroke-width="1.5"/>
           <ellipse cx="80" cy="52" rx="21" ry="3.5" fill="#654D3F"/>
           <path d="M74 44 Q70 30 76 18" fill="none" stroke="#8C7E75" stroke-width="1.8" stroke-linecap="round" class="anim-steam-1"/>
           <path d="M80 42 Q86 28 80 14" fill="none" stroke="#8C7E75" stroke-width="2" stroke-linecap="round" class="anim-steam-2"/>
           <path d="M86 44 Q82 30 88 18" fill="none" stroke="#8C7E75" stroke-width="1.8" stroke-linecap="round" class="anim-steam-3"/>
-          <text x="80" y="116" text-anchor="middle" font-size="9" font-weight="600" fill="#9B8D83">BrewCraft Ready</text>
+          <text x="80" y="116" text-anchor="middle" font-size="8.5" font-weight="600" fill="#9B8D83" letter-spacing="0.5">BrewCraft Ready</text>
         </svg>
       `,
 
       spiral: `
-        <svg viewBox="0 0 160 120" class="w-full h-full">
+        <svg viewBox="0 0 160 120" class="w-full h-full overflow-hidden">
           <defs>
             <radialGradient id="spiralCoffeeGrad" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stop-color="#8C5D3D"/>
               <stop offset="100%" stop-color="#5A3A25"/>
             </radialGradient>
+            <clipPath id="serverClipSpiral">
+              <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z"/>
+            </clipPath>
           </defs>
-          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
-          <path d="M55 102 C65 99 95 99 105 102 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.75"/>
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#FDFCFA" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M57 82 C56 90 57 98 60 105" fill="none" stroke="#FFFFFF" stroke-width="1.3" opacity="0.8" stroke-linecap="round"/>
           <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+          <path d="M55 102 C65 99 95 99 105 102 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.85"/>
           <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
           <ellipse cx="80" cy="34" rx="30" ry="5" fill="#EDE8E2" stroke="#CFC2B7" stroke-width="1.5"/>
           <ellipse cx="80" cy="39" rx="24" ry="4.5" fill="url(#spiralCoffeeGrad)"/>
-          <ellipse cx="80" cy="39" rx="8" ry="2" fill="none" stroke="#7EA8BE" stroke-width="1.5" class="anim-ripple-slow"/>
-          <ellipse cx="80" cy="39" rx="16" ry="3.5" fill="none" stroke="#7EA8BE" stroke-width="1.2" class="anim-ripple-fast"/>
-          <line x1="80" y1="72" x2="80" y2="98" stroke="#B87B52" stroke-width="1.5" stroke-dasharray="3 3" class="anim-stream-down"/>
+          <ellipse cx="80" cy="39" rx="8" ry="2" fill="none" stroke="#6BA3BE" stroke-width="1.5" class="anim-ripple-slow"/>
+          <ellipse cx="80" cy="39" rx="16" ry="3.5" fill="none" stroke="#6BA3BE" stroke-width="1.2" class="anim-ripple-fast"/>
+          <g clip-path="url(#serverClipSpiral)">
+            <line x1="80" y1="72" x2="80" y2="98" stroke="#B87B52" stroke-width="1.6" stroke-dasharray="3 3" class="anim-stream-down"/>
+          </g>
           <g class="anim-kettle-spiral">
-            <path d="M74 16 Q 77 26 79 37" fill="none" stroke="#7EA8BE" stroke-width="2.2" stroke-linecap="round" class="anim-water-pulse"/>
-            <path d="M44 8 C54 8 68 10 74 16 L76 14 C70 9 54 6 44 6 Z" fill="#654D3F"/>
+            <path d="M74 16 Q 77 26 79 37" fill="none" stroke="#6BA3BE" stroke-width="2.2" stroke-linecap="round" class="anim-water-pulse"/>
+            <path d="M44 8 C54 8 68 10 74 16 L76 14 C70 9 54 6 44 6 Z" fill="#4A3B32"/>
           </g>
         </svg>
       `,
 
       steady_center: `
-        <svg viewBox="0 0 160 120" class="w-full h-full">
+        <svg viewBox="0 0 160 120" class="w-full h-full overflow-hidden">
           <defs>
             <radialGradient id="centerCoffeeGrad" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stop-color="#8C5D3D"/>
               <stop offset="100%" stop-color="#5A3A25"/>
             </radialGradient>
+            <clipPath id="serverClipCenter">
+              <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z"/>
+            </clipPath>
           </defs>
-          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
-          <path d="M55 100 C65 98 95 98 105 100 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.75"/>
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#FDFCFA" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M57 82 C56 90 57 98 60 105" fill="none" stroke="#FFFFFF" stroke-width="1.3" opacity="0.8" stroke-linecap="round"/>
           <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+          <path d="M55 100 C65 98 95 98 105 100 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.85"/>
           <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
           <ellipse cx="80" cy="34" rx="30" ry="5" fill="#EDE8E2" stroke="#CFC2B7" stroke-width="1.5"/>
           <ellipse cx="80" cy="39" rx="24" ry="4.5" fill="url(#centerCoffeeGrad)"/>
-          <circle cx="80" cy="39" r="3" fill="none" stroke="#7EA8BE" stroke-width="1.5" class="anim-center-dot-pulse"/>
-          <line x1="80" y1="72" x2="80" y2="98" stroke="#B87B52" stroke-width="1.5" stroke-dasharray="2 2" class="anim-stream-down"/>
-          <line x1="80" y1="14" x2="80" y2="38" stroke="#7EA8BE" stroke-width="1.6" stroke-linecap="round" class="anim-steady-shine"/>
-          <path d="M50 8 C60 8 74 9 79 14 L81 12 C75 7 60 6 50 6 Z" fill="#654D3F"/>
+          <circle cx="80" cy="39" r="3" fill="none" stroke="#6BA3BE" stroke-width="1.5" class="anim-center-dot-pulse"/>
+          <g clip-path="url(#serverClipCenter)">
+            <line x1="80" y1="72" x2="80" y2="98" stroke="#B87B52" stroke-width="1.6" stroke-dasharray="2 2" class="anim-stream-down"/>
+          </g>
+          <line x1="80" y1="14" x2="80" y2="38" stroke="#6BA3BE" stroke-width="1.8" stroke-linecap="round" class="anim-steady-shine"/>
+          <path d="M50 8 C60 8 74 9 79 14 L81 12 C75 7 60 6 50 6 Z" fill="#4A3B32"/>
         </svg>
       `,
 
       swirl: `
-        <svg viewBox="0 0 160 120" class="w-full h-full">
+        <svg viewBox="0 0 160 120" class="w-full h-full overflow-hidden">
           <defs>
             <radialGradient id="swirlGrad" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stop-color="#9E6746"/>
@@ -2688,8 +2752,8 @@
             </radialGradient>
           </defs>
           <g class="anim-dripper-swirl" style="transform-origin: 80px 110px;">
-            <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
-            <path d="M56 103 C66 100 94 100 104 103 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.75"/>
+            <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#FDFCFA" stroke="#D8CCC4" stroke-width="1.5"/>
+            <path d="M56 103 C66 100 94 100 104 103 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.85"/>
             <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
             <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
             <ellipse cx="80" cy="34" rx="30" ry="5" fill="#EDE8E2" stroke="#CFC2B7" stroke-width="1.5"/>
@@ -2699,152 +2763,191 @@
               <path d="M77 41 Q82 43 84 39" stroke="#D8CCC4" stroke-width="1.0" fill="none" stroke-linecap="round"/>
             </g>
           </g>
-          <path d="M40 32 C34 40 36 50 44 56" fill="none" stroke="#654D3F" stroke-width="2" stroke-dasharray="3 2" stroke-linecap="round"/>
-          <polygon points="43,58 48,54 44,52" fill="#654D3F"/>
-          <path d="M120 32 C126 40 124 50 116 56" fill="none" stroke="#654D3F" stroke-width="2" stroke-dasharray="3 2" stroke-linecap="round"/>
-          <polygon points="117,58 112,54 116,52" fill="#654D3F"/>
-          <text x="80" y="16" text-anchor="middle" font-size="9" font-weight="bold" fill="#654D3F">雙手拿起均勻輕搖 Swirl</text>
+          <path d="M40 32 C34 40 36 50 44 56" fill="none" stroke="#786B63" stroke-width="1.8" stroke-dasharray="3 2" stroke-linecap="round"/>
+          <polygon points="43,58 48,54 44,52" fill="#786B63"/>
+          <path d="M120 32 C126 40 124 50 116 56" fill="none" stroke="#786B63" stroke-width="1.8" stroke-dasharray="3 2" stroke-linecap="round"/>
+          <polygon points="117,58 112,54 116,52" fill="#786B63"/>
+          <text x="80" y="16" text-anchor="middle" font-size="8.5" font-weight="600" fill="#786B63">雙手拿起均勻輕搖 Swirl</text>
         </svg>
       `,
 
       vigorous_pour: `
-        <svg viewBox="0 0 160 120" class="w-full h-full">
-          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
-          <path d="M55 98 C65 96 95 96 105 98 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.75"/>
+        <svg viewBox="0 0 160 120" class="w-full h-full overflow-hidden">
+          <defs>
+            <clipPath id="serverClipVigorous">
+              <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z"/>
+            </clipPath>
+          </defs>
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#FDFCFA" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M57 82 C56 90 57 98 60 105" fill="none" stroke="#FFFFFF" stroke-width="1.3" opacity="0.8" stroke-linecap="round"/>
           <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+          <path d="M55 98 C65 96 95 96 105 98 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.85"/>
           <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
           <ellipse cx="80" cy="34" rx="30" ry="5" fill="#EDE8E2" stroke="#CFC2B7" stroke-width="1.5"/>
           <ellipse cx="80" cy="39" rx="24" ry="4.5" fill="#7A4E33"/>
-          <ellipse cx="80" cy="39" rx="14" ry="3" fill="none" stroke="#7EA8BE" stroke-width="2" class="anim-vigorous-wave"/>
+          <ellipse cx="80" cy="39" rx="14" ry="3" fill="none" stroke="#6BA3BE" stroke-width="2" class="anim-vigorous-wave"/>
           <circle cx="76" cy="38" r="1.8" fill="#FAF9F7" class="anim-bubble-1"/>
           <circle cx="84" cy="37" r="1.5" fill="#FAF9F7" class="anim-bubble-2"/>
-          <path d="M72 14 Q76 26 79 38" fill="none" stroke="#7EA8BE" stroke-width="4.5" stroke-linecap="round" class="anim-heavy-stream"/>
-          <path d="M42 6 C52 6 66 8 72 14 L74 11 C68 6 52 4 42 4 Z" fill="#654D3F"/>
-          <line x1="80" y1="72" x2="80" y2="98" stroke="#B87B52" stroke-width="2.2" stroke-dasharray="4 2" class="anim-stream-down-fast"/>
+          <path d="M72 14 Q76 26 79 38" fill="none" stroke="#6BA3BE" stroke-width="4.5" stroke-linecap="round" class="anim-heavy-stream"/>
+          <path d="M42 6 C52 6 66 8 72 14 L74 11 C68 6 52 4 42 4 Z" fill="#4A3B32"/>
+          <g clip-path="url(#serverClipVigorous)">
+            <line x1="80" y1="72" x2="80" y2="98" stroke="#B87B52" stroke-width="2.2" stroke-dasharray="4 2" class="anim-stream-down-fast"/>
+          </g>
         </svg>
       `,
 
       drip_slow: `
-        <svg viewBox="0 0 160 120" class="w-full h-full">
-          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
-          <path d="M58 106 C66 104 94 104 102 106 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.75"/>
+        <svg viewBox="0 0 160 120" class="w-full h-full overflow-hidden">
+          <defs>
+            <clipPath id="serverClipDripSlow">
+              <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z"/>
+            </clipPath>
+          </defs>
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#FDFCFA" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M57 82 C56 90 57 98 60 105" fill="none" stroke="#FFFFFF" stroke-width="1.3" opacity="0.8" stroke-linecap="round"/>
           <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
+          <path d="M58 106 C66 104 94 104 102 106 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52" opacity="0.85"/>
           <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
           <ellipse cx="80" cy="34" rx="30" ry="5" fill="#EDE8E2" stroke="#CFC2B7" stroke-width="1.5"/>
           <ellipse cx="80" cy="39" rx="24" ry="4.5" fill="#5A3A25"/>
-          <g class="anim-drip-fall">
-            <ellipse cx="80" cy="24" rx="1.8" ry="2.8" fill="#7EA8BE"/>
+          
+          <!-- 壺口滴落水滴 (完全嚴格約束於壺嘴與粉層之間) -->
+          <g class="anim-kettle-drip-fall">
+            <ellipse cx="80" cy="18" rx="1.6" ry="2.4" fill="#6BA3BE"/>
           </g>
-          <circle cx="80" cy="39" r="2" fill="none" stroke="#7EA8BE" stroke-width="1.2" class="anim-drip-splash"/>
-          <path d="M54 10 C62 10 74 11 79 16 L81 14 C76 9 62 8 54 8 Z" fill="#654D3F"/>
-          <circle cx="79.5" cy="16" r="1.5" fill="#7EA8BE"/>
+          <circle cx="80" cy="39" r="2" fill="none" stroke="#6BA3BE" stroke-width="1.2" class="anim-bed-drip-splash"/>
+          
+          <path d="M54 10 C62 10 74 11 79 16 L81 14 C76 9 62 8 54 8 Z" fill="#4A3B32"/>
+          <circle cx="79.5" cy="16" r="1.5" fill="#6BA3BE"/>
         </svg>
       `,
 
       steam_cover: `
-        <svg viewBox="0 0 160 120" class="w-full h-full">
-          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+        <svg viewBox="0 0 160 120" class="w-full h-full overflow-hidden">
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#FDFCFA" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M57 82 C56 90 57 98 60 105" fill="none" stroke="#FFFFFF" stroke-width="1.3" opacity="0.8" stroke-linecap="round"/>
           <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
           <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
           <path d="M48 34 C48 20 112 20 112 34 Z" fill="#EDE8E2" stroke="#654D3F" stroke-width="1.8"/>
           <circle cx="80" cy="18" r="3.5" fill="#654D3F"/>
-          <path d="M70 14 Q74 6 68 0" fill="none" stroke="#B3A69C" stroke-width="1.5" stroke-linecap="round" class="anim-steam-1"/>
-          <path d="M80 12 Q85 4 79 -2" fill="none" stroke="#B3A69C" stroke-width="1.8" stroke-linecap="round" class="anim-steam-2"/>
-          <path d="M90 14 Q86 6 92 0" fill="none" stroke="#B3A69C" stroke-width="1.5" stroke-linecap="round" class="anim-steam-3"/>
-          <text x="80" y="58" text-anchor="middle" font-size="9" font-weight="bold" fill="#654D3F">加蓋聚溫深悶蒸</text>
+          <path d="M70 14 Q74 6 68 0" fill="none" stroke="#8C7E75" stroke-width="1.5" stroke-linecap="round" class="anim-steam-1"/>
+          <path d="M80 12 Q85 4 79 -2" fill="none" stroke="#8C7E75" stroke-width="1.8" stroke-linecap="round" class="anim-steam-2"/>
+          <path d="M90 14 Q86 6 92 0" fill="none" stroke="#8C7E75" stroke-width="1.5" stroke-linecap="round" class="anim-steam-3"/>
+          <text x="80" y="58" text-anchor="middle" font-size="8.5" font-weight="600" fill="#786B63">加蓋聚溫深悶蒸</text>
         </svg>
       `,
 
       switch_closed: `
-        <svg viewBox="0 0 160 120" class="w-full h-full">
-          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+        <svg viewBox="0 0 160 120" class="w-full h-full overflow-hidden">
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#FDFCFA" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M57 82 C56 90 57 98 60 105" fill="none" stroke="#FFFFFF" stroke-width="1.3" opacity="0.8" stroke-linecap="round"/>
           <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
           <path d="M48 28 L112 28 L92 68 L68 68 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
           <polygon points="54,34 106,34 90,66 70,66" fill="#8C5D3D" opacity="0.9"/>
           <ellipse cx="80" cy="34" rx="26" ry="4" fill="#A26D4F"/>
           <circle cx="72" cy="34" r="1.5" fill="#FAF9F7" class="anim-bubble-1"/>
           <circle cx="86" cy="33" r="1.2" fill="#FAF9F7" class="anim-bubble-2"/>
-          <rect x="74" y="68" width="12" height="6" rx="2" fill="#D97706"/>
+          <rect x="74" y="68" width="12" height="6" rx="2" fill="#C87A38"/>
           <circle cx="80" cy="71" r="2" fill="#FFFFFF"/>
-          <line x1="86" y1="71" x2="96" y2="65" stroke="#D97706" stroke-width="2.5" stroke-linecap="round"/>
-          <text x="80" y="18" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#D97706">止水閥關閉 · 全浸泡中</text>
+          <line x1="86" y1="71" x2="96" y2="65" stroke="#C87A38" stroke-width="2.5" stroke-linecap="round"/>
+          <text x="80" y="18" text-anchor="middle" font-size="8.5" font-weight="600" fill="#C87A38">止水閥關閉 · 全浸泡中</text>
         </svg>
       `,
 
       switch_open: `
-        <svg viewBox="0 0 160 120" class="w-full h-full">
-          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+        <svg viewBox="0 0 160 120" class="w-full h-full overflow-hidden">
+          <defs>
+            <clipPath id="serverClipSwitchOpen">
+              <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z"/>
+            </clipPath>
+          </defs>
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#FDFCFA" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M57 82 C56 90 57 98 60 105" fill="none" stroke="#FFFFFF" stroke-width="1.3" opacity="0.8" stroke-linecap="round"/>
           <path d="M56 100 C66 97 94 97 104 100 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52"/>
           <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
           <path d="M48 28 L112 28 L92 68 L68 68 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
           <ellipse cx="80" cy="52" rx="16" ry="3" fill="#7A4E33"/>
           <rect x="74" y="68" width="12" height="6" rx="2" fill="#059669"/>
           <line x1="86" y1="71" x2="98" y2="74" stroke="#059669" stroke-width="2.5" stroke-linecap="round"/>
-          <path d="M77 74 L77 102 L83 102 L83 74 Z" fill="#B87B52" class="anim-stream-rush"/>
-          <text x="80" y="18" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#059669">按下開關 · 快速釋放過濾</text>
+          <g clip-path="url(#serverClipSwitchOpen)">
+            <path d="M77 74 L77 102 L83 102 L83 74 Z" fill="#B87B52" class="anim-stream-rush"/>
+          </g>
+          <text x="80" y="18" text-anchor="middle" font-size="8.5" font-weight="600" fill="#059669">按下開關 · 快速釋放過濾</text>
         </svg>
       `,
 
       bypass_pot: `
-        <svg viewBox="0 0 160 120" class="w-full h-full">
+        <svg viewBox="0 0 160 120" class="w-full h-full overflow-hidden">
           <g opacity="0.25" transform="translate(-30, -10) scale(0.8)">
             <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
           </g>
-          <path d="M60 60 L100 60 L110 106 C110 110 104 112 98 112 L62 112 C56 112 50 110 50 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M60 60 L100 60 L110 106 C110 110 104 112 98 112 L62 112 C56 112 50 110 50 106 Z" fill="#FDFCFA" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M55 70 C54 80 55 92 58 104" fill="none" stroke="#FFFFFF" stroke-width="1.3" opacity="0.8" stroke-linecap="round"/>
           <path d="M54 94 C64 91 96 91 106 94 L108 106 C108 109 102 111 97 111 L63 111 C58 111 52 109 52 106 Z" fill="#C99066" opacity="0.85"/>
           <path d="M106 72 C116 72 118 92 108 98" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
-          <path d="M74 24 Q 78 42 80 62" fill="none" stroke="#7EA8BE" stroke-width="3.2" stroke-linecap="round" class="anim-bypass-stream"/>
-          <ellipse cx="80" cy="62" rx="10" ry="2.5" fill="none" stroke="#7EA8BE" stroke-width="1.5" class="anim-ripple-slow"/>
-          <path d="M44 14 C54 14 68 17 74 24 L76 21 C70 15 54 12 44 12 Z" fill="#654D3F"/>
-          <text x="80" y="14" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#654D3F">純熱水直接稀釋 Bypass</text>
+          <path d="M74 24 Q 78 42 80 62" fill="none" stroke="#6BA3BE" stroke-width="3.2" stroke-linecap="round" class="anim-bypass-stream"/>
+          <ellipse cx="80" cy="62" rx="10" ry="2.5" fill="none" stroke="#6BA3BE" stroke-width="1.5" class="anim-ripple-slow"/>
+          <path d="M44 14 C54 14 68 17 74 24 L76 21 C70 15 54 12 44 12 Z" fill="#4A3B32"/>
+          <text x="80" y="14" text-anchor="middle" font-size="8.5" font-weight="600" fill="#786B63">純熱水直接稀釋 Bypass</text>
         </svg>
       `,
 
       drain_rest: `
-        <svg viewBox="0 0 160 120" class="w-full h-full">
-          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#F7F4F0" stroke="#D8CCC4" stroke-width="1.5"/>
+        <svg viewBox="0 0 160 120" class="w-full h-full overflow-hidden">
+          <defs>
+            <clipPath id="serverClipDrainRest">
+              <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z"/>
+            </clipPath>
+          </defs>
+          <path d="M62 76 L98 76 L108 106 C108 110 102 112 96 112 L64 112 C58 112 52 110 52 106 Z" fill="#FDFCFA" stroke="#D8CCC4" stroke-width="1.5"/>
+          <path d="M57 82 C56 90 57 98 60 105" fill="none" stroke="#FFFFFF" stroke-width="1.3" opacity="0.8" stroke-linecap="round"/>
           <path d="M54 96 C64 93 96 93 106 96 L107 106 C107 109 101 111 96 111 L64 111 C59 111 53 109 53 106 Z" fill="#B87B52"/>
           <path d="M104 80 C114 80 115 98 105 102" fill="none" stroke="#D8CCC4" stroke-width="2" stroke-linecap="round"/>
           <path d="M50 34 L110 34 L92 72 L68 72 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="1.5"/>
           <ellipse cx="80" cy="34" rx="30" ry="5" fill="#EDE8E2" stroke="#CFC2B7" stroke-width="1.5"/>
           <ellipse cx="80" cy="46" rx="19" ry="3.5" fill="#5A3A25"/>
-          <g class="anim-drip-fall-slow">
-            <ellipse cx="80" cy="82" rx="1.5" ry="2.2" fill="#B87B52"/>
+          
+          <!-- 滴濾落盡水滴 (嚴格約束於下壺內) -->
+          <g clip-path="url(#serverClipDrainRest)">
+            <g class="anim-drip-fall-server">
+              <path d="M80 73 C78.8 74.8 78 76.5 78 78 A2 2 0 0 0 82 78 C82 76.5 81.2 74.8 80 73 Z" fill="#B87B52"/>
+            </g>
+            <circle cx="80" cy="96" r="1.8" fill="none" stroke="#B87B52" stroke-width="1.2" class="anim-drip-splash-server"/>
           </g>
-          <circle cx="80" cy="96" r="2" fill="none" stroke="#B87B52" stroke-width="1" class="anim-drip-splash"/>
-          <text x="80" y="20" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#8C7E75">靜待咖啡液滴淨落乾</text>
+          
+          <text x="80" y="20" text-anchor="middle" font-size="8.5" font-weight="600" fill="#8C7E75">靜待咖啡液滴淨落乾</text>
         </svg>
       `,
 
       finish: `
-        <svg viewBox="0 0 160 120" class="w-full h-full">
+        <svg viewBox="0 0 160 120" class="w-full h-full overflow-hidden">
           <path d="M56 50 L104 50 L98 96 C98 104 92 108 80 108 C68 108 62 104 62 96 Z" fill="#FFFFFF" stroke="#CFC2B7" stroke-width="2"/>
-          <path d="M102 58 C114 58 116 82 100 86" fill="none" stroke="#CFC2B7" stroke-width="3" stroke-linecap="round"/>
+          <path d="M102 58 C114 58 116 82 100 86" fill="none" stroke="#CFC2B7" stroke-width="2.5" stroke-linecap="round"/>
           <ellipse cx="80" cy="108" rx="42" ry="5" fill="#EDE8E2" stroke="#D8CCC4" stroke-width="1.5"/>
           <ellipse cx="80" cy="52" rx="21" ry="3.5" fill="#73472B"/>
           <path d="M74 44 Q70 30 76 18" fill="none" stroke="#654D3F" stroke-width="1.8" stroke-linecap="round" class="anim-steam-1"/>
           <path d="M80 42 Q86 28 80 14" fill="none" stroke="#654D3F" stroke-width="2" stroke-linecap="round" class="anim-steam-2"/>
           <path d="M86 44 Q82 30 88 18" fill="none" stroke="#654D3F" stroke-width="1.8" stroke-linecap="round" class="anim-steam-3"/>
-          <path d="M46 29 Q46 36 39 36 Q46 36 46 43 Q46 36 53 36 Q46 36 46 29 Z" fill="#D97706" class="anim-sparkle-1"/>
-          <path d="M110 33 Q110 40 103 40 Q110 40 110 47 Q110 40 117 40 Q110 40 110 33 Z" fill="#D97706" class="anim-sparkle-2"/>
-          <text x="80" y="116" text-anchor="middle" font-size="9" font-weight="bold" fill="#654D3F">風味圓滿萃取 · 請享用</text>
+          <path d="M46 29 Q46 36 39 36 Q46 36 46 43 Q46 36 53 36 Q46 36 46 29 Z" fill="#C87A38" class="anim-sparkle-1"/>
+          <path d="M110 33 Q110 40 103 40 Q110 40 110 47 Q110 40 117 40 Q110 40 110 33 Z" fill="#C87A38" class="anim-sparkle-2"/>
+          <text x="80" y="116" text-anchor="middle" font-size="8.5" font-weight="600" fill="#786B63">風味圓滿萃取 · 請享用</text>
         </svg>
       `
     };
 
     const STEP_ICONS = {
-      idle: `<svg class="w-4 h-4 text-[#8C7E75]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>`,
-      bloom: `<svg class="w-4 h-4 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 19c1-1.5 1-3 0-4.5s-1-3 0-4.5"></path><path d="M12 19c1-1.5 1-3 0-4.5s-1-3 0-4.5"></path><path d="M18 19c1-1.5 1-3 0-4.5s-1-3 0-4.5"></path></svg>`,
-      swirl: `<svg class="w-4 h-4 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19"></path></svg>`,
-      drip_slow: `<svg class="w-4 h-4 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>`,
-      pour: `<svg class="w-4 h-4 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>`,
-      steam_cover: `<svg class="w-4 h-4 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v4"></path><path d="M2 14c0-4.4 4.5-8 10-8s10 3.6 10 8H2z"></path><line x1="2" y1="14" x2="22" y2="14"></line></svg>`,
+      idle: `<svg class="w-4 h-4 text-[#8C7E75]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path></svg>`,
+      bloom: `<svg class="w-4 h-4 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a6 6 0 0 0 6-6c0-4-6-11-6-11s-6 7-6 11a6 6 0 0 0 6 6z"></path><path d="M12 11v6"></path></svg>`,
+      swirl: `<svg class="w-4 h-4 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.85.83 6.72 2.24L21 7"></path><polyline points="21 3 21 7 17 7"></polyline></svg>`,
+      drip_slow: `<svg class="w-4 h-4 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path><circle cx="12" cy="14" r="1.5" fill="currentColor"></circle></svg>`,
+      pour: `<svg class="w-4 h-4 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v14"></path><path d="m8 12 4 4 4-4"></path><path d="M5 20h14"></path></svg>`,
+      steam_cover: `<svg class="w-4 h-4 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v3"></path><path d="M3 14c0-4.5 4-8 9-8s9 3.5 9 8H3z"></path><line x1="2" y1="14" x2="22" y2="14"></line></svg>`,
       switch_closed: `<svg class="w-4 h-4 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
-      switch_open: `<svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`,
+      switch_open: `<svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path><polyline points="10 17 12 19 15 15"></polyline></svg>`,
       bypass_pot: `<svg class="w-4 h-4 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 11V4h-5"></path><path d="M5 19h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2z"></path><path d="M9 13v-2"></path></svg>`,
       drain_rest: `<svg class="w-4 h-4 text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>`,
       finish: `<svg class="w-4 h-4 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>`,
-      default: `<svg class="w-4 h-4 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c2.5-2.5 5.5-2.5 8 0s5.5 2.5 8 0 5.5-2.5 8 0"></path><path d="M2 17c2.5-2.5 5.5-2.5 8 0s5.5 2.5 8 0 5.5-2.5 8 0"></path></svg>`
+      default: `<svg class="w-4 h-4 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>`
     };
 
     let currentRenderedAnimType = null;
@@ -3215,11 +3318,12 @@
               <div>
                 <div class="flex items-center gap-2">
                   <span class="w-4 h-4 text-[#654D3F] flex items-center justify-center">
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.2 17.8c-2.4-3.1-2.4-6.5 0-9.6 1.8-2.3 2.1-4.8 1.4-6.2 3.8 1.5 5.4 5.3 5.4 8 0 4.2-2.8 7.8-6.8 7.8zM5 12c0-2.7 1.6-6.5 5.4-8-.7 1.4-.4 3.9 1.4 6.2 2.4 3.1 2.4 6.5 0 9.6-4 0-6.8-3.6-6.8-7.8z"/>
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/>
+                      <path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/>
                     </svg>
                   </span>
-                  <h4 class="text-sm font-bold text-[#2C2521]">${escapedBeanName}</h4>
+                  <h3 class="text-sm font-bold text-[#2C2521]">${escapedBeanName}</h3>
                   ${ratingsCount > 0 ? `
                     <span class="px-2 py-0.5 rounded-full bg-[#FAF9F7] border border-[#E6E0D8] text-[11px] font-bold text-amber-600 flex items-center gap-1 font-mono-num">
                       <svg class="w-3 h-3 text-amber-500 fill-current inline-block" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
