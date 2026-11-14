@@ -598,49 +598,59 @@
           </div>
         </div>
         
-        <div class="flex items-center gap-3">
+        <!-- 計時器主控群組 (響應式設計：手機端自適應換行與寬度，保證 100% 容納於螢幕內不溢出) -->
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
           <!-- 碼錶數字 (Barista Stopwatch) -->
-          <div class="text-3xl sm:text-4xl font-mono-num font-bold text-[#2C2521] tracking-tight bg-[#FAF9F7] px-4 py-1.5 rounded-xl border border-[#EDE8E2]" id="timer-digits">
+          <div class="text-2xl sm:text-4xl font-mono-num font-bold text-[#2C2521] tracking-tight bg-[#FAF9F7] px-3 sm:px-4 py-1.5 rounded-xl border border-[#EDE8E2] text-center flex-shrink-0" id="timer-digits">
             00:00
           </div>
 
-          <!-- 控制鍵 -->
-          <button id="timer-run-btn" onclick="toggleTimer()" class="px-4 py-2 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition shadow-sm flex items-center gap-1.5">
+          <!-- 主控制鍵：開始 / 暫停沖煮 -->
+          <button id="timer-run-btn" onclick="toggleTimer()" 
+                  class="flex-1 sm:flex-initial px-3.5 sm:px-4 py-2 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
             <span id="timer-run-icon">
               <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
             </span>
             <span id="timer-run-text">開始沖煮</span>
           </button>
           
-          <button onclick="resetTimer()" class="px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-[#685B52] text-xs hover:border-[#CFC2B7] transition flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-[#8C7E75]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-              <path d="M3 3v5h5"></path>
-            </svg>
-            <span>重設</span>
-          </button>
-
-          <!-- 提示音開關按鈕 -->
-          <button onclick="toggleAudio()" id="audio-btn" class="px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-xs hover:border-[#CFC2B7] text-[#685B52] transition flex items-center gap-1.5 cursor-pointer" title="點擊開關步驟提示音">
-            <span id="audio-icon">
-              <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          <!-- 次要控制按鈕組 (手機端平分寬度，桌面端水平排列) -->
+          <div class="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-start mt-1 sm:mt-0">
+            <!-- 重設按鈕 -->
+            <button onclick="resetTimer()" 
+                    class="flex-1 sm:flex-initial px-2 sm:px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-[#685B52] text-xs hover:border-[#CFC2B7] transition flex items-center justify-center gap-1.5 cursor-pointer"
+                    title="重設計時與步驟">
+              <svg class="w-3.5 h-3.5 text-[#8C7E75]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
               </svg>
-            </span>
-            <span id="audio-text" class="text-[11px] font-medium hidden sm:inline">提示音開啟</span>
-          </button>
+              <span>重設</span>
+            </button>
 
-          <!-- 吧台專注模式 (Zen HUD) 按鈕 -->
-          <button onclick="openZenBaristaMode()" id="open-zen-btn" 
-                  class="px-3 py-2 rounded-xl bg-[#2D231D] hover:bg-[#1E1713] text-amber-300 text-xs font-semibold transition flex items-center gap-1.5 shadow-2xs border border-[#42332A] cursor-pointer" 
-                  title="開啟吧台大字專注模式 (遠距清晰 HUD)">
-            <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
-            </svg>
-            <span class="font-medium">專注模式</span>
-          </button>
+            <!-- 提示音開關按鈕 -->
+            <button onclick="toggleAudio()" id="audio-btn" 
+                    class="flex-1 sm:flex-initial px-2 sm:px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-xs hover:border-[#CFC2B7] text-[#685B52] transition flex items-center justify-center gap-1.5 cursor-pointer" 
+                    title="點擊開關步驟提示音">
+              <span id="audio-icon">
+                <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                </svg>
+              </span>
+              <span id="audio-text" class="text-[11px] font-medium">提示音</span>
+            </button>
+
+            <!-- 吧台專注模式 (Zen HUD) 按鈕 -->
+            <button onclick="openZenBaristaMode()" id="open-zen-btn" 
+                    class="flex-1 sm:flex-initial px-2.5 sm:px-3 py-2 rounded-xl bg-[#2D231D] hover:bg-[#1E1713] text-amber-300 text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-2xs border border-[#42332A] cursor-pointer" 
+                    title="開啟吧台大字專注模式 (遠距清晰 HUD)">
+              <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+              </svg>
+              <span class="font-medium">專注模式</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1441,11 +1451,12 @@
 
       </div>
 
-      <!-- 底部巨大觸控操作列 (專為吧台濕手指防誤觸優化) -->
-      <div class="pt-3 border-t border-[#2E241E] flex items-center justify-center gap-3 sm:gap-4 flex-shrink-0">
+      <!-- 底部巨大觸控操作列 (專為吧台濕手指防誤觸優化，響應式不溢出) -->
+      <div class="pt-3 border-t border-[#2E241E] flex items-center justify-between sm:justify-center gap-1.5 sm:gap-4 flex-shrink-0 w-full max-w-lg mx-auto">
         <!-- 重設 -->
         <button onclick="resetTimer()" 
-                class="h-12 px-4 rounded-xl bg-[#281F1A] hover:bg-[#342922] border border-[#3D3028] text-xs font-semibold text-[#D8CCC4] transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                class="h-12 w-10 sm:w-auto px-2 sm:px-4 rounded-xl bg-[#281F1A] hover:bg-[#342922] border border-[#3D3028] text-xs font-semibold text-[#D8CCC4] transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer flex-shrink-0"
+                title="重設計時">
           <svg class="w-4 h-4 text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
             <path d="M3 3v5h5"></path>
@@ -1455,7 +1466,7 @@
 
         <!-- 上一段 -->
         <button onclick="skipToPreviousStep()" 
-                class="h-12 px-4 rounded-xl bg-[#281F1A] hover:bg-[#342922] border border-[#3D3028] text-xs font-semibold text-[#D8CCC4] transition flex items-center gap-1.5 active:scale-95 cursor-pointer"
+                class="h-12 w-10 sm:w-auto px-2 sm:px-4 rounded-xl bg-[#281F1A] hover:bg-[#342922] border border-[#3D3028] text-xs font-semibold text-[#D8CCC4] transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer flex-shrink-0"
                 title="跳回上一段">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <polygon points="19 20 9 12 19 4 19 20"></polygon>
@@ -1466,16 +1477,16 @@
 
         <!-- 核心播放/暫停鍵 (巨大高對比琥珀按鈕) -->
         <button id="zen-run-btn" onclick="toggleTimer()" 
-                class="h-14 px-8 sm:px-12 rounded-2xl bg-amber-500 hover:bg-amber-400 text-[#1E1713] font-bold text-base transition-all shadow-lg flex items-center gap-2 active:scale-95 cursor-pointer">
+                class="h-12 sm:h-14 px-3 sm:px-10 rounded-xl sm:rounded-2xl bg-amber-500 hover:bg-amber-400 text-[#1E1713] font-bold text-sm sm:text-base transition-all shadow-lg flex items-center justify-center gap-1.5 sm:gap-2 active:scale-95 cursor-pointer flex-1 sm:flex-initial min-w-0 max-w-xs">
           <span id="zen-run-icon">
             <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
           </span>
-          <span id="zen-run-text">開始沖煮 (Space)</span>
+          <span id="zen-run-text" class="truncate">開始沖煮<span class="hidden sm:inline"> (Space)</span></span>
         </button>
 
         <!-- 下一段 -->
         <button onclick="skipToNextStep()" 
-                class="h-12 px-4 rounded-xl bg-[#281F1A] hover:bg-[#342922] border border-[#3D3028] text-xs font-semibold text-[#D8CCC4] transition flex items-center gap-1.5 active:scale-95 cursor-pointer"
+                class="h-12 w-10 sm:w-auto px-2 sm:px-4 rounded-xl bg-[#281F1A] hover:bg-[#342922] border border-[#3D3028] text-xs font-semibold text-[#D8CCC4] transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer flex-shrink-0"
                 title="提前跳至下一段">
           <span class="hidden sm:inline">下一段</span>
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -3134,12 +3145,12 @@
       const zenRunBtn = document.getElementById('zen-run-btn');
       if (zenRunBtn) {
         if (timerRunning) {
-          zenRunText.textContent = '暫停計時 (Space)';
-          zenRunBtn.className = 'h-14 px-8 sm:px-12 rounded-2xl bg-amber-600 hover:bg-amber-500 text-[#FAF6F2] font-bold text-base transition-all shadow-lg flex items-center gap-2 active:scale-95 cursor-pointer';
+          zenRunText.innerHTML = '暫停計時<span class="hidden sm:inline"> (Space)</span>';
+          zenRunBtn.className = 'h-12 sm:h-14 px-3 sm:px-10 rounded-xl sm:rounded-2xl bg-amber-600 hover:bg-amber-500 text-[#FAF6F2] font-bold text-sm sm:text-base transition-all shadow-lg flex items-center justify-center gap-1.5 sm:gap-2 active:scale-95 cursor-pointer flex-1 sm:flex-initial min-w-0 max-w-xs';
           zenRunIcon.innerHTML = '<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>';
         } else {
-          zenRunText.textContent = timerSeconds > 0 ? '繼續沖煮 (Space)' : '開始沖煮 (Space)';
-          zenRunBtn.className = 'h-14 px-8 sm:px-12 rounded-2xl bg-amber-500 hover:bg-amber-400 text-[#1E1713] font-bold text-base transition-all shadow-lg flex items-center gap-2 active:scale-95 cursor-pointer';
+          zenRunText.innerHTML = (timerSeconds > 0 ? '繼續沖煮' : '開始沖煮') + '<span class="hidden sm:inline"> (Space)</span>';
+          zenRunBtn.className = 'h-12 sm:h-14 px-3 sm:px-10 rounded-xl sm:rounded-2xl bg-amber-500 hover:bg-amber-400 text-[#1E1713] font-bold text-sm sm:text-base transition-all shadow-lg flex items-center justify-center gap-1.5 sm:gap-2 active:scale-95 cursor-pointer flex-1 sm:flex-initial min-w-0 max-w-xs';
           zenRunIcon.innerHTML = '<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>';
         }
       }
@@ -3420,7 +3431,7 @@
         document.getElementById('timer-run-text').textContent = '繼續沖煮';
         const icon = document.getElementById('timer-run-icon');
         if (icon) icon.innerHTML = ICON_PLAY_SVG;
-        document.getElementById('timer-run-btn').className = 'px-4 py-2 rounded-xl bg-amber-700 hover:bg-amber-600 text-white text-xs font-semibold transition flex items-center gap-1.5';
+        document.getElementById('timer-run-btn').className = 'flex-1 sm:flex-initial px-3.5 sm:px-4 py-2 rounded-xl bg-amber-700 hover:bg-amber-600 text-white text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer';
         document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
         
         // 暫停時，微動畫平滑定格
@@ -3437,7 +3448,7 @@
         document.getElementById('timer-run-text').textContent = '暫停計時';
         const icon = document.getElementById('timer-run-icon');
         if (icon) icon.innerHTML = ICON_PAUSE_SVG;
-        document.getElementById('timer-run-btn').className = 'px-4 py-2 rounded-xl bg-[#8C7E75] hover:bg-[#786A61] text-white text-xs font-semibold transition flex items-center gap-1.5';
+        document.getElementById('timer-run-btn').className = 'flex-1 sm:flex-initial px-3.5 sm:px-4 py-2 rounded-xl bg-[#8C7E75] hover:bg-[#786A61] text-white text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer';
         document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-subtle-pulse';
 
         if (viewport) viewport.classList.remove('timer-paused');
@@ -3467,7 +3478,7 @@
       document.getElementById('timer-run-text').textContent = '開始沖煮';
       const icon = document.getElementById('timer-run-icon');
       if (icon) icon.innerHTML = ICON_PLAY_SVG;
-      document.getElementById('timer-run-btn').className = 'px-4 py-2 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition shadow-sm flex items-center gap-1.5';
+      document.getElementById('timer-run-btn').className = 'flex-1 sm:flex-initial px-3.5 sm:px-4 py-2 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition shadow-sm flex items-center justify-center gap-1.5 cursor-pointer';
       document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-stone-400';
       document.getElementById('timer-status-title').textContent = '即時注水指引計時器';
       document.getElementById('timer-current-target').textContent = '準備中';
