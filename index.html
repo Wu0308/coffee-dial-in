@@ -500,24 +500,30 @@
         
         <!-- 重點核心 1: 沖煮計時 (Hero Feature Toggle) -->
         <button onclick="toggleTimerSection()" id="timer-toggle-btn" 
-                class="group relative px-4 py-2.5 rounded-xl bg-[#2D231D] hover:bg-[#1E1713] text-[#FAF6F2] transition-all duration-200 flex items-center gap-2 shadow-sm border border-[#42332A] hover:border-[#574438] hover:-translate-y-0.5 active:scale-95 cursor-pointer">
-          <span class="relative flex h-2 w-2">
-            <span id="timer-pulse-ring" class="hidden absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
-            <span id="timer-pulse-dot" class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                class="group relative h-10 px-3.5 rounded-xl bg-[#2D231D] hover:bg-[#1E1713] text-[#FAF6F2] transition-all duration-200 flex items-center gap-2.5 shadow-2xs border border-[#42332A] hover:border-[#574438] hover:-translate-y-0.5 active:scale-95 cursor-pointer"
+                title="開啟 / 關閉 沖煮計時面板">
+          <span class="w-6 h-6 rounded-lg bg-white/10 group-hover:bg-white/15 text-amber-400 flex items-center justify-center transition-colors flex-shrink-0 relative shadow-2xs">
+            <svg class="w-3.5 h-3.5 text-amber-400 group-hover:rotate-12 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="13" r="8"></circle>
+              <path d="M12 9v4l2.5 2.5"></path>
+              <path d="M10 2h4"></path>
+              <path d="M12 2v3"></path>
+            </svg>
+            <span class="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+              <span id="timer-pulse-ring" class="hidden absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
+              <span id="timer-pulse-dot" class="relative inline-flex rounded-full h-2 w-2 bg-amber-500 border border-[#2D231D]"></span>
+            </span>
           </span>
-          <svg class="w-4 h-4 text-amber-400 group-hover:rotate-12 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="13" r="8"></circle>
-            <path d="M12 9v4l2.5 2.5"></path>
-            <path d="M10 2h4"></path>
-            <path d="M12 2v3"></path>
-          </svg>
-          <span id="timer-toggle-text" class="font-bold text-xs tracking-wide">沖煮計時</span>
-          <span id="timer-active-pill" class="hidden text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.2 rounded-full font-mono-num font-semibold">ON</span>
+          <div class="flex items-center gap-1.5">
+            <span id="timer-toggle-text" class="font-bold text-xs tracking-tight">沖煮計時</span>
+            <span id="timer-active-pill" class="hidden px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono-num font-semibold">ON</span>
+          </div>
         </button>
 
         <!-- 重點核心 2: 咖啡豆評分庫 (Signature Vault Button) -->
         <button onclick="openRecipeVaultModal()" id="vault-toggle-btn"
-                class="group relative px-3.5 py-2.5 rounded-xl bg-[#FAF5F0] hover:bg-[#F2E8DF] text-[#3D2C22] border border-[#DDD3CA] hover:border-[#C4B7AC] transition-all duration-200 flex items-center gap-2.5 shadow-2xs hover:-translate-y-0.5 active:scale-95 cursor-pointer">
+                class="group relative h-10 px-3.5 rounded-xl bg-[#FAF5F0] hover:bg-[#F2E8DF] text-[#3D2C22] border border-[#DDD3CA] hover:border-[#C4B7AC] transition-all duration-200 flex items-center gap-2.5 shadow-2xs hover:-translate-y-0.5 active:scale-95 cursor-pointer"
+                title="查看已評分與儲存之咖啡豆單">
           <span class="w-6 h-6 rounded-lg bg-[#EAE0D5] group-hover:bg-[#E0D0C2] text-amber-700 flex items-center justify-center transition-colors flex-shrink-0 shadow-2xs">
             <svg class="w-3.5 h-3.5 text-amber-700 fill-current" viewBox="0 0 24 24" aria-hidden="true">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
@@ -534,7 +540,7 @@
 
         <!-- 輔助工具 1: 複製參數 -->
         <button onclick="copyRecipe()" id="copy-recipe-btn"
-                class="px-3 py-2.5 rounded-xl bg-white hover:bg-[#FAF9F7] border border-[#E6E0D8] hover:border-[#CFC2B7] text-[#5C4A3E] hover:text-[#2C2521] transition-all duration-150 flex items-center gap-1.5 shadow-2xs hover:-translate-y-0.5 active:scale-95 cursor-pointer text-xs" 
+                class="h-10 px-3 rounded-xl bg-white hover:bg-[#FAF9F7] border border-[#E6E0D8] hover:border-[#CFC2B7] text-[#5C4A3E] hover:text-[#2C2521] transition-all duration-150 flex items-center gap-1.5 shadow-2xs hover:-translate-y-0.5 active:scale-95 cursor-pointer text-xs" 
                 title="複製完整沖煮參數至剪貼簿">
           <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -545,7 +551,7 @@
 
         <!-- 輔助工具 2: 重設預設 -->
         <button onclick="resetDefaults()" 
-                class="px-2.5 py-2.5 rounded-xl bg-white hover:bg-[#FAF9F7] border border-[#E6E0D8] hover:border-[#CFC2B7] text-[#8C7E75] hover:text-[#5C4A3E] transition-all duration-150 flex items-center gap-1 shadow-2xs hover:-translate-y-0.5 active:scale-95 cursor-pointer text-xs" 
+                class="h-10 px-3 rounded-xl bg-white hover:bg-[#FAF9F7] border border-[#E6E0D8] hover:border-[#CFC2B7] text-[#8C7E75] hover:text-[#5C4A3E] transition-all duration-150 flex items-center gap-1.5 shadow-2xs hover:-translate-y-0.5 active:scale-95 cursor-pointer text-xs" 
                 title="重設為當前手法與烘焙度推薦之預設參數">
           <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
