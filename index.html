@@ -34,6 +34,14 @@
       --text-main: #2C2521;
       --text-sub: #8C7E75;
       --text-muted: #9B8D83;
+      --target-size: 28px;
+      accent-color: #654D3F;
+    }
+
+    @media (pointer: coarse) {
+      :root {
+        --target-size: 44px;
+      }
     }
 
     body {
@@ -41,6 +49,45 @@
       color: var(--text-main);
       font-family: 'Plus Jakarta Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       -webkit-font-smoothing: antialiased;
+      padding-top: max(1.5rem, env(safe-area-inset-top));
+      padding-bottom: max(2rem, env(safe-area-inset-bottom));
+      padding-left: max(1rem, env(safe-area-inset-left));
+      padding-right: max(1rem, env(safe-area-inset-right));
+    }
+
+    h1, h2, h3, h4 {
+      text-wrap: balance;
+    }
+
+    p, .text-pretty {
+      text-wrap: pretty;
+    }
+
+    /* Native Dialog Modal (Modern Web Guidance) */
+    dialog#recipe-vault-modal {
+      border: none;
+      background: transparent;
+      padding: 0;
+      margin: auto;
+      max-width: 42rem;
+      width: calc(100% - 2rem);
+      max-height: 92vh;
+    }
+    dialog#recipe-vault-modal:modal {
+      overscroll-behavior: contain;
+    }
+    dialog#recipe-vault-modal::backdrop {
+      background: rgba(30, 24, 20, 0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      overflow: hidden;
+      overscroll-behavior: contain;
+    }
+
+    /* Accessible focus indicator */
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid #654D3F;
+      outline-offset: 2px;
     }
 
     .font-mono-num {
@@ -72,6 +119,7 @@
       color: #685B52;
       transition: all 0.18s ease;
       cursor: pointer;
+      min-height: var(--target-size);
     }
     .canva-btn:hover {
       border-color: #CFC2B7;
@@ -362,34 +410,55 @@
 
   <div class="max-w-6xl mx-auto">
 
-    <!-- 頂部 Header (完全對齊 Canva 網頁版型) -->
+    <!-- 頂部 Header -->
     <header class="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
       <div>
-        <div class="text-[11px] font-semibold tracking-[0.16em] uppercase text-[#9B8D83] mb-1">
-          POUR-OVER DIAL-IN
+        <div class="text-[11px] font-semibold tracking-[0.16em] uppercase text-[#9B8D83] mb-1 flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+            <line x1="6" y1="1" x2="6" y2="4"></line>
+            <line x1="10" y1="1" x2="10" y2="4"></line>
+            <line x1="14" y1="1" x2="14" y2="4"></line>
+          </svg>
+          <span>POUR-OVER DIAL-IN</span>
         </div>
         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-[#2C2521] flex items-center gap-2">
-          手沖參數調配器
+          <span>手沖參數調配器</span>
         </h1>
       </div>
       
-      <!-- 快捷工具鍵 (保持簡潔極簡外觀) -->
+      <!-- 快捷工具鍵 -->
       <div class="flex items-center gap-2 text-xs flex-wrap">
         <button onclick="openRecipeVaultModal()" class="px-3 py-1.5 rounded-lg bg-white border border-[#E6E0D8] text-[#685B52] hover:border-[#CFC2B7] hover:text-[#3D3028] transition flex items-center gap-1.5 shadow-sm">
-          <span>⭐</span>
+          <svg class="w-3.5 h-3.5 text-amber-600" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" aria-hidden="true">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
           <span>咖啡豆評分庫</span>
           <span id="saved-beans-badge" class="ml-0.5 px-1.5 py-0.2 rounded-full bg-[#ECE3DC] text-[#3D3028] text-[10px] font-bold">1</span>
         </button>
         <button onclick="copyRecipe()" class="px-3 py-1.5 rounded-lg bg-white border border-[#E6E0D8] text-[#685B52] hover:border-[#CFC2B7] hover:text-[#3D3028] transition flex items-center gap-1.5 shadow-sm">
-          <span>📋</span>
+          <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
           <span id="copy-btn-text">複製配方</span>
         </button>
         <button onclick="toggleTimerSection()" id="timer-toggle-btn" class="px-3 py-1.5 rounded-lg bg-white border border-[#E6E0D8] text-[#685B52] hover:border-[#CFC2B7] hover:text-[#3D3028] transition flex items-center gap-1.5 shadow-sm">
-          <span>⏱️</span>
+          <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="13" r="8"></circle>
+            <path d="M12 9v4l2.5 2.5"></path>
+            <path d="M10 2h4"></path>
+            <path d="M12 2v3"></path>
+          </svg>
           <span>沖煮計時</span>
         </button>
-        <button onclick="resetDefaults()" class="px-3 py-1.5 rounded-lg bg-white border border-[#E6E0D8] text-[#8C7E75] hover:border-[#CFC2B7] hover:text-[#3D3028] transition shadow-sm">
-          重設預設
+        <button onclick="resetDefaults()" class="px-3 py-1.5 rounded-lg bg-white border border-[#E6E0D8] text-[#8C7E75] hover:border-[#CFC2B7] hover:text-[#3D3028] transition flex items-center gap-1.5 shadow-sm" title="恢復預設參數">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+          </svg>
+          <span>重設預設</span>
         </button>
       </div>
     </header>
@@ -415,17 +484,29 @@
 
           <!-- 控制鍵 -->
           <button id="timer-run-btn" onclick="toggleTimer()" class="px-4 py-2 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition shadow-sm flex items-center gap-1.5">
-            <span>▶</span>
+            <span id="timer-run-icon">
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+            </span>
             <span id="timer-run-text">開始沖煮</span>
           </button>
           
-          <button onclick="resetTimer()" class="px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-[#685B52] text-xs hover:border-[#CFC2B7] transition">
-            重設
+          <button onclick="resetTimer()" class="px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-[#685B52] text-xs hover:border-[#CFC2B7] transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-[#8C7E75]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+            </svg>
+            <span>重設</span>
           </button>
 
           <!-- 提示音開關按鈕 -->
-          <button onclick="toggleAudio()" id="audio-btn" class="px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-xs hover:border-[#CFC2B7] text-[#685B52] transition flex items-center gap-1" title="點擊開關步驟提示音">
-            <span id="audio-icon">🔊</span>
+          <button onclick="toggleAudio()" id="audio-btn" class="px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-xs hover:border-[#CFC2B7] text-[#685B52] transition flex items-center gap-1.5" title="點擊開關步驟提示音">
+            <span id="audio-icon">
+              <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+              </svg>
+            </span>
             <span id="audio-text" class="text-[11px] font-medium hidden sm:inline">提示音開啟</span>
           </button>
         </div>
@@ -445,8 +526,12 @@
             <span class="text-[#8C7E75]">/ <span id="timer-total-water-goal">0</span>g</span>
           </div>
           <!-- 沖煮完成時快捷記錄筆記按鈕 -->
-          <button id="timer-log-btn" onclick="openBrewLogFormForCurrentMethod()" class="hidden px-2.5 py-1 rounded-lg bg-[#ECE3DC] hover:bg-[#dfd3cb] text-[#3D3028] font-medium text-[11px] transition shadow-xs">
-            📝 評分這杯手法
+          <button id="timer-log-btn" onclick="openBrewLogFormForCurrentMethod()" class="hidden px-2.5 py-1 rounded-lg bg-[#ECE3DC] hover:bg-[#dfd3cb] text-[#3D3028] font-medium text-[11px] transition shadow-xs flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+            <span>評分這杯手法</span>
           </button>
         </div>
       </div>
@@ -616,13 +701,23 @@
             <!-- 風味萃取導引提示卡片 (已依需求改移至風味偏好正下方，依所選風味即時說明) -->
             <div class="mt-3 p-3.5 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] text-xs text-[#685B52] space-y-2">
               <div class="flex items-start gap-2">
-                <span class="text-base flex-shrink-0">💡</span>
-                <div class="flex-1 leading-relaxed" id="flavor-adjustment-tip">
+                <svg class="w-4 h-4 text-[#654D3F] flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M9 18h6"></path>
+                  <path d="M10 22h4"></path>
+                  <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path>
+                </svg>
+                <div class="flex-1 leading-relaxed text-pretty" id="flavor-adjustment-tip">
                   金杯標準平衡萃取，標準水溫與黃金秒數節奏，酸、甜、甘、醇四大維度均衡展現。
                 </div>
               </div>
               <div class="text-[11px] text-[#8C7E75] pl-6 flex items-center justify-between border-t border-[#EDE8E2]/60 pt-1.5">
-                <span id="flavor-timing-adjustment-note">⏱️ 標準金杯秒數節奏 · 層次分明</span>
+                <div class="flex items-center gap-1.5" id="flavor-timing-adjustment-container">
+                  <svg class="w-3.5 h-3.5 text-[#8C7E75] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span id="flavor-timing-adjustment-note">標準金杯秒數節奏 · 層次分明</span>
+                </div>
                 <button onclick="stepCustomTemp(1)" class="text-[11px] text-[#654D3F] hover:underline font-medium">
                   +1°C 提高萃取
                 </button>
@@ -633,11 +728,17 @@
           <!-- 重新計算與一鍵收藏按鈕 -->
           <div class="pt-2 space-y-2">
             <button onclick="recalculate()" class="w-full py-3 px-4 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white font-medium text-sm transition shadow-sm flex items-center justify-center gap-1.5 active:scale-[0.99]">
+              <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+              </svg>
               <span>重新計算</span>
             </button>
             
             <button onclick="openRatingModalForCurrentBrew()" class="w-full py-2.5 px-3 rounded-xl bg-white border border-[#E6E0D8] hover:border-[#CFC2B7] text-[#685B52] hover:text-[#3D3028] text-xs font-medium transition flex items-center justify-center gap-1.5 shadow-2xs">
-              <span>⭐</span>
+              <svg class="w-3.5 h-3.5 text-amber-600" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" aria-hidden="true">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
               <span>評分此手法至特定咖啡豆</span>
             </button>
           </div>
@@ -665,7 +766,12 @@
             <!-- 1. 水溫卡 (支援自定義調整) -->
             <div class="canva-card p-4 sm:p-5 flex flex-col justify-between">
               <div class="flex items-center justify-between">
-                <span class="text-xs text-[#8C7E75] font-medium">水溫</span>
+                <div class="flex items-center gap-1.5 text-xs text-[#8C7E75] font-medium">
+                  <svg class="w-3.5 h-3.5 text-[#8C7E75]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
+                  </svg>
+                  <span>水溫</span>
+                </div>
                 <button id="reset-temp-btn" onclick="resetCustomTemp()" class="hidden text-[10px] text-[#8C7E75] hover:text-[#654D3F] transition">↺ 推薦</button>
               </div>
               <div class="mt-2">
@@ -681,7 +787,13 @@
             <!-- 2. 研磨度卡 (支援自定義選擇/調整) -->
             <div class="canva-card p-4 sm:p-5 flex flex-col justify-between">
               <div class="flex items-center justify-between">
-                <span class="text-xs text-[#8C7E75] font-medium">研磨度</span>
+                <div class="flex items-center gap-1.5 text-xs text-[#8C7E75] font-medium">
+                  <svg class="w-3.5 h-3.5 text-[#8C7E75]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  </svg>
+                  <span>研磨度</span>
+                </div>
                 <button id="reset-grind-btn" onclick="resetCustomGrind()" class="hidden text-[10px] text-[#8C7E75] hover:text-[#654D3F] transition">↺ 推薦</button>
               </div>
               <div class="mt-2">
@@ -702,7 +814,16 @@
             <!-- 3. 粉水比卡 (支援自定義調整) -->
             <div class="canva-card p-4 sm:p-5 flex flex-col justify-between">
               <div class="flex items-center justify-between">
-                <span class="text-xs text-[#8C7E75] font-medium">粉水比</span>
+                <div class="flex items-center gap-1.5 text-xs text-[#8C7E75] font-medium">
+                  <svg class="w-3.5 h-3.5 text-[#8C7E75]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path>
+                    <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path>
+                    <path d="M7 21h10"></path>
+                    <path d="M12 3v18"></path>
+                    <path d="M3 7h18"></path>
+                  </svg>
+                  <span>粉水比</span>
+                </div>
                 <button id="reset-ratio-btn" onclick="resetCustomRatio()" class="hidden text-[10px] text-[#8C7E75] hover:text-[#654D3F] transition">↺ 推薦</button>
               </div>
               <div class="mt-2">
@@ -717,7 +838,12 @@
 
             <!-- 4. 總注水量卡 (隨自訂動態連動) -->
             <div class="canva-card p-4 sm:p-5 flex flex-col justify-between">
-              <div class="text-xs text-[#8C7E75] font-medium">總注水量</div>
+              <div class="flex items-center gap-1.5 text-xs text-[#8C7E75] font-medium">
+                <svg class="w-3.5 h-3.5 text-[#8C7E75]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                </svg>
+                <span>總注水量</span>
+              </div>
               <div class="mt-2">
                 <div class="text-2xl font-bold text-[#2C2521] font-mono-num" id="param-water">225g</div>
                 <div class="text-[11px] text-[#9B8D83] mt-0.5 truncate" id="param-water-note">依 15g 粉計算</div>
@@ -738,12 +864,21 @@
             </div>
             <div class="flex items-center gap-2 text-xs">
               <span class="text-[#8C7E75] hidden md:inline">手法指引：<span id="guide-method-name" class="font-semibold text-[#654D3F]">四六法 (粕谷哲)</span></span>
-              <button id="toggle-custom-steps-btn" onclick="toggleCustomStepsMode()" class="px-2.5 py-1 rounded-lg border border-[#E6E0D8] bg-white hover:border-[#CFC2B7] text-[#654D3F] font-medium transition flex items-center gap-1 shadow-2xs">
-                <span id="custom-steps-btn-icon">✏️</span>
+              <button id="toggle-custom-steps-btn" onclick="toggleCustomStepsMode()" class="px-2.5 py-1 rounded-lg border border-[#E6E0D8] bg-white hover:border-[#CFC2B7] text-[#654D3F] font-medium transition flex items-center gap-1.5 shadow-2xs">
+                <span id="custom-steps-btn-icon">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+                    <path d="m15 5 4 4"></path>
+                  </svg>
+                </span>
                 <span id="custom-steps-btn-text">自訂各段秒數與水量</span>
               </button>
-              <button id="reset-custom-steps-btn" onclick="resetToRecommendedSteps()" class="hidden px-2 py-1 rounded-lg border border-[#E6E0D8] bg-[#FAF9F7] hover:bg-[#EDE8E2] text-[#8C7E75] text-[11px] transition" title="恢復推薦標準參數">
-                ↺ 恢復推薦
+              <button id="reset-custom-steps-btn" onclick="resetToRecommendedSteps()" class="hidden px-2 py-1 rounded-lg border border-[#E6E0D8] bg-[#FAF9F7] hover:bg-[#EDE8E2] text-[#8C7E75] text-[11px] transition flex items-center gap-1" title="恢復推薦標準參數">
+                <svg class="w-3 h-3 text-[#8C7E75]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                  <path d="M3 3v5h5"></path>
+                </svg>
+                <span>恢復推薦</span>
               </button>
             </div>
           </div>
@@ -791,27 +926,46 @@
 
     </main>
 
-    <!-- 頁腳 -->
-    <footer class="mt-10 pt-4 border-t border-[#EDE8E2] text-center text-xs text-[#9B8D83]">
-      BrewCraft · 手沖咖啡參數調配系統 · 依照 Canva 極簡工具介面規範建置
+    <!-- 頁腳 (極簡純粹設計) -->
+    <footer class="mt-12 py-6 border-t border-[#EDE8E2] text-center text-xs text-[#8C7E75] space-y-1">
+      <div class="font-medium tracking-wide text-[#654D3F] flex items-center justify-center gap-1.5">
+        <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+          <line x1="6" y1="1" x2="6" y2="4"></line>
+          <line x1="10" y1="1" x2="10" y2="4"></line>
+          <line x1="14" y1="1" x2="14" y2="4"></line>
+        </svg>
+        <span>BrewCraft · Pour-Over Dial-In</span>
+      </div>
+      <div class="text-[11px] text-[#9B8D83]">專注純粹手沖體驗 · 精準掌握每一次萃取節奏</div>
     </footer>
 
   </div>
 
   <!-- ========================================== -->
-  <!-- 咖啡豆評分庫 彈跳視窗 (遵照 Canva 原設計風格) -->
+  <!-- 咖啡豆評分庫 彈跳視窗 (Modern Web Guidance: Native <dialog>) -->
   <!-- ========================================== -->
-  <div id="recipe-vault-modal" onclick="if(event.target === this) closeRecipeVaultModal()" class="hidden fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4">
-    <div class="canva-card w-full max-w-2xl max-h-[92vh] flex flex-col bg-white shadow-2xl overflow-hidden border border-[#EDE8E2]">
+  <dialog id="recipe-vault-modal" aria-labelledby="vault-modal-title" class="p-0 border-0 bg-transparent rounded-2xl max-w-2xl w-[calc(100%-2rem)] my-auto shadow-2xl z-50">
+    <div class="canva-card w-full max-h-[92vh] flex flex-col bg-white shadow-2xl overflow-hidden border border-[#EDE8E2]">
       
       <!-- 視窗標題 -->
       <div class="p-4 sm:p-5 border-b border-[#F0EAE3] flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <span class="text-lg">☕</span>
-          <h3 class="text-base font-bold text-[#2C2521]">咖啡豆與多手法風味評分庫</h3>
+          <svg class="w-5 h-5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+            <line x1="6" y1="1" x2="6" y2="4"></line>
+            <line x1="10" y1="1" x2="10" y2="4"></line>
+            <line x1="14" y1="1" x2="14" y2="4"></line>
+          </svg>
+          <h3 id="vault-modal-title" class="text-base font-bold text-[#2C2521]">咖啡豆與多手法風味評分庫</h3>
         </div>
-        <button onclick="closeRecipeVaultModal()" class="w-8 h-8 rounded-full hover:bg-[#FAF9F7] flex items-center justify-center text-stone-400 hover:text-stone-700 text-lg transition">
-          ✕
+        <button type="button" onclick="closeRecipeVaultModal()" aria-label="關閉視窗" class="w-8 h-8 rounded-full hover:bg-[#FAF9F7] flex items-center justify-center text-stone-400 hover:text-stone-700 transition">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
         </button>
       </div>
 
@@ -834,7 +988,14 @@
           <!-- 建立新咖啡豆名稱卡片 -->
           <div class="p-4 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] space-y-3">
             <div class="text-xs font-semibold text-[#2C2521] flex items-center justify-between">
-              <span>＋ 建立新咖啡豆名稱專區</span>
+              <span class="flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="16"></line>
+                  <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+                <span>建立新咖啡豆名稱專區</span>
+              </span>
               <span class="text-[11px] text-[#8C7E75]">建立後即可在該豆子底下評分不同沖煮法</span>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
@@ -860,8 +1021,12 @@
           
           <div class="p-4 sm:p-5 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] space-y-4">
             <div class="flex items-center justify-between">
-              <div class="text-xs font-bold text-[#654D3F]">
-                📝 沖煮手法評分與風味記錄
+              <div class="text-xs font-bold text-[#654D3F] flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 20h9"></path>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+                <span>沖煮手法評分與風味記錄</span>
               </div>
               <div class="text-[11px] text-[#8C7E75] font-mono-num" id="rate-form-current-params">
                 15g · 92°C · 1:15 · 225g
@@ -950,7 +1115,7 @@
       </div>
 
     </div>
-  </div>
+  </dialog>
 
   <!-- JavaScript 核心調配邏輯、時間精準換算、Web Audio 與 咖啡豆多手法評分模組 -->
   <script>
@@ -1071,7 +1236,7 @@
         },
         pourRatio46: [0.24, 0.16], // Kasuya 四六法則：前段第一注大、第二注小，激發明亮果酸
         note: '偏高水溫激發花果酸香，縮短悶蒸與每段落水秒數（-15s），前段加大注水，保持果酸純淨明亮。',
-        timingNote: '⏱️ 悶蒸縮短至 35s · 節奏輕快避開雜苦 (-15s)'
+        timingNote: '悶蒸縮短至 35s · 節奏輕快避開雜苦 (-15s)'
       },
       sweet: {
         name: '突出甜感',
@@ -1083,7 +1248,7 @@
         },
         pourRatio46: [0.16, 0.24], // Kasuya 四六法則：前段第一注小、第二注大，甜感最大化！
         note: '微降水溫避免澀感，延長悶蒸至 52s 與每段落水間隔（+10s），前小後大注水，充分釋放焦糖甜感。',
-        timingNote: '⏱️ 悶蒸延長至 52s · 溫和間隔充分溶解甜感 (+10s)'
+        timingNote: '悶蒸延長至 52s · 溫和間隔充分溶解甜感 (+10s)'
       },
       body: {
         name: '追求厚實',
@@ -1095,7 +1260,7 @@
         },
         pourRatio46: [0.20, 0.20],
         note: '收窄粉水比提高濃度，拉長每段滴濾時間（+20s），充分浸透釋放咖啡油脂與厚實醇度。',
-        timingNote: '⏱️ 萃取接觸時間延長 · 口感濃郁厚實 (+20s)'
+        timingNote: '萃取接觸時間延長 · 口感濃郁厚實 (+20s)'
       },
       balance: {
         name: '平衡順口',
@@ -1107,7 +1272,7 @@
         },
         pourRatio46: [0.20, 0.20],
         note: '金杯標準平衡萃取，標準水溫與黃金秒數節奏，酸、甜、甘、醇四大維度均衡展現。',
-        timingNote: '⏱️ 標準金杯秒數節奏 · 層次分明'
+        timingNote: '標準金杯秒數節奏 · 層次分明'
       }
     };
 
@@ -1331,6 +1496,9 @@
       if (timerRunning) resetTimer();
     }
 
+    const ICON_PENCIL_SVG = `<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg>`;
+    const ICON_CHECK_SVG = `<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
     function updateCustomStepControlsUI() {
       const badge = document.getElementById('custom-steps-badge');
       const resetBtn = document.getElementById('reset-custom-steps-btn');
@@ -1342,10 +1510,10 @@
 
       if (state.isEditingSteps) {
         if (btnText) btnText.textContent = '完成自訂編輯';
-        if (btnIcon) btnIcon.textContent = '✓';
+        if (btnIcon) btnIcon.innerHTML = ICON_CHECK_SVG;
       } else {
         if (btnText) btnText.textContent = state.isCustomSteps ? '修改各段參數' : '自訂各段秒數與水量';
-        if (btnIcon) btnIcon.textContent = '✏️';
+        if (btnIcon) btnIcon.innerHTML = ICON_PENCIL_SVG;
       }
     }
 
@@ -1990,6 +2158,11 @@
       playSynthesizedTone(1046.5, 'sine', 0.50, now + 0.36, 0.28);
     }
 
+    const ICON_SPEAKER_ON_SVG = `<svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
+    const ICON_SPEAKER_MUTED_SVG = `<svg class="w-3.5 h-3.5 text-[#8C7E75]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
+    const ICON_PLAY_SVG = `<svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>`;
+    const ICON_PAUSE_SVG = `<svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>`;
+
     function toggleAudio() {
       audioEnabled = !audioEnabled;
       initAudioContext();
@@ -1997,12 +2170,12 @@
       const audioIcon = document.getElementById('audio-icon');
       const audioText = document.getElementById('audio-text');
       if (audioEnabled) {
-        audioIcon.textContent = '🔊';
-        audioText.textContent = '提示音開啟';
+        if (audioIcon) audioIcon.innerHTML = ICON_SPEAKER_ON_SVG;
+        if (audioText) audioText.textContent = '提示音開啟';
         playStepChangeSound();
       } else {
-        audioIcon.textContent = '🔇';
-        audioText.textContent = '靜音模式';
+        if (audioIcon) audioIcon.innerHTML = ICON_SPEAKER_MUTED_SVG;
+        if (audioText) audioText.textContent = '靜音模式';
       }
     }
 
@@ -2055,6 +2228,8 @@
         timerRunning = false;
         releaseScreenWakeLock();
         document.getElementById('timer-run-text').textContent = '繼續沖煮';
+        const icon = document.getElementById('timer-run-icon');
+        if (icon) icon.innerHTML = ICON_PLAY_SVG;
         document.getElementById('timer-run-btn').className = 'px-4 py-2 rounded-xl bg-amber-700 hover:bg-amber-600 text-white text-xs font-semibold transition flex items-center gap-1.5';
         document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
         
@@ -2069,6 +2244,8 @@
         timerStartTime = Date.now() - (timerSeconds * 1000);
 
         document.getElementById('timer-run-text').textContent = '暫停計時';
+        const icon = document.getElementById('timer-run-icon');
+        if (icon) icon.innerHTML = ICON_PAUSE_SVG;
         document.getElementById('timer-run-btn').className = 'px-4 py-2 rounded-xl bg-[#8C7E75] hover:bg-[#786A61] text-white text-xs font-semibold transition flex items-center gap-1.5';
         document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-subtle-pulse';
 
@@ -2096,6 +2273,8 @@
 
       document.getElementById('timer-digits').textContent = '00:00';
       document.getElementById('timer-run-text').textContent = '開始沖煮';
+      const icon = document.getElementById('timer-run-icon');
+      if (icon) icon.innerHTML = ICON_PLAY_SVG;
       document.getElementById('timer-run-btn').className = 'px-4 py-2 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition shadow-sm flex items-center gap-1.5';
       document.getElementById('timer-status-dot').className = 'w-2.5 h-2.5 rounded-full bg-stone-400';
       document.getElementById('timer-status-title').textContent = '即時注水指引計時器';
@@ -2681,13 +2860,19 @@
     }
 
     function openRecipeVaultModal() {
-      document.getElementById('recipe-vault-modal').classList.remove('hidden');
+      const modal = document.getElementById('recipe-vault-modal');
+      if (modal) {
+        if (typeof modal.showModal === 'function') {
+          if (!modal.open) modal.showModal();
+        } else {
+          modal.classList.remove('hidden');
+        }
+      }
       renderBeansList();
       populateBeanDropdown();
       updateVaultBadges();
     }
 
-    
     // 監聽 Escape 鍵關閉彈跳視窗
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
@@ -2695,8 +2880,32 @@
       }
     });
 
+    // 點擊 native <dialog> 外部背景時自動關閉 (Modern Light Dismiss)
+    const vaultModalEl = document.getElementById('recipe-vault-modal');
+    if (vaultModalEl) {
+      vaultModalEl.addEventListener('click', (event) => {
+        const rect = vaultModalEl.getBoundingClientRect();
+        const isInDialog = (
+          rect.top <= event.clientY &&
+          event.clientY <= rect.top + rect.height &&
+          rect.left <= event.clientX &&
+          event.clientX <= rect.left + rect.width
+        );
+        if (!isInDialog) {
+          closeRecipeVaultModal();
+        }
+      });
+    }
+
     function closeRecipeVaultModal() {
-      document.getElementById('recipe-vault-modal').classList.add('hidden');
+      const modal = document.getElementById('recipe-vault-modal');
+      if (modal) {
+        if (typeof modal.close === 'function') {
+          if (modal.open) modal.close();
+        } else {
+          modal.classList.add('hidden');
+        }
+      }
     }
 
     function switchVaultTab(tab) {
