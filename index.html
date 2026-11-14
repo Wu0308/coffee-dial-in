@@ -471,7 +471,7 @@
   <div class="max-w-6xl mx-auto">
 
     <!-- 頂部 Header -->
-    <header class="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+    <header class="mb-6 pb-4 border-b border-[#EDE6DD] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
       <div class="flex items-center gap-3.5">
         <div class="w-11 h-11 rounded-2xl bg-[#3D2C22] text-[#F5ECE5] flex items-center justify-center shadow-md flex-shrink-0 border border-[#4F3B30]">
           <!-- Bespoke Artisan Dripper + Steam Vector Mark -->
@@ -495,43 +495,70 @@
         </div>
       </div>
       
-      <!-- 快捷工具鍵 -->
-      <div class="flex items-center gap-2 text-xs flex-wrap">
-        <button onclick="openRecipeVaultModal()" class="px-3.5 py-2 rounded-xl bg-white border border-[#E6E0D8] text-[#5C4A3E] hover:border-[#CFC2B7] hover:text-[#2C2521] hover:-translate-y-0.5 active:scale-95 transition flex items-center gap-2 shadow-2xs">
-          <svg class="w-3.5 h-3.5 text-amber-600 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-          </svg>
-          <span class="font-semibold">咖啡豆評分庫</span>
-          <span id="saved-beans-badge" class="ml-0.5 px-1.5 py-0.2 rounded-full bg-[#E8E4DF] text-[#3D3028] text-[10px] font-bold">1</span>
-        </button>
-        <button onclick="copyRecipe()" class="px-3.5 py-2 rounded-xl bg-white border border-[#E6E0D8] text-[#5C4A3E] hover:border-[#CFC2B7] hover:text-[#2C2521] hover:-translate-y-0.5 active:scale-95 transition flex items-center gap-1.5 shadow-2xs">
-          <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-          </svg>
-          <span id="copy-btn-text" class="font-medium">複製配方</span>
-        </button>
-        <button onclick="toggleTimerSection()" id="timer-toggle-btn" class="px-3.5 py-2 rounded-xl bg-white border border-[#E6E0D8] text-[#5C4A3E] hover:border-[#CFC2B7] hover:text-[#2C2521] hover:-translate-y-0.5 active:scale-95 transition flex items-center gap-1.5 shadow-2xs">
-          <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <!-- 頂部重點功能與快捷工具列 -->
+      <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap">
+        
+        <!-- 重點核心 1: 沖煮計時 (Hero Feature Toggle) -->
+        <button onclick="toggleTimerSection()" id="timer-toggle-btn" 
+                class="group relative px-4 py-2.5 rounded-xl bg-[#2D231D] hover:bg-[#1E1713] text-[#FAF6F2] transition-all duration-200 flex items-center gap-2 shadow-sm border border-[#42332A] hover:border-[#574438] hover:-translate-y-0.5 active:scale-95 cursor-pointer">
+          <span class="relative flex h-2 w-2">
+            <span id="timer-pulse-ring" class="hidden absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
+            <span id="timer-pulse-dot" class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+          </span>
+          <svg class="w-4 h-4 text-amber-400 group-hover:rotate-12 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="13" r="8"></circle>
             <path d="M12 9v4l2.5 2.5"></path>
             <path d="M10 2h4"></path>
             <path d="M12 2v3"></path>
           </svg>
-          <span class="font-medium">沖煮計時</span>
+          <span id="timer-toggle-text" class="font-bold text-xs tracking-wide">沖煮計時</span>
+          <span id="timer-active-pill" class="hidden text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.2 rounded-full font-mono-num font-semibold">ON</span>
         </button>
-        <button onclick="resetDefaults()" class="px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-[#8C7E75] hover:border-[#CFC2B7] hover:text-[#2C2521] hover:-translate-y-0.5 active:scale-95 transition flex items-center gap-1.5 shadow-2xs" title="恢復預設參數">
+
+        <!-- 重點核心 2: 咖啡豆評分庫 (Signature Vault Button) -->
+        <button onclick="openRecipeVaultModal()" id="vault-toggle-btn"
+                class="group relative px-3.5 py-2.5 rounded-xl bg-[#FAF5F0] hover:bg-[#F2E8DF] text-[#3D2C22] border border-[#DDD3CA] hover:border-[#C4B7AC] transition-all duration-200 flex items-center gap-2.5 shadow-2xs hover:-translate-y-0.5 active:scale-95 cursor-pointer">
+          <span class="w-6 h-6 rounded-lg bg-[#EAE0D5] group-hover:bg-[#E0D0C2] text-amber-700 flex items-center justify-center transition-colors flex-shrink-0 shadow-2xs">
+            <svg class="w-3.5 h-3.5 text-amber-700 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </span>
+          <div class="flex items-center gap-1.5">
+            <span class="font-bold text-xs text-[#2C2521] leading-tight tracking-tight">咖啡評分庫</span>
+            <span id="saved-beans-badge" class="px-1.5 py-0.2 rounded-full bg-[#3D2C22] text-[#FDFCFA] text-[10px] font-bold font-mono-num shadow-2xs">1</span>
+          </div>
+        </button>
+
+        <!-- 分隔線 (Divider) -->
+        <div class="hidden sm:block h-6 w-px bg-[#E6DFD7] mx-0.5" aria-hidden="true"></div>
+
+        <!-- 輔助工具 1: 複製參數 -->
+        <button onclick="copyRecipe()" id="copy-recipe-btn"
+                class="px-3 py-2.5 rounded-xl bg-white hover:bg-[#FAF9F7] border border-[#E6E0D8] hover:border-[#CFC2B7] text-[#5C4A3E] hover:text-[#2C2521] transition-all duration-150 flex items-center gap-1.5 shadow-2xs hover:-translate-y-0.5 active:scale-95 cursor-pointer text-xs" 
+                title="複製完整沖煮參數至剪貼簿">
+          <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span id="copy-btn-text" class="font-medium">複製參數</span>
+        </button>
+
+        <!-- 輔助工具 2: 重設預設 -->
+        <button onclick="resetDefaults()" 
+                class="px-2.5 py-2.5 rounded-xl bg-white hover:bg-[#FAF9F7] border border-[#E6E0D8] hover:border-[#CFC2B7] text-[#8C7E75] hover:text-[#5C4A3E] transition-all duration-150 flex items-center gap-1 shadow-2xs hover:-translate-y-0.5 active:scale-95 cursor-pointer text-xs" 
+                title="重設為當前手法與烘焙度推薦之預設參數">
           <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
             <path d="M3 3v5h5"></path>
           </svg>
-          <span class="font-medium">重設預設</span>
+          <span class="font-medium">重設</span>
         </button>
+
       </div>
     </header>
 
     <!-- 互動式沖煮計時器模式 (支援換段提示音與倒數提示) -->
-    <section id="timer-bar" class="hidden mb-6 brew-card p-5 sm:p-6 border-[#D8CCC4] bg-[#FDFCFB] transition-all">
+    <section id="timer-bar" class="hidden mb-6 brew-card p-5 sm:p-6 border-[#DDD4CA] bg-[#FAF8F5] shadow-sm transition-all duration-300">
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
           <div class="text-xs font-bold text-[#654D3F] flex items-center gap-2">
@@ -544,8 +571,8 @@
         </div>
         
         <div class="flex items-center gap-3">
-          <!-- 碼錶數字 -->
-          <div class="text-3xl sm:text-4xl font-mono-num font-bold text-[#2C2521] bg-[#FAF9F7] px-4 py-1.5 rounded-xl border border-[#EDE8E2]" id="timer-digits">
+          <!-- 碼錶數字 (Barista Stopwatch) -->
+          <div class="text-3xl sm:text-4xl font-mono-num font-bold text-[#2C2521] tracking-tight bg-[#FAF9F7] px-4 py-1.5 rounded-xl border border-[#EDE8E2]" id="timer-digits">
             00:00
           </div>
 
@@ -643,7 +670,7 @@
               <span id="step-anim-countdown-text">剩餘 -- 秒</span>
             </div>
             <div class="w-full bg-[#EAE4DC] h-2 rounded-full overflow-hidden">
-              <div id="step-anim-progress-bar" class="bg-[#654D3F] h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+              <div id="step-anim-progress-bar" class="bg-gradient-to-r from-amber-600 to-[#654D3F] h-full rounded-full transition-all duration-300" style="width: 0%"></div>
             </div>
           </div>
         </div>
@@ -821,12 +848,12 @@
             </div>
 
             <!-- 快捷粉量推薦標籤 -->
-            <div class="flex items-center gap-1.5 mt-2 flex-wrap">
-              <button type="button" onclick="onDoseChange(12)" class="px-2 py-0.5 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#8C7E75] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num">12g 淺嚐</button>
-              <button type="button" onclick="onDoseChange(15)" class="px-2 py-0.5 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#654D3F] font-semibold hover:border-[#CFC2B7] transition font-mono-num">15g 金杯</button>
-              <button type="button" onclick="onDoseChange(18)" class="px-2 py-0.5 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#8C7E75] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num">18g 濃郁</button>
-              <button type="button" onclick="onDoseChange(20)" class="px-2 py-0.5 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#8C7E75] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num">20g 雙人</button>
-              <button type="button" onclick="onDoseChange(30)" class="px-2 py-0.5 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#8C7E75] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num">30g 分享壺</button>
+            <div class="flex items-center gap-1.5 mt-2 flex-wrap" id="quick-dose-container">
+              <button type="button" onclick="onDoseChange(12)" data-dose="12" class="quick-dose-pill px-2.5 py-1 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#786B63] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num cursor-pointer">12g 淺嚐</button>
+              <button type="button" onclick="onDoseChange(15)" data-dose="15" class="quick-dose-pill px-2.5 py-1 rounded-lg bg-[#654D3F] text-white border border-[#654D3F] text-[10px] font-bold transition font-mono-num shadow-2xs cursor-pointer">15g 金杯</button>
+              <button type="button" onclick="onDoseChange(18)" data-dose="18" class="quick-dose-pill px-2.5 py-1 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#786B63] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num cursor-pointer">18g 濃郁</button>
+              <button type="button" onclick="onDoseChange(20)" data-dose="20" class="quick-dose-pill px-2.5 py-1 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#786B63] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num cursor-pointer">20g 雙人</button>
+              <button type="button" onclick="onDoseChange(30)" data-dose="30" class="quick-dose-pill px-2.5 py-1 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#786B63] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num cursor-pointer">30g 分享壺</button>
             </div>
 
             <!-- 微調滑桿 -->
@@ -1546,6 +1573,17 @@
       }
     }
 
+    function updateQuickDosePills(currentDose) {
+      document.querySelectorAll('.quick-dose-pill').forEach(btn => {
+        const d = parseFloat(btn.dataset.dose);
+        if (Math.abs(d - currentDose) < 0.1) {
+          btn.className = 'quick-dose-pill px-2.5 py-1 rounded-lg bg-[#654D3F] text-white border border-[#654D3F] text-[10px] font-bold transition font-mono-num shadow-2xs cursor-pointer';
+        } else {
+          btn.className = 'quick-dose-pill px-2.5 py-1 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#786B63] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num cursor-pointer';
+        }
+      });
+    }
+
     function onDoseCommit(val) {
       let num = parseFloat(val);
       if (isNaN(num)) num = 15.0;
@@ -1555,6 +1593,7 @@
       state.dose = num;
       document.getElementById('dose-input').value = num;
       document.getElementById('dose-range').value = Math.min(Math.max(num, 10), 35);
+      updateQuickDosePills(num);
       calculateAndRender();
       if (timerRunning) resetTimer();
     }
@@ -2429,10 +2468,34 @@
 
     function toggleTimerSection() {
       const section = document.getElementById('timer-bar');
+      const toggleBtn = document.getElementById('timer-toggle-btn');
+      const pulseRing = document.getElementById('timer-pulse-ring');
+      const pulseDot = document.getElementById('timer-pulse-dot');
+      const activePill = document.getElementById('timer-active-pill');
+
       section.classList.toggle('hidden');
-      if (!section.classList.contains('hidden')) {
+      const isOpen = !section.classList.contains('hidden');
+
+      if (toggleBtn) {
+        if (isOpen) {
+          toggleBtn.classList.add('ring-2', 'ring-amber-500/70', 'bg-[#1E1713]', 'border-amber-500/60');
+          toggleBtn.classList.remove('bg-[#2D231D]', 'border-[#42332A]');
+          if (pulseRing) pulseRing.classList.remove('hidden');
+          if (pulseDot) pulseDot.className = 'relative inline-flex rounded-full h-2 w-2 bg-emerald-400';
+          if (activePill) activePill.classList.remove('hidden');
+        } else {
+          toggleBtn.classList.remove('ring-2', 'ring-amber-500/70', 'bg-[#1E1713]', 'border-amber-500/60');
+          toggleBtn.classList.add('bg-[#2D231D]', 'border-[#42332A]');
+          if (pulseRing) pulseRing.classList.add('hidden');
+          if (pulseDot) pulseDot.className = 'relative inline-flex rounded-full h-2 w-2 bg-amber-500';
+          if (activePill) activePill.classList.add('hidden');
+        }
+      }
+
+      if (isOpen) {
         initAudioContext();
         if (timerSeconds === 0) resetStepAnimationCue();
+        section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }
 
@@ -3062,7 +3125,7 @@
       navigator.clipboard.writeText(text).then(() => {
         const btnText = document.getElementById('copy-btn-text');
         btnText.textContent = '已複製！';
-        setTimeout(() => { btnText.textContent = '複製配方'; }, 2000);
+        setTimeout(() => { btnText.textContent = '複製參數'; }, 2000);
       }).catch(err => {
         alert('配方內容：\n\n' + text);
       });
