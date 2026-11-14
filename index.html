@@ -743,6 +743,7 @@
           <div class="flex items-center gap-2 text-xs font-mono-num">
             <div class="flex items-center gap-1.5 bg-[#FAF9F7] px-2.5 py-1 rounded-lg border border-[#EDE8E2]">
               <span class="text-[#8C7E75] text-[11px]">建議流速:</span>
+              <span id="curve-live-flow-badge" class="hidden"></span>
               <strong id="curve-live-flow-rate" class="font-bold text-[#654D3F]">0.0 g/s</strong>
             </div>
             <div class="flex items-center gap-1.5 bg-[#FAF9F7] px-2.5 py-1 rounded-lg border border-[#EDE8E2]">
@@ -1957,7 +1958,109 @@
       }
     };
 
-    
+    // ========================================================
+    // 精品手沖水流型態定義 (Specialty Flow Profiles)
+    // 依據手沖物理動力學，為不同手法與階段賦予精準的水流強度與建議流速
+    // ========================================================
+    const FLOW_PROFILES = {
+      fast: {
+        key: 'fast',
+        name: '大水流',
+        subText: '強攪拌 · 快速注入',
+        targetRate: 4.8,     // ~4.8 g/s (約 4.2 - 5.5 g/s)
+        minRateSafe: 3.5,
+        maxRateSafe: 6.5,
+        drainMinSec: 6,
+        colorClass: 'text-amber-900 bg-amber-50 border-amber-300/80',
+        iconSvg: `<svg class="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c3-4 6-4 8 0 3 4 6 4 8 0 1-1.3 2-2 4-2"></path><path d="M2 17c3-4 6-4 8 0 3 4 6 4 8 0 1-1.3 2-2 4-2"></path></svg>`
+      },
+      medium_fast: {
+        key: 'medium_fast',
+        name: '中大水流',
+        subText: '適度攪拌 · 迅速出水',
+        targetRate: 4.0,     // ~4.0 g/s
+        minRateSafe: 2.8,
+        maxRateSafe: 5.5,
+        drainMinSec: 5,
+        colorClass: 'text-[#654D3F] bg-[#FAF5F0] border-[#E8DEC8]',
+        iconSvg: `<svg class="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>`
+      },
+      medium: {
+        key: 'medium',
+        name: '標準水流',
+        subText: '平穩繞圈 · 均勻萃取',
+        targetRate: 3.3,     // ~3.3 g/s
+        minRateSafe: 2.2,
+        maxRateSafe: 4.6,
+        drainMinSec: 4,
+        colorClass: 'text-[#654D3F] bg-[#FAF5F0] border-[#E8DEC8]',
+        iconSvg: `<svg class="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle></svg>`
+      },
+      gentle: {
+        key: 'gentle',
+        name: '柔和小水流',
+        subText: '低擾流 · 均勻滲透',
+        targetRate: 2.4,     // ~2.4 g/s
+        minRateSafe: 1.5,
+        maxRateSafe: 3.6,
+        drainMinSec: 3,
+        colorClass: 'text-teal-900 bg-teal-50 border-teal-300/80',
+        iconSvg: `<svg class="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`
+      },
+      drip: {
+        key: 'drip',
+        name: '極細點滴',
+        subText: '深層悶潤 · 無擾滲透',
+        targetRate: 1.2,     // ~1.2 g/s
+        minRateSafe: 0.6,
+        maxRateSafe: 2.2,
+        drainMinSec: 2,
+        colorClass: 'text-indigo-900 bg-indigo-50 border-indigo-300/80',
+        iconSvg: `<svg class="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="6" r="1.5"></circle><circle cx="12" cy="18" r="1.5"></circle></svg>`
+      },
+      bypass: {
+        key: 'bypass',
+        name: '旁路直注',
+        subText: '不經濾杯 · 直接稀釋',
+        targetRate: 8.0,     // ~8.0 g/s
+        minRateSafe: 4.0,
+        maxRateSafe: 12.0,
+        drainMinSec: 2,
+        colorClass: 'text-sky-900 bg-sky-50 border-sky-300/80',
+        iconSvg: `<svg class="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>`
+      },
+      drain: {
+        key: 'drain',
+        name: '靜置滴漏',
+        subText: '自然濾乾收杯',
+        targetRate: 0,
+        minRateSafe: 0,
+        maxRateSafe: 0,
+        drainMinSec: 0,
+        colorClass: 'text-stone-600 bg-stone-100 border-stone-200',
+        iconSvg: `<svg class="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v6l6 6 6-6V3"></path><path d="M6 21h12"></path></svg>`
+      }
+    };
+
+    function getStepFlowProfile(step) {
+      if (!step || step.amount <= 0) return FLOW_PROFILES.drain;
+      let key = step.flowType;
+      if (!key) {
+        if (step.animType === 'drip_slow' || (step.name && step.name.includes('點滴'))) {
+          key = 'drip';
+        } else if (step.animType === 'vigorous_pour' || (step.name && step.name.includes('大水流'))) {
+          key = 'fast';
+        } else if (step.animType === 'bypass_pot' || (step.name && step.name.includes('Bypass'))) {
+          key = 'bypass';
+        } else if (step.animType === 'steady_center' || (step.name && step.name.includes('細水'))) {
+          key = 'gentle';
+        } else {
+          key = 'medium';
+        }
+      }
+      return FLOW_PROFILES[key] || FLOW_PROFILES.medium;
+    }
+
     function formatTimerDigits(seconds) {
       const m = Math.floor(seconds / 60);
       const s = seconds % 60;
@@ -2338,6 +2441,17 @@
       state.isCustomSteps = true;
     }
 
+    function setCustomStepFlowType(idx, flowType) {
+      if (!state.customStepsData) {
+        state.customStepsData = JSON.parse(JSON.stringify(currentStepsCache));
+      }
+      if (!state.customStepsData[idx]) return;
+      state.customStepsData[idx].flowType = flowType;
+      state.isCustomSteps = true;
+      recalculateCustomStepsMetrics();
+      renderStepTimeline();
+    }
+
     function recalculateCustomStepsMetrics() {
       if (!state.customStepsData) return;
       let curCum = 0;
@@ -2356,13 +2470,17 @@
         const timelineRangeElem = document.getElementById(`timeline-step-range-${i}`);
         if (timelineRangeElem) timelineRangeElem.textContent = `(${st.timeRangeStr})`;
 
-        // 即時計算流速與提供專業萃取警示
+        // 即時計算流速與提供專業水流型態自適應警示
         const warnElem = document.getElementById(`timeline-step-warn-${i}`);
         if (warnElem) {
           const tPour = getStepPourDuration(st);
+          const flowProfile = getStepFlowProfile(st);
           if (st.amount > 0 && tPour > 0) {
             const flowRate = st.amount / tPour;
-            if (flowRate > 5.5) {
+            const maxSafe = (st.flowType === 'bypass') ? 12.0 : (flowProfile.maxRateSafe || 5.5);
+            const minSafe = flowProfile.minRateSafe || 1.4;
+
+            if (flowRate > maxSafe) {
               warnElem.innerHTML = `
                 <div class="text-[11px] text-amber-900 bg-amber-50 border border-amber-300/80 rounded-lg px-2.5 py-1.5 flex items-start gap-1.5 leading-relaxed">
                   <svg class="w-3.5 h-3.5 text-amber-700 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -2370,10 +2488,10 @@
                     <line x1="12" y1="9" x2="12" y2="13"></line>
                     <line x1="12" y1="17" x2="12.01" y2="17"></line>
                   </svg>
-                  <span>此段建議流速過急 (~${flowRate.toFixed(1)} g/s)：水流衝擊力過大易穿孔造成通道效應與苦澀味。建議延長秒數或減少注水量。</span>
+                  <span>此段建議流速過急 (~${flowRate.toFixed(1)} g/s，超出${flowProfile.name}安全極限 ${maxSafe} g/s)：水流衝擊力過大易穿孔造成通道效應與苦澀味。建議延長秒數或減少注水量。</span>
                 </div>
               `;
-            } else if (flowRate < 1.4 && st.amount >= 20) {
+            } else if (flowRate < minSafe && st.amount >= 20 && st.flowType !== 'drip') {
               warnElem.innerHTML = `
                 <div class="text-[11px] text-[#654D3F] bg-[#FAF5F0] border border-[#E8DEC8] rounded-lg px-2.5 py-1.5 flex items-start gap-1.5 leading-relaxed">
                   <svg class="w-3.5 h-3.5 text-[#8C7E75] flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -2381,7 +2499,7 @@
                     <line x1="12" y1="16" x2="12" y2="12"></line>
                     <line x1="12" y1="8" x2="12.01" y2="8"></line>
                   </svg>
-                  <span>此段建議流速偏緩 (~${flowRate.toFixed(1)} g/s)：細水流接觸空氣面積大，水溫易迅速散失，請維持水流垂直均勻。</span>
+                  <span>此段建議流速偏緩 (~${flowRate.toFixed(1)} g/s)：水柱過細接觸空氣面積大，水溫易迅速散失，請維持水流垂直均勻。</span>
                 </div>
               `;
             } else {
@@ -2472,6 +2590,7 @@
             name: '悶蒸',
             amount: bloomWater,
             durationSec: bloomSec,
+            flowType: 'medium',
             note: `由中心向外柔和繞圈，確保浸透並排氣至 ${formatTime(bloomSec)}`,
             animType: 'bloom',
             actionTitle: '溫潤注水 · 均勻排氣膨脹 (悶蒸)',
@@ -2483,6 +2602,7 @@
             name: '第一段',
             amount: pour2,
             durationSec: step2Sec,
+            flowType: 'medium',
             note: `穩定繞圈注水，調節酸甜明亮與焦糖化，落水至 ${formatTime(bloomSec + step2Sec)}`,
             animType: 'spiral',
             actionTitle: '穩定繞圈注水 (風味主軸)',
@@ -2494,10 +2614,11 @@
             name: '第二段',
             amount: pour3,
             durationSec: step3Sec,
-            note: '後60%第一注，維持細水流繞圈，提升萃取乾淨度',
+            flowType: 'fast',
+            note: '後60%第一注，中大水流迅速沖入，提升萃取乾淨度',
             animType: 'spiral',
-            actionTitle: '後段細水流繞圈',
-            actionTip: '後60%第一注，維持細柔水流緩慢繞圈，等待水落乾。',
+            actionTitle: '後段中大水流迅速注水',
+            actionTip: '後60%第一注，中大水流迅速拉升水位後停止注水，等待水完全落乾。',
             defaultAmount: pour3,
             defaultDuration: step3Sec
           },
@@ -2505,10 +2626,11 @@
             name: '第三段',
             amount: pour4,
             durationSec: step4Sec,
-            note: '提升萃取醇厚度，等水完全落乾再進行下一注',
+            flowType: 'fast',
+            note: '中大水流提升萃取醇厚度，等水完全落乾再進行下一注',
             animType: 'spiral',
             actionTitle: '提升醇厚度注水',
-            actionTip: '均勻繞圈注水，等水完全落乾後再注最後一注。',
+            actionTip: '均勻快速注水，等水完全落乾後再注最後一注。',
             defaultAmount: pour4,
             defaultDuration: step4Sec
           },
@@ -2516,7 +2638,8 @@
             name: '第四段',
             amount: pour5,
             durationSec: step5Sec,
-            note: '收尾注至目標水量，落乾移開濾杯',
+            flowType: 'fast',
+            note: '收尾快速注至目標水量，落乾移開濾杯',
             animType: 'drain_rest',
             actionTitle: '收尾注水與自然滴濾',
             actionTip: '注足最後目標水量，讓咖啡液自然滴盡，落乾後立即移開濾杯。',
@@ -2536,6 +2659,7 @@
             name: '悶蒸',
             amount: bloomWater,
             durationSec: bloomSec,
+            flowType: 'gentle',
             note: `中心點向外微幅潤濕，排氣膨脹至 ${bloomSec} 秒`,
             animType: 'bloom',
             actionTitle: '中心微潤 · 均勻排氣膨脹 (悶蒸)',
@@ -2547,6 +2671,7 @@
             name: '持續注水',
             amount: mainPour,
             durationSec: mainSec,
+            flowType: 'gentle',
             note: '極細穩定水流不中斷，中心小範圍繞圈注滿',
             animType: 'steady_center',
             actionTitle: '垂直極細注水不中斷',
@@ -2558,6 +2683,7 @@
             name: '滴濾收尾',
             amount: 0,
             durationSec: drainSec,
+            flowType: 'drain',
             note: '靜置等待水層平穩濾乾，移開濾杯',
             animType: 'drain_rest',
             actionTitle: '靜待均勻滴濾',
@@ -2581,6 +2707,7 @@
             name: '悶蒸',
             amount: bloomWater,
             durationSec: bloomSec,
+            flowType: 'medium',
             note: `浸濕全部粉床，釋放二氧化碳至 ${bloomSec} 秒`,
             animType: 'bloom',
             actionTitle: '全粉床浸潤 · 漢堡膨脹 (悶蒸)',
@@ -2592,6 +2719,7 @@
             name: '第一段注水',
             amount: pour1,
             durationSec: pour1Sec,
+            flowType: 'medium',
             note: '由內向外穩定均勻繞圈，帶出果香酸甜',
             animType: 'spiral',
             actionTitle: '由內向外中等水流繞圈',
@@ -2603,6 +2731,7 @@
             name: '第二段注水',
             amount: pour2,
             durationSec: pour2Sec,
+            flowType: 'gentle',
             note: '中心維持平穩水柱補足水量，滴濾完畢移開',
             animType: 'steady_center',
             actionTitle: '中心平穩水柱補足',
@@ -2626,6 +2755,7 @@
             name: '悶蒸 + 輕搖 (Swirl)',
             amount: bloomWater,
             durationSec: bloomSec,
+            flowType: 'medium',
             note: `注水後輕搖濾杯消除乾粉結塊，浸潤至 ${bloomSec} 秒`,
             animType: 'bloom',
             actionTitle: '悶蒸注水 + 均勻排氣膨脹 (Swirl)',
@@ -2637,6 +2767,7 @@
             name: '第一段大水流',
             amount: pour1,
             durationSec: p1Sec,
+            flowType: 'fast',
             note: '較大水流衝擊攪拌，注入至 60% 總水量',
             animType: 'vigorous_pour',
             actionTitle: '大水流攪拌衝擊',
@@ -2648,6 +2779,7 @@
             name: '第二段細水流',
             amount: pour2,
             durationSec: p2Sec,
+            flowType: 'gentle',
             note: '輕柔補至目標總水量，完成後順勢輕微晃動',
             animType: 'steady_center',
             actionTitle: '溫柔細水流補水',
@@ -2659,6 +2791,7 @@
             name: '粉床平整滴濾',
             amount: 0,
             durationSec: drainSec,
+            flowType: 'drain',
             note: '讓咖啡液自然滴盡，粉床收杯平整如鏡',
             animType: 'drain_rest',
             actionTitle: '平整自然滴濾收杯',
@@ -2679,6 +2812,7 @@
             name: '中心點滴潤濕',
             amount: bloomWater,
             durationSec: 30,
+            flowType: 'drip',
             note: '細小點滴僅潤濕中心粉芯',
             animType: 'drip_slow',
             actionTitle: '中心點滴滴水 (Drop by Drop)',
@@ -2690,6 +2824,7 @@
             name: '加蓋深悶蒸',
             amount: 0,
             durationSec: steamSec,
+            flowType: 'drain',
             note: `蓋上悶蒸蓋深層悶蒸 ${Math.round(steamSec / 60)} 分鐘，排淨氣體`,
             animType: 'bloom',
             actionTitle: `深層悶蒸膨脹 (加蓋 ${Math.round(steamSec / 60)} 分鐘)`,
@@ -2701,6 +2836,7 @@
             name: '核心萃取注水',
             amount: extractWater,
             durationSec: 45,
+            flowType: 'fast',
             note: '大水流僅在中心硬幣大小區域注水',
             animType: 'steady_center',
             actionTitle: '中心 50 圓大水流萃取',
@@ -2712,6 +2848,7 @@
             name: '熱水稀釋 (Bypass)',
             amount: bypassWater,
             durationSec: 15,
+            flowType: 'bypass',
             note: '移開濾杯，向分享壺直接加入純淨熱水',
             animType: 'bypass_pot',
             actionTitle: '移開濾杯直接加熱水 (Bypass)',
@@ -2731,6 +2868,7 @@
             name: '開閥初浸透',
             amount: bloomWater,
             durationSec: bloomSec,
+            flowType: 'medium',
             note: `開閥注水滴出底層明亮酸甜，${bloomSec} 秒時關閉止水閥`,
             animType: 'bloom',
             actionTitle: '開閥初浸透排氣 (初悶蒸)',
@@ -2742,6 +2880,7 @@
             name: '關閥全浸泡',
             amount: remaining,
             durationSec: steepSec,
+            flowType: 'fast',
             note: '一口氣注滿全部熱水，關閥均勻浸泡萃取',
             animType: 'switch_closed',
             actionTitle: '關閉止水閥全浸泡 (閥門關閉)',
@@ -2753,6 +2892,7 @@
             name: '開閥釋放滴濾',
             amount: 0,
             durationSec: 30,
+            flowType: 'drain',
             note: '按下開關，重力自然過濾落水完成',
             animType: 'switch_open',
             actionTitle: '按下開關釋放咖啡液 (開閥落水)',
@@ -2781,6 +2921,7 @@
           endSec: end,
           timeRangeStr: `${formatTime(start)} - ${formatTime(end)}`,
           note: step.note,
+          flowType: step.flowType,
           animType: step.animType || 'spiral',
           actionTitle: step.actionTitle || step.name,
           actionTip: step.actionTip || step.note
@@ -2951,7 +3092,27 @@
         const stepIcon = STEP_ICONS[st.animType] || STEP_ICONS.pour;
 
         if (state.isEditingSteps) {
-          // 編輯模式：時間軸卡片內嵌即時可調之注水量、秒數與筆記
+          // 編輯模式：時間軸卡片內嵌即時可調之注水量、秒數、水流型態與筆記
+          const curFlow = st.flowType || (
+            st.animType === 'drip_slow' ? 'drip' :
+            st.animType === 'vigorous_pour' ? 'fast' :
+            st.animType === 'bypass_pot' ? 'bypass' :
+            (st.animType === 'steady_center' || (st.name && st.name.includes('細水'))) ? 'gentle' :
+            'medium'
+          );
+
+          const flowButtons = (st.amount > 0) ? `
+            <div class="flex items-center gap-2 flex-wrap pt-0.5">
+              <span class="text-xs text-[#8C7E75] font-medium">水流型態:</span>
+              <div class="inline-flex items-center p-0.5 rounded-lg bg-[#F0EAE3] gap-1 text-[11px]">
+                <button type="button" onclick="setCustomStepFlowType(${idx}, 'fast')" class="px-2 py-0.5 rounded-md transition ${curFlow === 'fast' ? 'bg-[#654D3F] text-white shadow-2xs font-bold' : 'text-[#7C6E64] hover:text-[#2C2521]'}">大水流</button>
+                <button type="button" onclick="setCustomStepFlowType(${idx}, 'medium')" class="px-2 py-0.5 rounded-md transition ${curFlow === 'medium' ? 'bg-[#654D3F] text-white shadow-2xs font-bold' : 'text-[#7C6E64] hover:text-[#2C2521]'}">標準</button>
+                <button type="button" onclick="setCustomStepFlowType(${idx}, 'gentle')" class="px-2 py-0.5 rounded-md transition ${curFlow === 'gentle' ? 'bg-[#654D3F] text-white shadow-2xs font-bold' : 'text-[#7C6E64] hover:text-[#2C2521]'}">小水流</button>
+                <button type="button" onclick="setCustomStepFlowType(${idx}, 'drip')" class="px-2 py-0.5 rounded-md transition ${curFlow === 'drip' ? 'bg-[#654D3F] text-white shadow-2xs font-bold' : 'text-[#7C6E64] hover:text-[#2C2521]'}">點滴</button>
+              </div>
+            </div>
+          ` : '';
+
           node.innerHTML = `
             <div id="timeline-bullet-${idx}" class="absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-amber-100 border border-amber-300 text-amber-900 flex items-center justify-center text-xs font-mono-num font-bold shadow-2xs">
               ${idx + 1}
@@ -2989,6 +3150,7 @@
                   累計: <span id="timeline-step-cum-${idx}" class="ml-1.5 text-amber-900 font-bold">${st.cumulative}g</span>
                 </div>
               </div>
+              ${flowButtons}
               <div id="timeline-step-warn-${idx}"></div>
               <div>
                 <input type="text" value="${escapeHtml(st.note)}" 
@@ -3001,10 +3163,18 @@
         } else {
           // 瀏覽與沖煮時間軸卡片模式 (與注水曲線物理動力學引擎 100% 統一對齊)
           const tPour = getStepPourDuration(st);
+          const flowProfile = getStepFlowProfile(st);
           const flowRate = (tPour > 0 && st.amount > 0) ? (st.amount / tPour).toFixed(1) : '0.0';
           const flowRateDisplay = (st.amount > 0 && tPour > 0)
-            ? `~${flowRate} g/s <span class="text-[#9B8D83] text-[10px] font-normal hidden sm:inline">(約 ${tPour}s 注完)</span>`
-            : `<span class="text-[#8C7E75]">靜置滴漏 (~0.0 g/s)</span>`;
+            ? `<div class="inline-flex items-center gap-1.5 flex-wrap">
+                 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold border ${flowProfile.colorClass}">
+                   ${flowProfile.iconSvg}
+                   ${flowProfile.name}
+                 </span>
+                 <span class="font-bold text-[#654D3F]">~${flowRate} g/s</span>
+                 <span class="text-[#9B8D83] text-[10px] font-normal hidden sm:inline">(約 ${tPour}s 注完)</span>
+               </div>`
+            : `<span class="inline-flex items-center gap-1 text-[#8C7E75]">${flowProfile.iconSvg} 靜置滴漏 (~0.0 g/s)</span>`;
 
           node.innerHTML = `
             <div id="timeline-bullet-${idx}" class="absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#FAF8F5] border border-[#DDD3CA] text-[#7C6E64] flex items-center justify-center text-xs font-mono-num font-bold shadow-2xs transition-all duration-200">
@@ -3038,7 +3208,7 @@
                 </div>
                 <div class="text-[11px] text-[#8C7E75] flex items-center gap-1 font-mono-num">
                   <span>建議流速：</span>
-                  <span class="font-semibold text-[#654D3F]">${flowRateDisplay}</span>
+                  ${flowRateDisplay}
                 </div>
               </div>
 
@@ -3122,54 +3292,47 @@
     // 升級方向：注水曲線即時追蹤與流速動力學 (Flow Rate & Water Curve Tracker 引擎)
     // ========================================================
 
-    // 推算單一步驟之專業注水時段長度 (秒，加設流速物理保護鎖)
+    // 推算單一步驟之專業注水時段長度 (秒，依手法與水流型態 flowType 深度演算)
     function getStepPourDuration(step) {
       if (!step || step.amount <= 0) return 0;
       const dur = Math.max(1, step.durationSec || 5);
       const amt = step.amount;
 
-      let estPour = 10;
-      if (dur <= 10) {
-        estPour = Math.max(3, dur - 2);
-      } else if (dur <= 15) {
-        estPour = Math.max(5, dur - 3);
-      } else if (step.animType === 'immersion' || (step.name && step.name.includes('浸泡'))) {
-        estPour = Math.min(25, Math.max(10, Math.round(amt / 8)));
-      } else if (step.animType === 'bloom' || (step.name && step.name.includes('悶蒸'))) {
-        estPour = Math.min(15, Math.max(8, Math.round(dur * 0.3)));
-      } else if (amt <= 50) {
-        estPour = Math.min(18, Math.max(10, Math.round(dur * 0.35)));
-      } else if (amt <= 100) {
-        estPour = Math.min(25, Math.max(14, Math.round(dur * 0.45)));
-      } else {
-        estPour = Math.min(dur - 10, Math.max(20, Math.round(dur * 0.6)));
+      const profile = getStepFlowProfile(step);
+      const targetRate = profile.targetRate || 3.3;
+
+      // 依目標水流基準流速推算所需出水秒數
+      let estPour = Math.round(amt / targetRate);
+
+      // 預留收水滴濾秒數 (大水流需留更充足時間沉降，點滴可較晚收尾)
+      const drainBuffer = Math.min(Math.floor(dur * 0.4), profile.drainMinSec || 3);
+      const maxAllowedPour = Math.max(2, dur - drainBuffer);
+
+      estPour = Math.max(2, Math.min(estPour, maxAllowedPour));
+
+      // 物理極限流速保護鎖 (Bypass 最高 12g/s, 一般注水上限 6.5g/s)
+      const maxPhysicalRate = (profile.key === 'bypass') ? 12.0 : (profile.maxRateSafe || 6.5);
+      const minTimeByMaxRate = Math.ceil(amt / maxPhysicalRate);
+      if (estPour < minTimeByMaxRate) {
+        estPour = minTimeByMaxRate;
       }
 
-      // 物理流速保護鎖：出水流速最多不超過 6.0 g/s
-      if (amt > 0) {
-        const minTimeByMaxRate = Math.ceil(amt / 6.0);
-        if (estPour < minTimeByMaxRate) {
-          estPour = minTimeByMaxRate;
-        }
-      }
-
-      // 嚴格確保注水時長不超過總段長時間 (留至少 2 秒給滴濾收水，若段長極短則以段長為限)
-      if (dur > 5) {
-        estPour = Math.min(dur - 2, estPour);
-      } else {
-        estPour = Math.min(dur, estPour);
-      }
+      // 嚴格確保出水時長不超過段長
+      estPour = Math.min(dur, estPour);
 
       return Math.max(2, estPour);
     }
 
-    // 計算當前秒數之即時物理注水狀態 (即時累計水量、建議流速、萃取階段狀態)
+    // 計算當前秒數之即時物理注水狀態 (即時累計水量、建議流速、水流型態、萃取階段狀態)
     function getWaterProfileState(sec) {
       if (!currentStepsCache || currentStepsCache.length === 0) {
         return {
           currentWater: 0,
           flowRate: 0,
           recFlowRate: 0,
+          flowType: 'drain',
+          flowName: '準備中',
+          flowColor: 'text-stone-600 bg-stone-100 border-stone-200',
           statusText: '準備中',
           statusPhase: 'idle'
         };
@@ -3180,12 +3343,16 @@
       if (sec <= 0) {
         const firstStep = currentStepsCache[0];
         const tPour = getStepPourDuration(firstStep);
-        const initRecRate = tPour > 0 ? (firstStep.amount / tPour).toFixed(1) : '3.0';
+        const fProf = getStepFlowProfile(firstStep);
+        const initRecRate = tPour > 0 ? (firstStep.amount / tPour).toFixed(1) : (fProf.targetRate || 3.0).toFixed(1);
         return {
           currentWater: 0,
           flowRate: 0,
           recFlowRate: parseFloat(initRecRate),
-          statusText: '準備開始注水',
+          flowType: fProf.key,
+          flowName: fProf.name,
+          flowColor: fProf.colorClass,
+          statusText: `準備開始注水 · 建議${fProf.name}`,
           statusPhase: 'idle'
         };
       }
@@ -3195,6 +3362,9 @@
           currentWater: totalWater,
           flowRate: 0,
           recFlowRate: 0,
+          flowType: 'drain',
+          flowName: '滴濾收尾',
+          flowColor: 'text-emerald-800 bg-emerald-50 border-emerald-300',
           statusText: '滴濾收尾 (Drawdown)',
           statusPhase: 'completed'
         };
@@ -3204,6 +3374,7 @@
       if (activeIndex === -1) activeIndex = 0;
       const step = currentStepsCache[activeIndex];
       const tPour = getStepPourDuration(step);
+      const flowProfile = getStepFlowProfile(step);
       const wStart = step.cumulative - step.amount;
       const wEnd = step.cumulative;
 
@@ -3217,21 +3388,29 @@
           currentWater: curW,
           flowRate: parseFloat(rate),
           recFlowRate: parseFloat(rate),
-          statusText: `${step.name} · 注水進行中 (~${rate} g/s)`,
+          flowType: flowProfile.key,
+          flowName: flowProfile.name,
+          flowColor: flowProfile.colorClass,
+          statusText: `${step.name} · ${flowProfile.name}進行中 (~${rate} g/s)`,
           statusPhase: 'pouring'
         };
       } else {
         // 滴濾穿透等待中
         const nextStep = currentStepsCache[activeIndex + 1];
         let nextRate = 0;
+        let nextProfile = FLOW_PROFILES.drain;
         if (nextStep && nextStep.amount > 0) {
           const nextPour = getStepPourDuration(nextStep);
+          nextProfile = getStepFlowProfile(nextStep);
           if (nextPour > 0) nextRate = parseFloat((nextStep.amount / nextPour).toFixed(1));
         }
         return {
           currentWater: wEnd,
           flowRate: 0,
           recFlowRate: nextRate,
+          flowType: 'drain',
+          flowName: '滴濾靜置',
+          flowColor: 'text-stone-600 bg-stone-100 border-stone-200',
           statusText: `${step.name} · 滴濾滲透中`,
           statusPhase: 'resting'
         };
@@ -3401,6 +3580,16 @@
       if (flowRateElem) {
         flowRateElem.textContent = profile.flowRate > 0 ? `${profile.flowRate.toFixed(1)} g/s` : '0.0 g/s';
       }
+      const flowBadgeElem = document.getElementById('curve-live-flow-badge');
+      if (flowBadgeElem) {
+        if (profile.statusPhase === 'pouring' && profile.flowName) {
+          flowBadgeElem.className = `inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold border ${profile.flowColor}`;
+          flowBadgeElem.innerHTML = `${FLOW_PROFILES[profile.flowType]?.iconSvg || ''} ${profile.flowName}`;
+        } else {
+          flowBadgeElem.className = 'hidden';
+          flowBadgeElem.innerHTML = '';
+        }
+      }
       const targetWaterElem = document.getElementById('curve-live-target-water');
       if (targetWaterElem) {
         targetWaterElem.textContent = `${profile.currentWater}g`;
@@ -3408,7 +3597,7 @@
       const statusBadge = document.getElementById('curve-status-badge');
       if (statusBadge) {
         if (profile.statusPhase === 'pouring') {
-          statusBadge.className = 'px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-bold animate-pulse shadow-2xs';
+          statusBadge.className = 'px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-bold shadow-2xs';
           statusBadge.textContent = '注水進行中';
         } else if (profile.statusPhase === 'resting') {
           statusBadge.className = 'px-2 py-0.5 rounded-full bg-sky-50 text-sky-800 border border-sky-300/80 text-[10px] font-bold shadow-2xs';
@@ -3425,7 +3614,7 @@
       // 2. 更新專注模式流速與狀態
       const zenFlowRateElem = document.getElementById('zen-live-flow-rate');
       if (zenFlowRateElem) {
-        zenFlowRateElem.textContent = profile.flowRate > 0 ? `~${profile.flowRate.toFixed(1)} g/s` : '0.0 g/s';
+        zenFlowRateElem.textContent = profile.flowRate > 0 ? `~${profile.flowRate.toFixed(1)} g/s (${profile.flowName || '注水'})` : '0.0 g/s';
       }
       const zenCurveFlowElem = document.getElementById('zen-curve-flow-rate');
       if (zenCurveFlowElem) {
