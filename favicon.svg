@@ -26,15 +26,14 @@
   <path d="M114 157 L222 332 C225 336 230 340 238 340 L274 340 C282 340 287 336 290 332 L398 157" 
         fill="none" stroke="#FAF9F7" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
 
-  <!-- Signature Spiral Flow Ribs -->
-  <path d="M162 176 C182 224 218 282 240 332" fill="none" stroke="#FAF9F7" stroke-opacity="0.65" stroke-width="8.5" stroke-linecap="round" />
-  <path d="M256 180 C256 228 254 284 256 336" fill="none" stroke="#FCD34D" stroke-width="9.5" stroke-linecap="round" />
-  <path d="M350 176 C330 224 294 282 272 332" fill="none" stroke="#FAF9F7" stroke-opacity="0.65" stroke-width="8.5" stroke-linecap="round" />
+  <!-- Twin Flow Ribs framing open center negative space (去突兀分割，營造自然漏斗流線) -->
+  <path d="M180 174 C198 222 224 282 242 332" fill="none" stroke="#FAF9F7" stroke-opacity="0.75" stroke-width="9" stroke-linecap="round" />
+  <path d="M332 174 C314 222 288 282 270 332" fill="none" stroke="#FAF9F7" stroke-opacity="0.75" stroke-width="9" stroke-linecap="round" />
 
   <!-- Dripper Collar Base Plate -->
   <rect x="206" y="344" width="100" height="12" rx="6" fill="#FAF9F7" />
 
-  <!-- Golden Extraction Droplet (Simple & Unmistakable) -->
+  <!-- Golden Extraction Droplet (The sole radiant focal point) -->
   <path d="M256 376 C256 376 239 402 239 417 C239 426.5 246.5 434 256 434 C265.5 434 273 426.5 273 417 C273 402 256 376 256 376 Z" 
         fill="url(#goldDrop)" />
   <circle cx="251.5" cy="413" r="3.2" fill="#FFFFFF" opacity="0.85" />
