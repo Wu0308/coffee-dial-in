@@ -1551,12 +1551,12 @@
             </svg>
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-xs font-bold tracking-[0.16em] uppercase text-amber-400/90 font-mono" id="zen-modal-title">
-              BREWCRAFT · 專注模式
+            <span class="text-xs font-bold tracking-[0.16em] uppercase text-amber-400 font-mono" id="zen-modal-title">
+              BREWCRAFT
             </span>
             <span class="text-[#4D382B] text-xs font-light">|</span>
             <span class="text-xs text-[#A8988C] font-mono truncate max-w-xs sm:max-w-md" id="zen-recipe-summary">
-              中焙 · 四六法 · 15g · 90°C · 1:15 · 225g
+              四六法 · 15g : 225g (1:15)
             </span>
           </div>
         </div>
@@ -1588,154 +1588,151 @@
         </div>
       </header>
 
-      <!-- 中間一體化核心舞台 (Monolith Centerpiece) - 自動適應高度，絕不溢出 -->
-      <main class="flex-1 min-h-0 flex flex-col justify-center items-center px-4 sm:px-6 py-2 max-w-4xl mx-auto w-full">
+      <!-- 中間一體化核心舞台 (Monolith Centerpiece) - 極簡聚焦，消除文字干擾，突出注水曲線 -->
+      <main class="flex-1 min-h-0 flex flex-col justify-center items-center px-4 sm:px-6 py-2 max-w-4xl mx-auto w-full gap-2 sm:gap-2.5">
         
-        <!-- 當前沖煮狀態標籤 (Current Action Pill) -->
-        <div class="flex items-center gap-2 mb-2 sm:mb-3">
-          <div id="zen-timer-substatus" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1C130E] border border-[#36241A] text-xs font-bold text-amber-300 shadow-sm">
+        <!-- 當前沖煮狀態標籤 (Current Action Pill) - 極簡純淨 -->
+        <div class="flex items-center gap-2">
+          <div id="zen-timer-substatus" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#1C130E] border border-[#36241A] text-xs font-medium text-amber-300">
             <span id="zen-status-dot" class="w-2 h-2 rounded-full bg-amber-400"></span>
-            <span id="zen-status-title">準備開始沖煮</span>
+            <span id="zen-status-title">準備沖煮</span>
           </div>
-          <span id="zen-step-indicator" class="text-xs font-mono-num font-semibold text-[#8C7A6E]">第 1 段 / 共 5 段</span>
+          <span id="zen-step-indicator" class="text-xs font-mono-num font-semibold text-[#8C7A6E]">第 1 / 5 段</span>
         </div>
 
         <!-- 雙生大字儀表 (The Dual Digital Centerpiece - Time & Weight as One) -->
-        <div class="w-full bg-[#16100D] border border-[#2B1C15] rounded-3xl p-4 sm:p-6 shadow-2xl relative overflow-hidden">
+        <div class="w-full bg-[#16100D] border border-[#2B1C15] rounded-2xl p-3 sm:p-4 shadow-2xl relative overflow-hidden">
           
-          <!-- 核心數字並列區 (左右並立，如電子秤般清晰) -->
-          <div class="grid grid-cols-2 divide-x divide-[#261A13] items-center text-center py-1 sm:py-2">
+          <!-- 核心數字並列區 (左右並立，專注純粹數字，零文字干擾) -->
+          <div class="grid grid-cols-2 divide-x divide-[#261A13] items-center text-center py-0.5 sm:py-1">
             
             <!-- 左：秒數 (Elapsed Time) -->
-            <div class="px-2 sm:px-6">
-              <div class="text-[10px] sm:text-[11px] font-bold tracking-[0.18em] uppercase text-[#8C7A6E] font-mono mb-1">
-                沖煮秒數 · TIME
+            <div class="px-2 sm:px-4">
+              <div class="text-[10px] font-bold tracking-[0.2em] uppercase text-[#736054] font-mono mb-0.5">
+                TIME
               </div>
-              <div id="zen-timer-digits" class="text-6xl sm:text-7xl md:text-8xl lg:text-[96px] font-mono-num font-black text-[#FAF6F2] tracking-tight leading-none select-none">
+              <div id="zen-timer-digits" class="text-5xl sm:text-6xl md:text-7xl lg:text-[84px] font-mono-num font-black text-[#FAF6F2] tracking-tight leading-none select-none">
                 00:00
               </div>
-              <div class="mt-2 flex items-center justify-center">
-                <span id="zen-step-countdown" class="px-2 py-0.5 rounded text-[11px] sm:text-xs font-mono-num font-medium text-amber-300 bg-amber-500/10 border border-amber-500/20">
-                  本段剩餘 45 秒
+              <div class="mt-1.5 flex items-center justify-center">
+                <span id="zen-step-countdown" class="px-2 py-0.5 rounded text-[11px] font-mono-num font-medium text-amber-300 bg-amber-500/10 border border-amber-500/20">
+                  剩餘 45s
                 </span>
               </div>
             </div>
 
             <!-- 右：累積目標水量 (Cumulative Target Weight) -->
-            <div class="px-2 sm:px-6">
-              <div class="text-[10px] sm:text-[11px] font-bold tracking-[0.18em] uppercase text-amber-400/90 font-mono mb-1">
-                目標累計 · WEIGHT
+            <div class="px-2 sm:px-4">
+              <div class="text-[10px] font-bold tracking-[0.2em] uppercase text-amber-400/80 font-mono mb-0.5">
+                TARGET
               </div>
               <div class="flex items-baseline justify-center">
-                <span id="zen-target-water" class="text-6xl sm:text-7xl md:text-8xl lg:text-[96px] font-mono-num font-black text-amber-400 tracking-tight leading-none select-none">
+                <span id="zen-target-water" class="text-5xl sm:text-6xl md:text-7xl lg:text-[84px] font-mono-num font-black text-amber-400 tracking-tight leading-none select-none">
                   45
                 </span>
-                <span class="text-2xl sm:text-3xl md:text-4xl font-mono-num font-bold text-amber-500/80 ml-1">g</span>
+                <span class="text-xl sm:text-2xl md:text-3xl font-mono-num font-bold text-amber-500/80 ml-1">g</span>
               </div>
-              <div class="mt-2 text-[11px] sm:text-xs text-[#8C7A6E] font-mono-num flex items-center justify-center gap-1.5">
+              <div class="mt-1.5 text-[11px] text-[#8C7A6E] font-mono-num flex items-center justify-center gap-1">
                 <span>/ 總量 <strong id="zen-total-water" class="text-[#D8CCC4]">225g</strong></span>
-                <span class="text-[#4D382B]">·</span>
-                <span id="zen-water-percent" class="text-amber-400/90 font-bold">已規劃 20%</span>
               </div>
             </div>
 
           </div>
 
-          <!-- 核心注水數據帶 (Action Ribbon: 本段注入 + 目標流速 + 手法) -->
-          <div class="mt-4 pt-3 border-t border-[#261A13] flex flex-wrap items-center justify-around gap-2 sm:gap-4 text-xs font-mono-num text-[#B3A194]">
+          <!-- 核心注水數據帶 (Action Ribbon: 本段 + 流速 + 手法) - 緊湊無冗詞 -->
+          <div class="mt-3 pt-2.5 border-t border-[#261A13] flex items-center justify-around gap-2 text-xs font-mono-num text-[#B3A194]">
             
             <div class="flex items-center gap-1.5">
-              <span class="text-[#8C7A6E]">本段注入：</span>
-              <strong id="zen-step-water" class="text-amber-300 text-sm sm:text-base font-bold">+45g</strong>
-              <span id="zen-step-water-range" class="text-[10px] text-[#736054]">(0➔45g)</span>
+              <span class="text-[#736054]">本段</span>
+              <strong id="zen-step-water" class="text-amber-300 font-bold">+45g</strong>
             </div>
 
-            <div class="hidden sm:block h-3.5 w-px bg-[#261A13]"></div>
+            <div class="h-3 w-px bg-[#261A13]"></div>
 
             <div class="flex items-center gap-1.5">
-              <span class="text-[#8C7A6E]">建議流速：</span>
-              <strong id="zen-live-flow-rate" class="text-emerald-300 text-sm sm:text-base font-bold">3.2 g/s</strong>
-              <span id="zen-flow-badge" class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
-                ● 標準水流
+              <span class="text-[#736054]">流速</span>
+              <strong id="zen-live-flow-rate" class="text-emerald-300 font-bold">3.2 g/s</strong>
+              <span id="zen-flow-badge" class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
+                標準水流
               </span>
             </div>
 
-            <div class="hidden sm:block h-3.5 w-px bg-[#261A13]"></div>
+            <div class="h-3 w-px bg-[#261A13]"></div>
 
-            <div class="flex items-center gap-1.5 truncate max-w-xs">
-              <span class="text-[#8C7A6E]">手法：</span>
-              <span id="zen-step-title" class="text-[#FAF6F2] font-semibold truncate">悶蒸排氣</span>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[#736054]">手法</span>
+              <span id="zen-step-title" class="text-[#FAF6F2] font-semibold">悶蒸</span>
             </div>
 
           </div>
 
-          <!-- 手法要領說明文字 (微縮單行) -->
-          <div id="zen-step-note" class="text-[11px] text-[#8C7A6E] mt-2 text-center truncate">
-            由中心向外柔和繞圈注水，確保咖啡粉浸透排氣。
-          </div>
-
           <!-- 階段分段進度條 (Segmented Progress Bar) -->
-          <div id="zen-step-segments" class="flex gap-1 h-1.5 w-full rounded-full overflow-hidden bg-[#241812] mt-3">
+          <div id="zen-step-segments" class="flex gap-1 h-1 w-full rounded-full overflow-hidden bg-[#241812] mt-2.5">
             <!-- 動態分段 -->
           </div>
 
         </div>
 
-        <!-- 【下一個步驟預覽引導條】(Next Step Anticipation Banner - 簡潔纖薄，絕不冗贅) -->
-        <div id="zen-next-step-card" class="w-full mt-2 sm:mt-3 bg-[#18110D] border border-[#2D1D16] rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 transition-all duration-200">
-          <div class="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
+        <!-- 【下一個步驟預覽引導條】(Next Step Anticipation Ribbon) - 極簡單行高對比 -->
+        <div id="zen-next-step-card" class="w-full bg-[#16100D] border border-[#261811] rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 transition-all duration-200">
+          <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0">
               <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/25 font-mono uppercase flex-shrink-0">
-                NEXT 下一步
+                NEXT
               </span>
-              <span id="zen-next-step-name" class="text-xs sm:text-sm font-bold text-[#FAF6F2] truncate">
-                第 2 段：均勻大水流繞圈萃取
+              <span id="zen-next-step-name" class="text-xs sm:text-sm font-semibold text-[#FAF6F2] truncate">
+                第 2 段：均勻注水
               </span>
-              <span class="hidden md:inline text-xs text-[#8C7A6E] font-mono-num">
-                (注水 <strong id="zen-next-step-water" class="text-amber-300 font-bold">+45g</strong> ➔ 累計 <span id="zen-next-step-cumul">90g</span>)
+              <span class="hidden sm:inline text-xs text-[#8C7A6E] font-mono-num">
+                (目標 <strong id="zen-next-step-water" class="text-amber-300 font-bold">+45g</strong> ➔ 累計 <span id="zen-next-step-cumul">90g</span>)
               </span>
             </div>
 
             <div class="flex items-center gap-2 flex-shrink-0">
-              <span class="hidden lg:inline text-[11px] text-[#8C7A6E] font-mono-num">
-                流速 <strong id="zen-next-step-flow" class="text-emerald-300 font-bold">~3.2 g/s</strong> (<span id="zen-next-step-profile">大水流</span>)
-              </span>
               <span id="zen-next-step-badge" class="px-2 py-0.5 rounded text-[11px] font-mono-num font-bold bg-[#261912] border border-[#3D271D] text-amber-300">
-                0:45 開始 (45s 後)
+                0:45 (45s 後)
               </span>
             </div>
           </div>
-          <!-- 下一步手法提示 -->
-          <div id="zen-next-step-tip" class="hidden sm:block text-[11px] text-[#8C7A6E] mt-1 truncate">
-            提前準備提壺，於換段時準時注入，以大水流均勻攪動粉層。
-          </div>
         </div>
 
-        <!-- 寬版純淨注水曲線 (Fluid Timeline Wave) -->
-        <div class="w-full mt-2 sm:mt-3 bg-[#140E0B] border border-[#261811] rounded-2xl px-3 py-1.5 sm:py-2">
-          <div class="flex items-center justify-between text-[10px] font-mono-num text-[#8C7A6E] mb-0.5">
-            <span class="flex items-center gap-1.5 text-amber-400/90 font-bold">
-              <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-              <span id="zen-curve-status">注水曲線推進</span>
-            </span>
-            <span>秤面估算：<strong id="zen-curve-cur-water" class="text-amber-300 font-bold">0g</strong> / <span id="zen-curve-total-water">225g</span> (<span id="zen-curve-flow-rate" class="text-emerald-300 font-bold">0.0 g/s</span>)</span>
+        <!-- 【重點核心：注水曲線儀表】(Hero Water Extraction Curve) - 擴大展示，清晰分明 -->
+        <div class="w-full bg-[#140E0B] border border-[#291B13] rounded-2xl p-2.5 sm:p-3.5 shadow-xl">
+          <div class="flex items-center justify-between text-xs font-mono-num text-[#8C7A6E] mb-1.5 px-1">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              <span class="text-amber-400/90 font-bold tracking-wider text-[11px] sm:text-xs uppercase">
+                注水曲線 · 階梯歷程
+              </span>
+            </div>
+            <div class="flex items-center gap-1.5 text-[11px] sm:text-xs">
+              <span class="text-[#736054]">秤面：</span>
+              <strong id="zen-curve-cur-water" class="text-amber-300 font-bold">0g</strong>
+              <span class="text-[#736054]">/</span>
+              <span id="zen-curve-total-water" class="text-[#D8CCC4]">225g</span>
+              <span class="text-[#4D382B]">·</span>
+              <span id="zen-curve-flow-rate" class="text-emerald-400 font-bold">0.0 g/s</span>
+            </div>
           </div>
-          <svg id="zen-water-curve-svg" viewBox="0 0 600 70" class="w-full h-11 sm:h-13 overflow-visible select-none">
-            <defs>
-              <linearGradient id="zenCurveGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.3"/>
-                <stop offset="100%" stop-color="#F59E0B" stop-opacity="0.01"/>
-              </linearGradient>
-              <linearGradient id="zenElapsedAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#10B981" stop-opacity="0.35"/>
-                <stop offset="100%" stop-color="#10B981" stop-opacity="0.02"/>
-              </linearGradient>
-            </defs>
-            <g id="zen-curve-bg-layer"></g>
-            <g id="zen-curve-ideal-layer"></g>
-            <g id="zen-curve-elapsed-layer"></g>
-            <g id="zen-curve-playhead-layer"></g>
-          </svg>
+          <!-- 寬幅高清晰曲線視窗 -->
+          <div class="w-full h-36 sm:h-44 md:h-48">
+            <svg id="zen-water-curve-svg" viewBox="0 0 700 180" preserveAspectRatio="none" class="w-full h-full overflow-visible select-none">
+              <defs>
+                <linearGradient id="zenCurveGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.32"/>
+                  <stop offset="100%" stop-color="#F59E0B" stop-opacity="0.01"/>
+                </linearGradient>
+                <linearGradient id="zenElapsedAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10B981" stop-opacity="0.4"/>
+                  <stop offset="100%" stop-color="#10B981" stop-opacity="0.02"/>
+                </linearGradient>
+              </defs>
+              <g id="zen-curve-bg-layer"></g>
+              <g id="zen-curve-ideal-layer"></g>
+              <g id="zen-curve-elapsed-layer"></g>
+              <g id="zen-curve-playhead-layer"></g>
+            </svg>
+          </div>
         </div>
 
       </main>
@@ -3717,39 +3714,64 @@
       renderZenWaterCurveSVG();
     }
 
-    // 繪製專注模式之注水曲線 SVG (寬版純淨專業儀表)
+    // 繪製專注模式之注水曲線 SVG (高清晰、階梯歷程、清晰分段網格)
     function renderZenWaterCurveSVG() {
       const svg = document.getElementById('zen-water-curve-svg');
       if (!svg || !currentStepsCache || currentStepsCache.length === 0) return;
 
       const totalWater = currentStepsCache[currentStepsCache.length - 1].cumulative;
       const totalTime = totalBrewSeconds || 165;
-      const ML = 36, MR = 16, MT = 6, MB = 14;
-      const PW = 600 - ML - MR;
-      const PH = 70 - MT - MB;
+      const ML = 48, MR = 20, MT = 24, MB = 26;
+      const PW = 700 - ML - MR;
+      const PH = 180 - MT - MB;
 
       const mapX = (t) => ML + (totalTime > 0 ? (t / totalTime) * PW : 0);
-      const mapY = (w) => (70 - MB) - (totalWater > 0 ? (w / totalWater) * PH : 0);
+      const mapY = (w) => (180 - MB) - (totalWater > 0 ? (w / totalWater) * PH : 0);
 
       const bgLayer = document.getElementById('zen-curve-bg-layer');
       if (bgLayer) {
-        let bgHtml = `
-          <line x1="${ML}" y1="${mapY(0)}" x2="${600 - MR}" y2="${mapY(0)}" stroke="#2B1D15" stroke-width="1"></line>
-          <line x1="${ML}" y1="${mapY(Math.round(totalWater / 2))}" x2="${600 - MR}" y2="${mapY(Math.round(totalWater / 2))}" stroke="#1E140E" stroke-width="1" stroke-dasharray="2,2"></line>
-          <line x1="${ML}" y1="${mapY(totalWater)}" x2="${600 - MR}" y2="${mapY(totalWater)}" stroke="#2B1D15" stroke-width="1" stroke-dasharray="2,2"></line>
-          <text x="${ML - 5}" y="${mapY(0) + 3}" text-anchor="end" font-size="8" font-family="ui-monospace, monospace" fill="#8C7A6E">0g</text>
-          <text x="${ML - 5}" y="${mapY(totalWater) + 3}" text-anchor="end" font-size="8" font-family="ui-monospace, monospace" fill="#F59E0B">${totalWater}g</text>
-        `;
+        let bgHtml = '';
 
+        // 1. 各階段背景分區 (Alternating Stage Bands) 與階段頂部標籤
         currentStepsCache.forEach((st, idx) => {
-          if (idx > 0) {
-            const sx = mapX(st.startSec);
-            bgHtml += `
-              <line x1="${sx}" y1="${MT}" x2="${sx}" y2="${70 - MB}" stroke="#2B1D15" stroke-width="1" stroke-dasharray="2,2"></line>
-              <text x="${sx}" y="${70 - 3}" text-anchor="middle" font-size="8" font-family="ui-monospace, monospace" fill="#8C7A6E">${formatTime(st.startSec)}</text>
-            `;
+          const sx = mapX(st.startSec);
+          const ex = mapX(st.endSec);
+          const sw = Math.max(2, ex - sx);
+          const stageName = (st.name || `第 ${idx + 1} 段`).replace(/（.*）/, '').trim();
+
+          // 階段淡色背景帶
+          if (idx % 2 === 0) {
+            bgHtml += `<rect x="${sx}" y="${MT}" width="${sw}" height="${PH}" fill="#19110D" fill-opacity="0.45"></rect>`;
           }
+
+          // 階段垂直分割線
+          if (idx > 0) {
+            bgHtml += `<line x1="${sx}" y1="${MT}" x2="${sx}" y2="${180 - MB}" stroke="#261A13" stroke-width="1" stroke-dasharray="3,2"></line>`;
+            bgHtml += `<text x="${sx}" y="${180 - 8}" text-anchor="middle" font-size="9" font-family="ui-monospace, monospace" fill="#8C7A6E">${formatTime(st.startSec)}</text>`;
+          }
+
+          // 階段頂部簡短標籤
+          bgHtml += `<text x="${sx + sw / 2}" y="${MT - 8}" text-anchor="middle" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" font-weight="600" fill="${idx === 0 ? '#F59E0B' : '#A8988C'}">${stageName}</text>`;
         });
+
+        // 最後時間標籤
+        bgHtml += `<text x="${mapX(totalTime)}" y="${180 - 8}" text-anchor="middle" font-size="9" font-family="ui-monospace, monospace" fill="#8C7A6E">${formatTime(totalTime)}</text>`;
+
+        // 2. 水平水量參考線 (0g, 50%, 100%)
+        const halfWater = Math.round(totalWater / 2);
+        bgHtml += `
+          <!-- 底部基準線 0g -->
+          <line x1="${ML}" y1="${mapY(0)}" x2="${700 - MR}" y2="${mapY(0)}" stroke="#2E1F17" stroke-width="1.2"></line>
+          <text x="${ML - 6}" y="${mapY(0) + 3}" text-anchor="end" font-size="9" font-family="ui-monospace, monospace" fill="#736054">0g</text>
+
+          <!-- 中間參考線 -->
+          <line x1="${ML}" y1="${mapY(halfWater)}" x2="${700 - MR}" y2="${mapY(halfWater)}" stroke="#22160F" stroke-width="1" stroke-dasharray="3,3"></line>
+          <text x="${ML - 6}" y="${mapY(halfWater) + 3}" text-anchor="end" font-size="9" font-family="ui-monospace, monospace" fill="#736054">${halfWater}g</text>
+
+          <!-- 頂部總量線 -->
+          <line x1="${ML}" y1="${mapY(totalWater)}" x2="${700 - MR}" y2="${mapY(totalWater)}" stroke="#F59E0B" stroke-opacity="0.35" stroke-width="1" stroke-dasharray="3,2"></line>
+          <text x="${ML - 6}" y="${mapY(totalWater) + 3}" text-anchor="end" font-size="9" font-family="ui-monospace, monospace" font-weight="bold" fill="#F59E0B">${totalWater}g</text>
+        `;
 
         bgLayer.innerHTML = bgHtml;
       }
@@ -3763,9 +3785,18 @@
             dLine += ` L ${mapX(pts[i].t)} ${mapY(pts[i].w)}`;
           }
           const dArea = dLine + ` L ${mapX(totalTime)} ${mapY(0)} L ${mapX(0)} ${mapY(0)} Z`;
+
+          let markersHtml = '';
+          pts.forEach((pt, pIdx) => {
+            if (pIdx > 0 && pt.w > 0) {
+              markersHtml += `<circle cx="${mapX(pt.t)}" cy="${mapY(pt.w)}" r="2.5" fill="#F59E0B"></circle>`;
+            }
+          });
+
           idealLayer.innerHTML = `
             <path d="${dArea}" fill="url(#zenCurveGrad)"></path>
-            <path d="${dLine}" fill="none" stroke="#F59E0B" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"></path>
+            <path d="${dLine}" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"></path>
+            ${markersHtml}
           `;
         }
       }
@@ -3890,7 +3921,7 @@
       updateZenWaterCurvePlayback(tClamped, profile);
     }
 
-    // 專注模式注水曲線動態光標與進度
+    // 專注模式注水曲線動態光標與進度 (700x180 寬幅清晰坐標系)
     function updateZenWaterCurvePlayback(tClamped, profile) {
       const elapsedLayer = document.getElementById('zen-curve-elapsed-layer');
       const playheadLayer = document.getElementById('zen-curve-playhead-layer');
@@ -3898,11 +3929,11 @@
 
       const totalWater = currentStepsCache[currentStepsCache.length - 1].cumulative;
       const totalTime = totalBrewSeconds || 165;
-      const ML = 36, MR = 16, MT = 6, MB = 14;
-      const PW = 600 - ML - MR;
-      const PH = 70 - MT - MB;
+      const ML = 48, MR = 20, MT = 24, MB = 26;
+      const PW = 700 - ML - MR;
+      const PH = 180 - MT - MB;
       const mapX = (t) => ML + (totalTime > 0 ? (t / totalTime) * PW : 0);
-      const mapY = (w) => (70 - MB) - (totalWater > 0 ? (w / totalWater) * PH : 0);
+      const mapY = (w) => (180 - MB) - (totalWater > 0 ? (w / totalWater) * PH : 0);
 
       const curX = mapX(tClamped);
       const curY = mapY(profile.currentWater);
@@ -3932,20 +3963,20 @@
 
         elapsedLayer.innerHTML = `
           <path d="${dElapsedArea}" fill="url(#zenElapsedAreaGrad)"></path>
-          <path d="${dElapsedLine}" fill="none" stroke="#34D399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="${dElapsedLine}" fill="none" stroke="#34D399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
         `;
         playheadLayer.innerHTML = `
-          <line x1="${curX}" y1="${MT}" x2="${curX}" y2="${70 - MB}" stroke="#34D399" stroke-width="1.2" stroke-dasharray="2,2"></line>
-          <circle cx="${curX}" cy="${curY}" r="6" fill="#34D399" fill-opacity="0.3"></circle>
-          <circle cx="${curX}" cy="${curY}" r="3.5" fill="#34D399" stroke="#120E0C" stroke-width="1.5"></circle>
-          <g transform="translate(${Math.max(ML + 16, Math.min(600 - MR - 16, curX))}, ${Math.max(MT + 2, curY - 12)})">
-            <rect x="-16" y="-8" width="32" height="14" rx="3.5" fill="#059669" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))"></rect>
-            <text x="0" y="2.5" text-anchor="middle" font-size="8.5" font-family="ui-monospace, monospace" font-weight="bold" fill="#ffffff">${profile.currentWater}g</text>
+          <line x1="${curX}" y1="${MT}" x2="${curX}" y2="${180 - MB}" stroke="#34D399" stroke-width="1.5" stroke-dasharray="2,2"></line>
+          <circle cx="${curX}" cy="${curY}" r="7" fill="#10B981" fill-opacity="0.3"></circle>
+          <circle cx="${curX}" cy="${curY}" r="4" fill="#34D399" stroke="#0F0C0A" stroke-width="1.8"></circle>
+          <g transform="translate(${Math.max(ML + 22, Math.min(700 - MR - 22, curX))}, ${Math.max(MT + 4, curY - 14)})">
+            <rect x="-20" y="-9" width="40" height="17" rx="4" fill="#047857" stroke="#10B981" stroke-width="1" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))"></rect>
+            <text x="0" y="3" text-anchor="middle" font-size="9" font-family="ui-monospace, monospace" font-weight="bold" fill="#ffffff">${profile.currentWater}g</text>
           </g>
         `;
       } else {
         elapsedLayer.innerHTML = '';
-        playheadLayer.innerHTML = `<circle cx="${mapX(0)}" cy="${mapY(0)}" r="3.5" fill="#D97706"></circle>`;
+        playheadLayer.innerHTML = `<circle cx="${mapX(0)}" cy="${mapY(0)}" r="4" fill="#D97706"></circle>`;
       }
     }
 
@@ -4277,7 +4308,7 @@
       // 摘要
       const summaryElem = document.getElementById('zen-recipe-summary');
       if (summaryElem) {
-        summaryElem.textContent = `${roastName} · ${methodName} · ${currentDose}g · ${currentTemp} · ${currentRatio} · ${totalWater}`;
+        summaryElem.textContent = `${methodName} · ${currentDose}g : ${totalWater} (${currentRatio})`;
       }
 
       // 碼錶數字
@@ -4337,37 +4368,37 @@
       // 超時處理 (Overtime / Drawdown completion)
       if (timerSeconds >= totalBrewSeconds) {
         const overtimeSec = timerSeconds - totalBrewSeconds;
-        document.getElementById('zen-status-title').textContent = overtimeSec === 0 ? '預估總時間到 · 靜候滴乾' : `萃取收尾滴濾中 (+${overtimeSec}s)`;
+        document.getElementById('zen-status-title').textContent = overtimeSec === 0 ? '時間到 · 靜候滴乾' : `滴濾收尾 (+${overtimeSec}s)`;
         document.getElementById('zen-status-dot').className = 'w-2 h-2 rounded-full bg-amber-400';
         document.getElementById('zen-target-water').textContent = totalWaterVal;
         const waterPercentElem = document.getElementById('zen-water-percent');
-        if (waterPercentElem) waterPercentElem.textContent = '已注入 100%';
+        if (waterPercentElem) waterPercentElem.textContent = '100%';
         document.getElementById('zen-step-water').textContent = '+0g';
         const waterRangeElem = document.getElementById('zen-step-water-range');
-        if (waterRangeElem) waterRangeElem.textContent = `全數注滿 · 累計 ${totalWaterVal}g`;
+        if (waterRangeElem) waterRangeElem.textContent = `${totalWaterVal}g`;
         const flowRateElem = document.getElementById('zen-live-flow-rate');
-        if (flowRateElem) flowRateElem.textContent = '0.0';
+        if (flowRateElem) flowRateElem.textContent = '0.0 g/s';
         const flowBadge = document.getElementById('zen-flow-badge');
-        if (flowBadge) flowBadge.innerHTML = '● 靜候落水完畢';
-        document.getElementById('zen-step-indicator').textContent = '滴濾收尾階段';
-        document.getElementById('zen-step-countdown').textContent = '完全滴淨即可移開濾杯';
-        document.getElementById('zen-step-title').textContent = '滴濾收尾 (Drawdown)';
-        document.getElementById('zen-step-note').textContent = '請觀察濾杯水位平整滴乾，完全落盡後即可移開濾杯，品嚐美味咖啡。';
+        if (flowBadge) flowBadge.innerHTML = '靜候落水';
+        document.getElementById('zen-step-indicator').textContent = '收尾階段';
+        document.getElementById('zen-step-countdown').textContent = '滴淨移開濾杯';
+        document.getElementById('zen-step-title').textContent = '滴濾收尾';
+        const stepNote = document.getElementById('zen-step-note');
+        if (stepNote) stepNote.textContent = '';
 
         if (nextStepBadge) {
-          nextStepBadge.className = 'px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-mono-num font-bold';
+          nextStepBadge.className = 'px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-mono-num font-bold';
           nextStepBadge.textContent = '全萃取達成';
         }
         if (nextStepCard) {
-          nextStepCard.classList.remove('ring-2', 'ring-amber-400', 'bg-[#2E2018]');
-          nextStepCard.classList.add('bg-[#211712]');
+          nextStepCard.className = 'w-full bg-[#18110D] border border-[#261811] rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 transition-all duration-200';
         }
-        if (nextStepName) nextStepName.textContent = '品味時間 · 享受一杯好咖啡';
+        if (nextStepName) nextStepName.textContent = '品味時間 · 享受好咖啡';
         if (nextStepWater) nextStepWater.textContent = '完成';
         if (nextStepCumul) nextStepCumul.textContent = `${totalWaterVal}g`;
         if (nextStepFlow) nextStepFlow.textContent = '出杯';
         if (nextStepProfile) nextStepProfile.textContent = '完美萃取';
-        if (nextStepTip) nextStepTip.textContent = '輕輕旋轉分享壺均勻咖啡風味，倒入溫熱的咖啡杯中品嚐豐富的風味層次！';
+        if (nextStepTip) nextStepTip.textContent = '';
 
         renderZenStepSegments(currentStepsCache.length);
         return;
@@ -4383,41 +4414,42 @@
 
       // 狀態更新
       if (!timerRunning && timerSeconds === 0) {
-        document.getElementById('zen-status-title').textContent = '準備開始沖煮';
+        document.getElementById('zen-status-title').textContent = '準備沖煮';
         document.getElementById('zen-status-dot').className = 'w-2 h-2 rounded-full bg-amber-400';
       } else if (timerRunning) {
         if (profile.statusPhase === 'pouring') {
-          document.getElementById('zen-status-title').textContent = '正在注水萃取中';
+          document.getElementById('zen-status-title').textContent = '注水萃取中';
           document.getElementById('zen-status-dot').className = 'w-2 h-2 rounded-full bg-emerald-400';
         } else {
-          document.getElementById('zen-status-title').textContent = '滴濾滲透靜置中';
+          document.getElementById('zen-status-title').textContent = '滴濾滲透中';
           document.getElementById('zen-status-dot').className = 'w-2 h-2 rounded-full bg-sky-400';
         }
       } else {
-        document.getElementById('zen-status-title').textContent = '沖煮暫停中';
+        document.getElementById('zen-status-title').textContent = '沖煮暫停';
         document.getElementById('zen-status-dot').className = 'w-2 h-2 rounded-full bg-amber-400';
       }
 
       document.getElementById('zen-target-water').textContent = activeStep.cumulative;
       const waterPercentElem = document.getElementById('zen-water-percent');
-      if (waterPercentElem) waterPercentElem.textContent = `已規劃 ${progressPercent}%`;
+      if (waterPercentElem) waterPercentElem.textContent = `${progressPercent}%`;
       document.getElementById('zen-step-water').textContent = activeStep.amount > 0 ? `+${activeStep.amount}g` : '0g';
       const waterRangeElem = document.getElementById('zen-step-water-range');
-      if (waterRangeElem) waterRangeElem.textContent = `區間：${startWater}g ➔ ${activeStep.cumulative}g`;
+      if (waterRangeElem) waterRangeElem.textContent = `${startWater}g ➔ ${activeStep.cumulative}g`;
 
       // 建議流速與型態
       const recRate = profile.recFlowRate > 0 ? profile.recFlowRate.toFixed(1) : (activeStep.amount > 0 ? (activeStep.amount / (getStepPourDuration(activeStep) || 15)).toFixed(1) : '0.0');
       const liveFlowElem = document.getElementById('zen-live-flow-rate');
-      if (liveFlowElem) liveFlowElem.textContent = recRate;
+      if (liveFlowElem) liveFlowElem.textContent = `${recRate} g/s`;
       const flowBadge = document.getElementById('zen-flow-badge');
       if (flowBadge) {
-        flowBadge.innerHTML = `● ${profile.flowName || '均勻注水'}`;
+        flowBadge.textContent = profile.flowName || '標準水流';
       }
 
-      document.getElementById('zen-step-indicator').textContent = `第 ${activeIndex + 1} 段 / 共 ${currentStepsCache.length} 段`;
-      document.getElementById('zen-step-countdown').textContent = `本段剩餘 ${remainingSec} 秒`;
-      document.getElementById('zen-step-title').textContent = activeStep.name;
-      document.getElementById('zen-step-note').textContent = activeStep.actionTip || activeStep.note || '';
+      document.getElementById('zen-step-indicator').textContent = `第 ${activeIndex + 1} / ${currentStepsCache.length} 段`;
+      document.getElementById('zen-step-countdown').textContent = `剩餘 ${remainingSec}s`;
+      document.getElementById('zen-step-title').textContent = (activeStep.name || '').replace(/（.*）/, '').trim();
+      const stepNote = document.getElementById('zen-step-note');
+      if (stepNote) stepNote.textContent = '';
 
       // 下一個步驟預覽 (Next Step Anticipation HUD)
       if (activeIndex < currentStepsCache.length - 1) {
@@ -4436,24 +4468,24 @@
             nextStepBadge.textContent = '進入本段';
           } else {
             nextStepBadge.className = 'px-2 py-0.5 rounded text-[11px] font-mono-num font-bold bg-[#261912] border border-[#3D271D] text-amber-300';
-            nextStepBadge.textContent = `${formatTime(nextStep.startSec)} 開始 (${timeUntilNext}s 後)`;
+            nextStepBadge.textContent = `${formatTime(nextStep.startSec)} (${timeUntilNext}s 後)`;
           }
         }
 
         if (nextStepCard) {
           if (timeUntilNext <= 10 && timeUntilNext > 0 && timerRunning) {
-            nextStepCard.className = 'w-full mt-2 sm:mt-3 bg-[#241710] border border-amber-400/70 shadow-lg rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 transition-all duration-200';
+            nextStepCard.className = 'w-full bg-[#241710] border border-amber-400/70 shadow-lg rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 transition-all duration-200';
           } else {
-            nextStepCard.className = 'w-full mt-2 sm:mt-3 bg-[#18110D] border border-[#2D1D16] rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 transition-all duration-200';
+            nextStepCard.className = 'w-full bg-[#16100D] border border-[#261811] rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 transition-all duration-200';
           }
         }
 
-        if (nextStepName) nextStepName.textContent = `第 ${activeIndex + 2} 段：${nextStep.name}`;
+        if (nextStepName) nextStepName.textContent = `第 ${activeIndex + 2} 段：${(nextStep.name || '').replace(/（.*）/, '').trim()}`;
         if (nextStepWater) nextStepWater.textContent = `+${nextStep.amount}g`;
         if (nextStepCumul) nextStepCumul.textContent = `${nextStep.cumulative}g`;
         if (nextStepFlow) nextStepFlow.textContent = `~${nextRate} g/s`;
         if (nextStepProfile) nextStepProfile.textContent = nextProf.name;
-        if (nextStepTip) nextStepTip.textContent = nextStep.actionTip || nextStep.note || '請提前提壺預備，時間到準時注水。';
+        if (nextStepTip) nextStepTip.textContent = '';
 
       } else if (activeIndex === currentStepsCache.length - 1) {
         // 最後一段進行中
@@ -4463,14 +4495,14 @@
           nextStepBadge.textContent = `${formatTime(totalBrewSeconds)} 總時間到 (${Math.max(0, timeUntilEnd)}s 後)`;
         }
         if (nextStepCard) {
-          nextStepCard.className = 'w-full mt-2 sm:mt-3 bg-[#18110D] border border-[#2D1D16] rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 transition-all duration-200';
+          nextStepCard.className = 'w-full bg-[#16100D] border border-[#261811] rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 transition-all duration-200';
         }
-        if (nextStepName) nextStepName.textContent = '下一階段：滴濾收尾 (Drawdown)';
+        if (nextStepName) nextStepName.textContent = '下一階段：滴濾收尾';
         if (nextStepWater) nextStepWater.textContent = '+0g';
-        if (nextStepCumul) nextStepCumul.textContent = `${totalWaterVal}g (全數注入)`;
-        if (nextStepFlow) nextStepFlow.textContent = '自然滴濾落水';
+        if (nextStepCumul) nextStepCumul.textContent = `${totalWaterVal}g`;
+        if (nextStepFlow) nextStepFlow.textContent = '自然落水';
         if (nextStepProfile) nextStepProfile.textContent = '滴濾';
-        if (nextStepTip) nextStepTip.textContent = '已完成所有注水階段，請觀察粉層濾泡自然落水，水位滴乾後即可移開濾杯。';
+        if (nextStepTip) nextStepTip.textContent = '';
       }
 
       renderZenStepSegments(activeIndex);
