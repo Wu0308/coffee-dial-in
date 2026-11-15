@@ -1648,36 +1648,11 @@
 
           </div>
 
-          <!-- 核心注水數據帶 (Action Ribbon: 本段 + 流速 + 手法) - 緊湊無冗詞 -->
-          <div class="mt-3 pt-2.5 border-t border-[#261A13] flex items-center justify-around gap-2 text-xs font-mono-num text-[#B3A194]">
-            
-            <div class="flex items-center gap-1.5">
-              <span class="text-[#736054]">本段</span>
-              <strong id="zen-step-water" class="text-amber-300 font-bold">+45g</strong>
+          <!-- 詳細沖煮步驟進度條 (Step Progress Timeline: 標示各步驟數字、步驟名稱，進度條隨時間向前推進) -->
+          <div class="mt-3 pt-2.5 border-t border-[#261A13]">
+            <div id="zen-step-segments" class="flex items-center gap-1.5 sm:gap-2.5 w-full">
+              <!-- 動態生成各步驟數字、步驟名稱與隨時間推進之進度條 -->
             </div>
-
-            <div class="h-3 w-px bg-[#261A13]"></div>
-
-            <div class="flex items-center gap-1.5">
-              <span class="text-[#736054]">流速</span>
-              <strong id="zen-live-flow-rate" class="text-emerald-300 font-bold">3.2 g/s</strong>
-              <span id="zen-flow-badge" class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
-                標準水流
-              </span>
-            </div>
-
-            <div class="h-3 w-px bg-[#261A13]"></div>
-
-            <div class="flex items-center gap-1.5">
-              <span class="text-[#736054]">手法</span>
-              <span id="zen-step-title" class="text-[#FAF6F2] font-semibold">悶蒸</span>
-            </div>
-
-          </div>
-
-          <!-- 階段分段進度條 (Segmented Progress Bar) -->
-          <div id="zen-step-segments" class="flex gap-1 h-1 w-full rounded-full overflow-hidden bg-[#241812] mt-2.5">
-            <!-- 動態分段 -->
           </div>
 
         </div>
@@ -1722,30 +1697,30 @@
               </span>
             </div>
 
-            <!-- 右側：醒目數據塊 (秤面即時重量 + 即時注水流速) -->
+            <!-- 右側：醒目數據塊 (秤面即時重量 + 即時注水流速) - 尺寸 100% 絕對固定，防數值變動改變大小 -->
             <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               
               <!-- 醒目指標 1：秤面即時累積 (Live Scale Weight) -->
-              <div class="flex items-center gap-2 px-2.5 sm:px-3 py-1 rounded-xl bg-[#1D140E] border border-amber-500/40 shadow-xs">
-                <div class="text-right">
-                  <div class="text-[9px] font-bold font-mono uppercase tracking-widest text-amber-400/80">SCALE 秤面</div>
-                  <div class="text-[10px] font-mono-num text-[#8C7A6E]">/ <span id="zen-curve-total-water">225g</span></div>
+              <div class="w-[126px] sm:w-[150px] h-[46px] sm:h-[50px] flex-shrink-0 flex items-center justify-between px-2.5 sm:px-3 rounded-xl bg-[#1D140E] border border-amber-500/40 shadow-xs box-border">
+                <div class="flex flex-col justify-center text-left min-w-0 pr-1">
+                  <div class="text-[9px] font-bold font-mono uppercase tracking-widest text-amber-400/80 leading-none mb-1">SCALE 秤面</div>
+                  <div class="text-[10px] font-mono-num text-[#8C7A6E] leading-none truncate">/ <span id="zen-curve-total-water">225g</span></div>
                 </div>
-                <div class="flex items-baseline">
+                <div class="flex items-baseline justify-end flex-shrink-0 tabular-nums">
                   <strong id="zen-curve-cur-water" class="text-2xl sm:text-3xl font-mono-num font-black text-amber-400 tracking-tight leading-none">0</strong>
-                  <span class="text-xs font-bold text-amber-500 ml-0.5 font-mono">g</span>
+                  <span class="text-xs font-bold text-amber-500 ml-0.5 font-mono leading-none">g</span>
                 </div>
               </div>
 
               <!-- 醒目指標 2：即時注水流速 (Live Flow Rate) -->
-              <div class="flex items-center gap-2 px-2.5 sm:px-3 py-1 rounded-xl bg-[#0F1E17] border border-emerald-500/40 shadow-xs">
-                <div class="text-right">
-                  <div class="text-[9px] font-bold font-mono uppercase tracking-widest text-emerald-400/80">FLOW 流速</div>
-                  <div id="zen-curve-flow-badge" class="text-[10px] font-bold text-emerald-400 truncate max-w-[65px] sm:max-w-none">標準水流</div>
+              <div class="w-[126px] sm:w-[150px] h-[46px] sm:h-[50px] flex-shrink-0 flex items-center justify-between px-2.5 sm:px-3 rounded-xl bg-[#0F1E17] border border-emerald-500/40 shadow-xs box-border">
+                <div class="flex flex-col justify-center text-left min-w-0 pr-1">
+                  <div class="text-[9px] font-bold font-mono uppercase tracking-widest text-emerald-400/80 leading-none mb-1">FLOW 流速</div>
+                  <div id="zen-curve-flow-badge" class="text-[10px] font-bold text-emerald-400 truncate max-w-[54px] sm:max-w-[70px] leading-none">標準水流</div>
                 </div>
-                <div class="flex items-baseline">
+                <div class="flex items-baseline justify-end flex-shrink-0 tabular-nums">
                   <strong id="zen-curve-flow-rate" class="text-2xl sm:text-3xl font-mono-num font-black text-emerald-300 tracking-tight leading-none">0.0</strong>
-                  <span class="text-xs font-bold text-emerald-400 ml-0.5 font-mono">g/s</span>
+                  <span class="text-xs font-bold text-emerald-400 ml-0.5 font-mono leading-none">g/s</span>
                 </div>
               </div>
 
@@ -4490,14 +4465,15 @@
       document.getElementById('zen-target-water').textContent = activeStep.cumulative;
       const waterPercentElem = document.getElementById('zen-water-percent');
       if (waterPercentElem) waterPercentElem.textContent = `${progressPercent}%`;
-      document.getElementById('zen-step-water').textContent = activeStep.amount > 0 ? `+${activeStep.amount}g` : '0g';
+      const stepWaterElem = document.getElementById('zen-step-water');
+      if (stepWaterElem) stepWaterElem.textContent = activeStep.amount > 0 ? `+${activeStep.amount}g` : '0g';
       const waterRangeElem = document.getElementById('zen-step-water-range');
       if (waterRangeElem) waterRangeElem.textContent = `${startWater}g ➔ ${activeStep.cumulative}g`;
 
       // 建議流速與型態 (與注水曲線即時流速 100% 絕對同步)
       const isPouring = profile.statusPhase === 'pouring';
       const liveRateNum = (isPouring && profile.flowRate > 0) ? profile.flowRate.toFixed(1) : (timerSeconds === 0 ? (profile.recFlowRate > 0 ? profile.recFlowRate.toFixed(1) : '0.0') : '0.0');
-      const liveFlowBadge = isPouring ? (profile.flowName || '注水中') : (profile.statusPhase === 'resting' ? '滴濾靜置' : (timerSeconds === 0 ? '建議 ' + (profile.flowName || '標準水流') : '滴濾收尾'));
+      const liveFlowBadge = isPouring ? (profile.flowName || '注水中') : (profile.statusPhase === 'resting' ? '滴濾靜置' : (timerSeconds === 0 ? '建議水流' : '滴濾收尾'));
 
       const liveFlowElem = document.getElementById('zen-live-flow-rate');
       if (liveFlowElem) liveFlowElem.textContent = `${liveRateNum} g/s`;
@@ -4515,9 +4491,12 @@
         zenCurvePhaseBadge.textContent = isPouring ? `${activeStep.name} · 注水` : (profile.statusPhase === 'resting' ? `${activeStep.name} · 靜置` : activeStep.name);
       }
 
-      document.getElementById('zen-step-indicator').textContent = `第 ${activeIndex + 1} / ${currentStepsCache.length} 段`;
-      document.getElementById('zen-step-countdown').textContent = `剩餘 ${remainingSec}s`;
-      document.getElementById('zen-step-title').textContent = (activeStep.name || '').replace(/（.*）/, '').trim();
+      const stepIndicatorElem = document.getElementById('zen-step-indicator');
+      if (stepIndicatorElem) stepIndicatorElem.textContent = `第 ${activeIndex + 1} / ${currentStepsCache.length} 段`;
+      const countdownElem = document.getElementById('zen-step-countdown');
+      if (countdownElem) countdownElem.textContent = `剩餘 ${remainingSec}s`;
+      const stepTitleElem = document.getElementById('zen-step-title');
+      if (stepTitleElem) stepTitleElem.textContent = (activeStep.name || '').replace(/（.*）/, '').trim();
       const stepNote = document.getElementById('zen-step-note');
       if (stepNote) stepNote.textContent = '';
 
@@ -4580,20 +4559,85 @@
 
     function renderZenStepSegments(activeIndex) {
       const container = document.getElementById('zen-step-segments');
-      if (!container || !currentStepsCache) return;
-      container.innerHTML = '';
+      if (!container || !currentStepsCache || currentStepsCache.length === 0) return;
 
+      const isAllDone = timerSeconds >= totalBrewSeconds || activeIndex >= currentStepsCache.length;
+      const stepsKey = currentStepsCache.map(s => (s.name || '') + s.endSec + s.cumulative).join('|');
+
+      // 若節點數量或步驟配置不符合，重新建構 DOM 骨架
+      if (container.children.length !== currentStepsCache.length || container.dataset.stepsKey !== stepsKey) {
+        container.dataset.stepsKey = stepsKey;
+        container.innerHTML = '';
+
+        currentStepsCache.forEach((st, idx) => {
+          const stepCol = document.createElement('div');
+          stepCol.id = `zen-step-col-${idx}`;
+          stepCol.className = 'flex-1 min-w-0 flex flex-col gap-1 transition-all duration-200';
+
+          const cleanName = (st.name || '').replace(/（.*）|\(.*\)/g, '').trim();
+
+          stepCol.innerHTML = `
+            <div class="flex items-center justify-between gap-1 min-w-0">
+              <div class="flex items-center gap-1 sm:gap-1.5 min-w-0">
+                <span id="zen-step-badge-${idx}" class="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] sm:text-xs font-mono font-bold transition-all duration-200">
+                  ${idx + 1}
+                </span>
+                <span id="zen-step-name-${idx}" class="text-[11px] sm:text-xs truncate transition-colors duration-200">
+                  ${cleanName}
+                </span>
+              </div>
+              <span class="text-[10px] font-mono-num text-[#736054] hidden md:inline flex-shrink-0">
+                ${st.cumulative}g
+              </span>
+            </div>
+            <div class="w-full h-1.5 sm:h-2 rounded-full bg-[#241710] overflow-hidden p-0">
+              <div id="zen-step-bar-${idx}" class="h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+            </div>
+          `;
+          container.appendChild(stepCol);
+        });
+      }
+
+      // 更新每個步驟的即時狀態與隨時間向前推進的進度條
       currentStepsCache.forEach((st, idx) => {
-        const seg = document.createElement('div');
-        seg.className = 'flex-1 h-full rounded-full transition-all duration-300';
-        if (idx < activeIndex) {
-          seg.className += ' bg-emerald-500';
-        } else if (idx === activeIndex) {
-          seg.className += ' bg-amber-400 animate-pulse';
+        const badge = document.getElementById(`zen-step-badge-${idx}`);
+        const nameElem = document.getElementById(`zen-step-name-${idx}`);
+        const bar = document.getElementById(`zen-step-bar-${idx}`);
+        if (!badge || !nameElem || !bar) return;
+
+        const isPast = isAllDone || idx < activeIndex;
+        const isCurrent = !isAllDone && (idx === activeIndex);
+
+        if (isPast) {
+          // 已完成：翡翠綠圓形白色勾勾，進度條 100%
+          badge.className = 'w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-2xs';
+          badge.innerHTML = `
+            <svg class="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          `;
+          nameElem.className = 'text-[11px] sm:text-xs truncate font-semibold text-emerald-400/90';
+          bar.className = 'h-full rounded-full bg-emerald-500 transition-all duration-300';
+          bar.style.width = '100%';
+        } else if (isCurrent) {
+          // 當前進行中：琥珀金數字徽章 + 琥珀金加粗名稱，進度條隨秒數向前推進
+          badge.className = 'w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-amber-400 text-[#140E0B] font-mono-num font-black text-[10px] sm:text-xs flex items-center justify-center ring-2 ring-amber-400/40 flex-shrink-0 shadow-2xs';
+          badge.textContent = idx + 1;
+          nameElem.className = 'text-[11px] sm:text-xs truncate font-bold text-amber-300';
+          bar.className = 'h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-300 shadow-xs transition-all duration-300';
+
+          const stepDur = st.endSec - st.startSec;
+          const elapsed = Math.max(0, timerSeconds - st.startSec);
+          const pct = stepDur > 0 ? Math.min(100, Math.max(0, (elapsed / stepDur) * 100)) : 0;
+          bar.style.width = `${pct.toFixed(1)}%`;
         } else {
-          seg.className += ' bg-[#3A2D23]';
+          // 未來待命步驟：暗黑帶邊框數字徽章，進度條 0%
+          badge.className = 'w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-[#221711] border border-[#3A261D] text-[#8C7A6E] font-mono-num font-medium text-[10px] sm:text-xs flex items-center justify-center flex-shrink-0';
+          badge.textContent = idx + 1;
+          nameElem.className = 'text-[11px] sm:text-xs truncate font-normal text-[#8C7A6E]';
+          bar.className = 'h-full rounded-full bg-transparent transition-all duration-300';
+          bar.style.width = '0%';
         }
-        container.appendChild(seg);
       });
     }
 
