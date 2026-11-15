@@ -1705,25 +1705,55 @@
           </div>
         </div>
 
-        <!-- 【重點核心：注水曲線儀表】(Hero Water Extraction Curve) - 擴大展示，清晰分明 -->
-        <div class="w-full bg-[#140E0B] border border-[#291B13] rounded-2xl p-2.5 sm:p-3.5 shadow-xl">
-          <div class="flex items-center justify-between text-xs font-mono-num text-[#8C7A6E] mb-1.5 px-1">
-            <div class="flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-              <span class="text-amber-400/90 font-bold tracking-wider text-[11px] sm:text-xs uppercase">
-                注水曲線 · 階梯歷程
+        <!-- 【重點核心：注水曲線儀表】(Hero Water Extraction Curve & Live Barista Cockpit) - 醒目秤面與同步流速 -->
+        <div class="w-full bg-[#140E0B] border border-[#2D1D16] rounded-2xl p-3 sm:p-4 shadow-2xl">
+          
+          <!-- 高醒目即時萃取監控列 (Live Scale Weight & Flow Rate Cockpit) -->
+          <div class="flex items-center justify-between gap-2.5 mb-2.5 pb-2.5 border-b border-[#241710]">
+            
+            <!-- 左側：曲線標題與當前段落狀態 -->
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0"></span>
+              <span class="text-xs font-bold font-mono tracking-wider text-amber-400/90 uppercase flex-shrink-0">
+                注水曲線
+              </span>
+              <span id="zen-curve-phase-badge" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-[#261A13] border border-[#3D271D] text-[#D8CCC4] truncate">
+                準備注水
               </span>
             </div>
-            <div class="flex items-center gap-1.5 text-[11px] sm:text-xs">
-              <span class="text-[#736054]">秤面：</span>
-              <strong id="zen-curve-cur-water" class="text-amber-300 font-bold">0g</strong>
-              <span class="text-[#736054]">/</span>
-              <span id="zen-curve-total-water" class="text-[#D8CCC4]">225g</span>
-              <span class="text-[#4D382B]">·</span>
-              <span id="zen-curve-flow-rate" class="text-emerald-400 font-bold">0.0 g/s</span>
+
+            <!-- 右側：醒目數據塊 (秤面即時重量 + 即時注水流速) -->
+            <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              
+              <!-- 醒目指標 1：秤面即時累積 (Live Scale Weight) -->
+              <div class="flex items-center gap-2 px-2.5 sm:px-3 py-1 rounded-xl bg-[#1D140E] border border-amber-500/40 shadow-xs">
+                <div class="text-right">
+                  <div class="text-[9px] font-bold font-mono uppercase tracking-widest text-amber-400/80">SCALE 秤面</div>
+                  <div class="text-[10px] font-mono-num text-[#8C7A6E]">/ <span id="zen-curve-total-water">225g</span></div>
+                </div>
+                <div class="flex items-baseline">
+                  <strong id="zen-curve-cur-water" class="text-2xl sm:text-3xl font-mono-num font-black text-amber-400 tracking-tight leading-none">0</strong>
+                  <span class="text-xs font-bold text-amber-500 ml-0.5 font-mono">g</span>
+                </div>
+              </div>
+
+              <!-- 醒目指標 2：即時注水流速 (Live Flow Rate) -->
+              <div class="flex items-center gap-2 px-2.5 sm:px-3 py-1 rounded-xl bg-[#0F1E17] border border-emerald-500/40 shadow-xs">
+                <div class="text-right">
+                  <div class="text-[9px] font-bold font-mono uppercase tracking-widest text-emerald-400/80">FLOW 流速</div>
+                  <div id="zen-curve-flow-badge" class="text-[10px] font-bold text-emerald-400 truncate max-w-[65px] sm:max-w-none">標準水流</div>
+                </div>
+                <div class="flex items-baseline">
+                  <strong id="zen-curve-flow-rate" class="text-2xl sm:text-3xl font-mono-num font-black text-emerald-300 tracking-tight leading-none">0.0</strong>
+                  <span class="text-xs font-bold text-emerald-400 ml-0.5 font-mono">g/s</span>
+                </div>
+              </div>
+
             </div>
+
           </div>
-          <!-- 寬幅高清晰曲線視窗 -->
+
+          <!-- 寬幅高清晰曲線視窗 (700 x 180 viewBox) -->
           <div class="w-full h-36 sm:h-44 md:h-48">
             <svg id="zen-water-curve-svg" viewBox="0 0 700 180" preserveAspectRatio="none" class="w-full h-full overflow-visible select-none">
               <defs>
@@ -3856,18 +3886,30 @@
         }
       }
 
-      // 2. 更新專注模式流速與狀態
+      // 2. 更新專注模式流速與狀態 (上下 100% 絕對同步)
+      const isPouring = profile.statusPhase === 'pouring';
+      const liveRateNum = (isPouring && profile.flowRate > 0) ? profile.flowRate.toFixed(1) : (curSec === 0 ? (profile.recFlowRate > 0 ? profile.recFlowRate.toFixed(1) : '0.0') : '0.0');
+      const liveFlowBadge = isPouring ? (profile.flowName || '注水中') : (profile.statusPhase === 'resting' ? '滴濾靜置' : (curSec === 0 ? '建議 ' + (profile.flowName || '標準水流') : '滴濾收尾'));
+
       const zenFlowRateElem = document.getElementById('zen-live-flow-rate');
       if (zenFlowRateElem) {
-        zenFlowRateElem.textContent = profile.flowRate > 0 ? `~${profile.flowRate.toFixed(1)} g/s (${profile.flowName || '注水'})` : '0.0 g/s';
+        zenFlowRateElem.textContent = `${liveRateNum} g/s`;
+      }
+      const zenFlowBadge = document.getElementById('zen-flow-badge');
+      if (zenFlowBadge) {
+        zenFlowBadge.textContent = liveFlowBadge;
       }
       const zenCurveFlowElem = document.getElementById('zen-curve-flow-rate');
       if (zenCurveFlowElem) {
-        zenCurveFlowElem.textContent = profile.flowRate > 0 ? `${profile.flowRate.toFixed(1)} g/s` : '0.0 g/s';
+        zenCurveFlowElem.textContent = liveRateNum;
       }
-      const zenCurveStatusElem = document.getElementById('zen-curve-status');
-      if (zenCurveStatusElem) {
-        zenCurveStatusElem.textContent = profile.statusText;
+      const zenCurveFlowBadge = document.getElementById('zen-curve-flow-badge');
+      if (zenCurveFlowBadge) {
+        zenCurveFlowBadge.textContent = liveFlowBadge;
+      }
+      const zenCurvePhaseBadge = document.getElementById('zen-curve-phase-badge');
+      if (zenCurvePhaseBadge) {
+        zenCurvePhaseBadge.textContent = profile.statusText || profile.flowName;
       }
 
       // 3. 更新主 SVG 即時推進曲線與光標 (Playhead Puck)
@@ -3948,7 +3990,7 @@
       const curY = mapY(profile.currentWater);
 
       const curWaterElem = document.getElementById('zen-curve-cur-water');
-      if (curWaterElem) curWaterElem.textContent = `${profile.currentWater}g`;
+      if (curWaterElem) curWaterElem.textContent = profile.currentWater;
       const totalWaterElem = document.getElementById('zen-curve-total-water');
       if (totalWaterElem) totalWaterElem.textContent = `${totalWater}g`;
 
@@ -4388,7 +4430,14 @@
         const flowRateElem = document.getElementById('zen-live-flow-rate');
         if (flowRateElem) flowRateElem.textContent = '0.0 g/s';
         const flowBadge = document.getElementById('zen-flow-badge');
-        if (flowBadge) flowBadge.innerHTML = '靜候落水';
+        if (flowBadge) flowBadge.textContent = '滴濾收尾';
+
+        const zenCurveFlowElem = document.getElementById('zen-curve-flow-rate');
+        if (zenCurveFlowElem) zenCurveFlowElem.textContent = '0.0';
+        const zenCurveFlowBadge = document.getElementById('zen-curve-flow-badge');
+        if (zenCurveFlowBadge) zenCurveFlowBadge.textContent = '滴濾收尾';
+        const zenCurvePhaseBadge = document.getElementById('zen-curve-phase-badge');
+        if (zenCurvePhaseBadge) zenCurvePhaseBadge.textContent = '滴濾收尾';
         document.getElementById('zen-step-indicator').textContent = '收尾階段';
         document.getElementById('zen-step-countdown').textContent = '滴淨移開濾杯';
         document.getElementById('zen-step-title').textContent = '滴濾收尾';
@@ -4445,13 +4494,25 @@
       const waterRangeElem = document.getElementById('zen-step-water-range');
       if (waterRangeElem) waterRangeElem.textContent = `${startWater}g ➔ ${activeStep.cumulative}g`;
 
-      // 建議流速與型態
-      const recRate = profile.recFlowRate > 0 ? profile.recFlowRate.toFixed(1) : (activeStep.amount > 0 ? (activeStep.amount / (getStepPourDuration(activeStep) || 15)).toFixed(1) : '0.0');
+      // 建議流速與型態 (與注水曲線即時流速 100% 絕對同步)
+      const isPouring = profile.statusPhase === 'pouring';
+      const liveRateNum = (isPouring && profile.flowRate > 0) ? profile.flowRate.toFixed(1) : (timerSeconds === 0 ? (profile.recFlowRate > 0 ? profile.recFlowRate.toFixed(1) : '0.0') : '0.0');
+      const liveFlowBadge = isPouring ? (profile.flowName || '注水中') : (profile.statusPhase === 'resting' ? '滴濾靜置' : (timerSeconds === 0 ? '建議 ' + (profile.flowName || '標準水流') : '滴濾收尾'));
+
       const liveFlowElem = document.getElementById('zen-live-flow-rate');
-      if (liveFlowElem) liveFlowElem.textContent = `${recRate} g/s`;
+      if (liveFlowElem) liveFlowElem.textContent = `${liveRateNum} g/s`;
       const flowBadge = document.getElementById('zen-flow-badge');
       if (flowBadge) {
-        flowBadge.textContent = profile.flowName || '標準水流';
+        flowBadge.textContent = liveFlowBadge;
+      }
+
+      const zenCurveFlowElem = document.getElementById('zen-curve-flow-rate');
+      if (zenCurveFlowElem) zenCurveFlowElem.textContent = liveRateNum;
+      const zenCurveFlowBadge = document.getElementById('zen-curve-flow-badge');
+      if (zenCurveFlowBadge) zenCurveFlowBadge.textContent = liveFlowBadge;
+      const zenCurvePhaseBadge = document.getElementById('zen-curve-phase-badge');
+      if (zenCurvePhaseBadge) {
+        zenCurvePhaseBadge.textContent = isPouring ? `${activeStep.name} · 注水` : (profile.statusPhase === 'resting' ? `${activeStep.name} · 靜置` : activeStep.name);
       }
 
       document.getElementById('zen-step-indicator').textContent = `第 ${activeIndex + 1} / ${currentStepsCache.length} 段`;
