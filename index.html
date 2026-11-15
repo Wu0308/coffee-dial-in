@@ -2072,6 +2072,7 @@
       method: 'four_six',   // four_six, single_pour, three_stage, hoffmann, matsuya, immersion
       dripper: 'conical',   // 'conical' (錐形), 'flat_wave' (平底蛋糕), 'trapezoid' (梯形扇形)
       brewMode: 'hot',      // 'hot' (熱手沖), 'iced' (急冷冰手沖)
+      currentIceWeight: 0,  // 記錄急冷冰手沖下壺冰塊重 (g)
       roast: 'medium',      // light, medium_light, medium, medium_dark, dark
       dose: 15.0,           // 8 ~ 50g
       flavor: 'balance',    // acid, sweet, body, balance
@@ -2590,6 +2591,9 @@
 
     function resetDefaults() {
       state.method = 'four_six';
+      state.dripper = 'conical';
+      state.brewMode = 'hot';
+      state.currentIceWeight = 0;
       state.roast = 'medium';
       state.dose = 15.0;
       state.flavor = 'balance';
@@ -2601,6 +2605,8 @@
       state.customStepsData = null;
       
       selectMethod('four_six');
+      updateDripperUI();
+      updateBrewModeUI();
       selectRoast('medium');
       selectFlavor('balance');
       onDoseChange(15);
@@ -2615,7 +2621,8 @@
     function stepCustomTemp(delta) {
       const roastConf = ROAST_CONFIGS[state.roast];
       const flavorConf = FLAVOR_CONFIGS[state.flavor];
-      const base = roastConf.baseTemp + flavorConf.tempDelta;
+      const icedTempBonus = (state.brewMode === 'iced') ? 1 : 0;
+      const base = roastConf.baseTemp + flavorConf.tempDelta + icedTempBonus;
       let current = base + state.tempAdjust;
       let target = current + delta;
       if (target < MIN_TEMP) target = MIN_TEMP;
@@ -2907,6 +2914,14 @@
         toast.className = 'fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-[10000] px-3.5 py-2 rounded-xl bg-[#2D231D] text-[#FAF6F2] text-xs font-medium shadow-xl border border-[#42332A] flex items-center gap-2 transition-all duration-300 opacity-0 translate-y-2 pointer-events-none';
         document.body.appendChild(toast);
       }
+      const zenModal = document.getElementById('zen-barista-modal');
+      const vaultModal = document.getElementById('recipe-vault-modal');
+      const hostElem = (zenModal && zenModal.open) ? zenModal
+                     : (vaultModal && vaultModal.open) ? vaultModal
+                     : document.body;
+      if (toast.parentElement !== hostElem) {
+        hostElem.appendChild(toast);
+      }
       toast.innerHTML = `
         <svg class="w-4 h-4 text-amber-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="10"></circle>
@@ -3077,11 +3092,32 @@
       // 動態連動總水量與粉水比
       const totalWater = curCum;
       const paramWater = document.getElementById('param-water');
-      if (paramWater) paramWater.textContent = `${totalWater}g`;
       const paramWaterNote = document.getElementById('param-water-note');
-      if (paramWaterNote) paramWaterNote.textContent = '依自訂步驟加總';
       const timerTotalGoal = document.getElementById('timer-total-water-goal');
-      if (timerTotalGoal) timerTotalGoal.textContent = totalWater;
+
+      if (state.brewMode === 'iced') {
+        const iceW = state.currentIceWeight || 0;
+        const customTotalMass = totalWater + iceW;
+        if (paramWater) paramWater.textContent = `${totalWater}g`;
+        if (paramWaterNote) paramWaterNote.textContent = `自訂熱水 + 下壺冰塊 ${iceW}g (總計 ${customTotalMass}g)`;
+        if (timerTotalGoal) timerTotalGoal.textContent = totalWater;
+
+        const calcRatio = Math.round((customTotalMass / state.dose) * 10) / 10;
+        const paramRatio = document.getElementById('param-ratio');
+        if (paramRatio) paramRatio.textContent = `1:${calcRatio}`;
+        const paramRatioNote = document.getElementById('param-ratio-note');
+        if (paramRatioNote) paramRatioNote.textContent = '自訂粉水比 (含冰塊)';
+      } else {
+        if (paramWater) paramWater.textContent = `${totalWater}g`;
+        if (paramWaterNote) paramWaterNote.textContent = '依自訂步驟加總';
+        if (timerTotalGoal) timerTotalGoal.textContent = totalWater;
+
+        const calcRatio = Math.round((totalWater / state.dose) * 10) / 10;
+        const paramRatio = document.getElementById('param-ratio');
+        if (paramRatio) paramRatio.textContent = `1:${calcRatio}`;
+        const paramRatioNote = document.getElementById('param-ratio-note');
+        if (paramRatioNote) paramRatioNote.textContent = '自訂粉水比';
+      }
 
       // 配方全域防呆：總水量若為 0g 則禁用計時開始按鈕，並提示
       const timerRunBtn = document.getElementById('timer-run-btn');
@@ -3098,12 +3134,6 @@
           timerRunBtn.classList.remove('opacity-40', 'cursor-not-allowed');
         }
       }
-
-      const calcRatio = Math.round((totalWater / state.dose) * 10) / 10;
-      const paramRatio = document.getElementById('param-ratio');
-      if (paramRatio) paramRatio.textContent = `1:${calcRatio}`;
-      const paramRatioNote = document.getElementById('param-ratio-note');
-      if (paramRatioNote) paramRatioNote.textContent = '自訂粉水比';
 
       const totalEst = document.getElementById('total-time-estimate');
       if (totalEst) totalEst.textContent = `約 ${formatTime(totalBrewSeconds)}`;
@@ -3133,6 +3163,7 @@
         return state.customStepsData;
       }
 
+      const refTotalMass = (isIced && totalTargetMass > 0) ? totalTargetMass : totalWater;
       const flavorConf = FLAVOR_CONFIGS[flavorKey] || FLAVOR_CONFIGS['balance'];
       const roastConf = ROAST_CONFIGS[roastKey] || ROAST_CONFIGS['medium'];
       const dripperConf = DRIPPER_CONFIGS[dripperKey] || DRIPPER_CONFIGS['conical'];
@@ -3147,8 +3178,10 @@
         // 依風味動態分配前 40% 水量 (Kasuya 4:6 法則：酸質前大多、甜感前小後大)
         const p1Ratio = flavorConf.pourRatio46 ? flavorConf.pourRatio46[0] : 0.20;
         const p2Ratio = flavorConf.pourRatio46 ? flavorConf.pourRatio46[1] : 0.20;
-        const bloomWater = Math.round(totalWater * p1Ratio);
-        const pour2 = Math.round(totalWater * p2Ratio);
+        const rawBloom = isIced ? Math.max(Math.round(dose * 2.0), Math.round(totalWater * p1Ratio)) : Math.round(totalWater * p1Ratio);
+        const bloomWater = Math.min(rawBloom, Math.round(totalWater * 0.35));
+        const frontTotal = Math.round(totalWater * (p1Ratio + p2Ratio));
+        const pour2 = Math.max(0, frontTotal - bloomWater);
         const remaining = totalWater - bloomWater - pour2;
         const pour3 = Math.round(remaining / 3);
         const pour4 = Math.round(remaining / 3);
@@ -3224,7 +3257,7 @@
           }
         ];
       } else if (method === 'single_pour') {
-        const bloomWater = Math.min(Math.round(dose * 2.5), Math.round(totalWater * 0.22));
+        const bloomWater = Math.min(Math.round(dose * 2.5), Math.round(refTotalMass * 0.22), Math.round(totalWater * 0.35));
         const mainPour = totalWater - bloomWater;
         const bloomPure = Math.round(bloomWater / (FLOW_PROFILES.gentle.targetRate * flowScale));
         const bloomSec = Math.max(25, bloomPure + 12, 35 + totalBloomAdjust);
@@ -3270,7 +3303,7 @@
           }
         ];
       } else if (method === 'three_stage') {
-        const bloomWater = Math.min(Math.round(dose * 2.2), Math.round(totalWater * 0.20));
+        const bloomWater = Math.min(Math.round(dose * 2.2), Math.round(refTotalMass * 0.20), Math.round(totalWater * 0.35));
         const rest = totalWater - bloomWater;
         const pour1 = Math.round(rest * 0.55);
         const pour2 = totalWater - bloomWater - pour1;
@@ -3319,9 +3352,9 @@
           }
         ];
       } else if (method === 'hoffmann') {
-        const bloomWater = Math.min(Math.round(dose * 3.0), Math.round(totalWater * 0.20));
-        const pour1 = Math.round((totalWater * 0.6) - bloomWater);
-        const pour2 = totalWater - bloomWater - pour1;
+        const bloomWater = Math.min(Math.round(dose * 3.0), Math.round(refTotalMass * 0.20), Math.round(totalWater * 0.35));
+        const pour1 = Math.max(bloomWater, Math.round((totalWater * 0.6) - bloomWater));
+        const pour2 = Math.max(0, totalWater - bloomWater - pour1);
 
         const bloomPure = Math.round(bloomWater / (FLOW_PROFILES.medium.targetRate * flowScale));
         const bloomSec = Math.max(30, bloomPure + 12, 45 + totalBloomAdjust);
@@ -3381,7 +3414,7 @@
         ];
       } else if (method === 'matsuya') {
         if (isIced) {
-          const bloomWater = Math.min(Math.round(dose * 2.0), Math.round(totalWater * 0.18));
+          const bloomWater = Math.min(Math.round(dose * 2.0), Math.round(refTotalMass * 0.18), Math.round(totalWater * 0.35));
           const extractWater = totalWater - bloomWater;
           const dripSec = calcPourAndDrainSec(bloomWater, 'drip', 5, flowScale, effectiveBedScale, 0);
           const steamSec = Math.max(120, 180 + tMod.bloomDelta * 2 + (roastConf.bloomRoastDelta || 0) * 5);
@@ -3440,7 +3473,7 @@
             }
           ];
         } else {
-          const bloomWater = Math.min(Math.round(dose * 2.0), Math.round(totalWater * 0.18));
+          const bloomWater = Math.min(Math.round(dose * 2.0), Math.round(refTotalMass * 0.18), Math.round(totalWater * 0.35));
           const extractWater = Math.round(totalWater * 0.55);
           const bypassWater = totalWater - bloomWater - extractWater;
 
@@ -3646,6 +3679,9 @@
       const totalTargetMass = Math.round(state.dose * finalRatioVal);
       const isIced = (state.brewMode === 'iced');
       const iceWeight = isIced ? Math.round(totalTargetMass * 0.35) : 0;
+      if (!state.isCustomSteps) {
+        state.currentIceWeight = isIced ? iceWeight : 0;
+      }
       const hotWaterTotal = isIced ? (totalTargetMass - iceWeight) : totalTargetMass;
       let effectivePourWater = hotWaterTotal;
 
@@ -3767,11 +3803,21 @@
       let steps;
       if (state.isCustomSteps && state.customStepsData) {
         steps = state.customStepsData;
-        effectivePourWater = steps.reduce((sum, s) => sum + s.amount, 0);
-        const customRatioVal = Math.round((effectivePourWater / state.dose) * 10) / 10;
-        ratioStr = `1:${customRatioVal}`;
-        document.getElementById('param-ratio').textContent = ratioStr;
-        document.getElementById('param-ratio-note').textContent = '依自訂步驟換算';
+        const customHotWater = steps.reduce((sum, s) => sum + s.amount, 0);
+        effectivePourWater = customHotWater;
+        if (isIced) {
+          const iceW = state.currentIceWeight || 0;
+          const customTotalMass = customHotWater + iceW;
+          const customRatioVal = Math.round((customTotalMass / state.dose) * 10) / 10;
+          ratioStr = `1:${customRatioVal}`;
+          document.getElementById('param-ratio').textContent = ratioStr;
+          document.getElementById('param-ratio-note').textContent = '自訂粉水比 (含冰塊)';
+        } else {
+          const customRatioVal = Math.round((customHotWater / state.dose) * 10) / 10;
+          ratioStr = `1:${customRatioVal}`;
+          document.getElementById('param-ratio').textContent = ratioStr;
+          document.getElementById('param-ratio-note').textContent = '依自訂步驟換算';
+        }
       } else {
         steps = generateSteps(state.method, state.dose, effectivePourWater, state.flavor, state.roast, state.dripper, isIced, iceWeight, totalTargetMass);
       }
@@ -3828,10 +3874,16 @@
       const paramWaterNoteElem = document.getElementById('param-water-note');
       const timerTotalWaterGoalElem = document.getElementById('timer-total-water-goal');
 
-      if (isIced && !state.isCustomSteps) {
-        if (paramWaterElem) paramWaterElem.textContent = `${hotWaterTotal}g`;
-        if (paramWaterNoteElem) paramWaterNoteElem.textContent = `熱水 + 下壺冰塊 ${iceWeight}g (總液重 ${totalTargetMass}g)`;
-        if (timerTotalWaterGoalElem) timerTotalWaterGoalElem.textContent = hotWaterTotal;
+      if (isIced) {
+        const iceW = state.isCustomSteps ? (state.currentIceWeight || 0) : iceWeight;
+        const totalMass = effectivePourWater + iceW;
+        if (paramWaterElem) paramWaterElem.textContent = `${effectivePourWater}g`;
+        if (paramWaterNoteElem) {
+          paramWaterNoteElem.textContent = state.isCustomSteps
+            ? `自訂熱水 + 下壺冰塊 ${iceW}g (總計 ${totalMass}g)`
+            : `熱水 + 下壺冰塊 ${iceWeight}g (總液重 ${totalTargetMass}g)`;
+        }
+        if (timerTotalWaterGoalElem) timerTotalWaterGoalElem.textContent = effectivePourWater;
       } else {
         if (paramWaterElem) paramWaterElem.textContent = `${effectivePourWater}g`;
         if (paramWaterNoteElem) paramWaterNoteElem.textContent = state.isCustomSteps ? '依自訂步驟加總' : `依 ${state.dose}g 粉計算`;
@@ -3849,8 +3901,9 @@
 
       const rateParamsElem = document.getElementById('rate-form-current-params');
       if (rateParamsElem) {
-        if (isIced && !state.isCustomSteps) {
-          rateParamsElem.textContent = `${state.dose}g · ${finalTemp}°C · ${ratioStr} · 熱水 ${hotWaterTotal}g + 冰 ${iceWeight}g`;
+        if (isIced) {
+          const iceW = state.isCustomSteps ? (state.currentIceWeight || 0) : iceWeight;
+          rateParamsElem.textContent = `${state.dose}g · ${finalTemp}°C · ${ratioStr} · 熱水 ${effectivePourWater}g + 冰 ${iceW}g`;
         } else {
           rateParamsElem.textContent = `${state.dose}g · ${finalTemp}°C · ${ratioStr} · ${effectivePourWater}g`;
         }
@@ -6176,12 +6229,10 @@
       text += `· 研磨刻度：${grind}\n`;
       text += `· 建議粉水比：${ratio}\n`;
       if (isIced) {
-        const ratioMatch = ratio.match(/1:([\d.]+)/);
-        const ratioNum = ratioMatch ? parseFloat(ratioMatch[1]) : 15;
-        const totalTargetMass = Math.round(state.dose * ratioNum);
-        const iceWeight = Math.round(totalTargetMass * 0.35);
-        const hotWaterTotal = totalTargetMass - iceWeight;
-        text += `· 總液重：${totalTargetMass}g (熱水量 ${hotWaterTotal}g + 下壺預置冰塊 ${iceWeight}g)\n`;
+        const customHotWater = currentStepsCache ? currentStepsCache.reduce((sum, s) => sum + s.amount, 0) : 0;
+        const iceW = state.currentIceWeight || Math.round(customHotWater * 0.54);
+        const totalTargetMass = customHotWater + iceW;
+        text += `· 總液重：${totalTargetMass}g (熱水量 ${customHotWater}g + 下壺預置冰塊 ${iceW}g)\n`;
       } else {
         text += `· 總注水量：${water}\n`;
       }
