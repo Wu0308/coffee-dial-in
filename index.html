@@ -1019,6 +1019,48 @@
             </div>
           </div>
 
+          <!-- 1.5 濾杯幾何 (三大濾杯幾何結構) -->
+          <div id="dripper-selector-container">
+            <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
+              <span>濾杯幾何</span>
+              <span id="selected-dripper-label" class="text-xs font-normal text-[#8C7E75]">錐形 V60</span>
+            </div>
+            <div class="grid grid-cols-3 gap-1.5 text-xs">
+              <button type="button" onclick="selectDripper('conical')" class="dial-btn active py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-dripper="conical">
+                <div class="w-6 h-6 rounded-md bg-[#FAF4EE] flex items-center justify-center text-[#654D3F] transition group-[.active]:scale-110">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 4h16l-7 14h-2L4 4z"></path>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                  </svg>
+                </div>
+                <span class="text-[11px] font-semibold">錐形 V60</span>
+                <span class="text-[9px] text-[#8C7E75] scale-90 -mt-1 group-[.active]:text-[#654D3F]">流速快·層次明</span>
+              </button>
+
+              <button type="button" onclick="selectDripper('flat_wave')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-dripper="flat_wave">
+                <div class="w-6 h-6 rounded-md bg-[#FAF4EE] flex items-center justify-center text-[#654D3F] transition group-[.active]:scale-110">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 5h16l-3 12H7L4 5z"></path>
+                    <line x1="5" y1="20" x2="19" y2="20"></line>
+                  </svg>
+                </div>
+                <span class="text-[11px] font-semibold">平底蛋糕</span>
+                <span class="text-[9px] text-[#8C7E75] scale-90 -mt-1 group-[.active]:text-[#654D3F]">均勻·甜感飽滿</span>
+              </button>
+
+              <button type="button" onclick="selectDripper('trapezoid')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-dripper="trapezoid">
+                <div class="w-6 h-6 rounded-md bg-[#FAF4EE] flex items-center justify-center text-[#654D3F] transition group-[.active]:scale-110">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M5 5h14l-4 13H9L5 5z"></path>
+                    <line x1="7" y1="21" x2="17" y2="21"></line>
+                  </svg>
+                </div>
+                <span class="text-[11px] font-semibold">梯形扇形</span>
+                <span class="text-[9px] text-[#8C7E75] scale-90 -mt-1 group-[.active]:text-[#654D3F]">半浸泡·醇厚</span>
+              </button>
+            </div>
+          </div>
+
           <!-- 2. 烘焙度 (5 階，附烘焙色相咖啡豆向量小圖示) -->
           <div>
             <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
@@ -1063,8 +1105,26 @@
             </div>
           </div>
 
-          <!-- 3. 咖啡粉量 -->
+          <!-- 3. 咖啡粉量 (含 熱 / 冰 雙向切換膠囊) -->
           <div>
+            <!-- 沖煮模式切換 (熱手沖 vs 急冷冰手沖) -->
+            <div class="mb-3">
+              <div class="text-sm font-semibold text-[#2C2521] mb-2 flex items-center justify-between">
+                <span>沖煮模式</span>
+                <span id="selected-brew-mode-label" class="text-xs font-normal text-[#8C7E75]">熱手沖</span>
+              </div>
+              <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-[#F0EAE3] text-xs">
+                <button type="button" onclick="selectBrewMode('hot')" data-brew-mode="hot" class="py-1.5 px-2 rounded-lg font-bold text-center transition bg-[#654D3F] text-white shadow-2xs flex items-center justify-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
+                  <span>熱手沖 (Hot)</span>
+                </button>
+                <button type="button" onclick="selectBrewMode('iced')" data-brew-mode="iced" class="py-1.5 px-2 rounded-lg font-semibold text-center transition text-[#7C6E64] hover:text-[#2C2521] flex items-center justify-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="19.07" y1="4.93" x2="4.93" y2="19.07"></line></svg>
+                  <span>急冷冰手沖 (Iced)</span>
+                </button>
+              </div>
+            </div>
+
             <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
               <span>咖啡粉量</span>
               <span class="text-xs font-normal text-[#8C7E75]">建議 1-2 杯</span>
@@ -1236,7 +1296,7 @@
               <div class="mt-2">
                 <div class="flex items-center gap-1.5">
                   <button id="btn-temp-minus" onclick="stepCustomTemp(-1)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#E8E4DF] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="減少 1°C (下限 80°C)">-</button>
-                  <span class="text-2xl font-bold text-[#2C2521] font-mono-num cursor-pointer hover:underline" id="param-temp" title="點擊自訂水溫 (範圍 80°C - 98°C)" onclick="editCustomTempPrompt()">92°C</span>
+                  <span class="text-2xl font-bold text-[#2C2521] font-mono-num cursor-pointer hover:underline" id="param-temp" title="點擊自訂水溫 (範圍 80°C - 98°C)" onclick="startInlineTempEdit()">92°C</span>
                   <button id="btn-temp-plus" onclick="stepCustomTemp(1)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#E8E4DF] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="增加 1°C (上限 98°C)">+</button>
                 </div>
                 <div class="text-[11px] text-[#9B8D83] mt-0.5 truncate" id="param-temp-note">標準萃取水溫</div>
@@ -1288,7 +1348,7 @@
               <div class="mt-2">
                 <div class="flex items-center gap-1.5">
                   <button id="btn-ratio-minus" onclick="stepCustomRatio(-0.5)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#E8E4DF] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="減少 0.5 (下限 1:10)">-</button>
-                  <span class="text-2xl font-bold text-[#2C2521] font-mono-num cursor-pointer hover:underline" id="param-ratio" title="點擊自訂粉水比 (範圍 1:10 - 1:20)" onclick="editCustomRatioPrompt()">1:15</span>
+                  <span class="text-2xl font-bold text-[#2C2521] font-mono-num cursor-pointer hover:underline" id="param-ratio" title="點擊自訂粉水比 (範圍 1:10 - 1:20)" onclick="startInlineRatioEdit()">1:15</span>
                   <button id="btn-ratio-plus" onclick="stepCustomRatio(0.5)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#E8E4DF] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="增加 0.5 (上限 1:20)">+</button>
                 </div>
                 <div class="text-[11px] text-[#9B8D83] mt-0.5 truncate" id="param-ratio-note">金杯平衡萃取</div>
@@ -2010,6 +2070,9 @@
     // 系統狀態
     const state = {
       method: 'four_six',   // four_six, single_pour, three_stage, hoffmann, matsuya, immersion
+      dripper: 'conical',   // 'conical' (錐形), 'flat_wave' (平底蛋糕), 'trapezoid' (梯形扇形)
+      brewMode: 'hot',      // 'hot' (熱手沖), 'iced' (急冷冰手沖)
+      currentIceWeight: 0,  // 記錄急冷冰手沖下壺冰塊重 (g)
       roast: 'medium',      // light, medium_light, medium, medium_dark, dark
       dose: 15.0,           // 8 ~ 50g
       flavor: 'balance',    // acid, sweet, body, balance
@@ -2127,6 +2190,40 @@
       }
     };
 
+    // 三大濾杯幾何物理參數表 (Dripper Geometry Configurations)
+    const DRIPPER_CONFIGS = {
+      conical: {
+        name: '錐形濾杯 (V60 / Kono / Origami)',
+        shortName: '錐形 V60',
+        grindShift: 0,           // 基準刻度偏移
+        drainScale: 1.00,        // 基準排水時間係數
+        bedExponent: 0.45,       // 圓錐體積粉層厚度指數
+        largeDoseThreshold: 24,  // 大粉量調粗門檻 (24g)
+        sensoryDelta: { acidity: 0.15, sweetness: 0, body: -0.05, aftertaste: 0, cleanliness: 0.2 },
+        pourHint: '螺旋由內向外，維持中心水流穩定'
+      },
+      flat_wave: {
+        name: '平底蛋糕杯 (Kalita Wave / B75 / Orea)',
+        shortName: '平底蛋糕',
+        grindShift: 0,
+        drainScale: 1.08,        // 平底三孔微限流，接觸時間微增 (+8%)
+        bedExponent: 0.54,       // 接近圓柱體，大粉量時粉層增厚較圓錐更快
+        largeDoseThreshold: 20,  // 20g 即提早調粗 1 階防積水
+        sensoryDelta: { acidity: -0.1, sweetness: 0.3, body: 0.15, aftertaste: 0.1, cleanliness: 0.1 },
+        pourHint: '平穩繞圈，注意避開波浪濾紙外緣皺摺'
+      },
+      trapezoid: {
+        name: '梯形扇形杯 (Melitta / 傳統三孔梯形)',
+        shortName: '梯形扇形',
+        grindShift: 1,           // 底部微小孔形成半浸泡蓄水，預設調粗 1 階防過萃苦澀
+        drainScale: 1.16,        // 排水最慢 (+16%)
+        bedExponent: 0.50,
+        largeDoseThreshold: 22,
+        sensoryDelta: { acidity: -0.2, sweetness: 0.2, body: 0.35, aftertaste: 0.2, cleanliness: -0.15 },
+        pourHint: '中心小圈柔和注水，維持穩定水位防溢流'
+      }
+    };
+
     // 風味調整偏好 (針對酸質、甜感、厚實、平衡之萃取科學設定)
     const FLAVOR_CONFIGS = {
       acid: {
@@ -2192,11 +2289,12 @@
     // 手沖粉量動力學縮放核心 (Dose-Adaptive Scaling Dynamics)
     // 依據粉層厚度 (達西定律 Darcy's Law) 與粉床表面積動態計算流速與時間微調係數
     // ========================================================
-    function getDoseScaleFactors(dose = state.dose) {
+    function getDoseScaleFactors(dose = state.dose, method = state.method, dripper = state.dripper) {
       const safeDose = Math.max(8, Math.min(50, dose || 15));
+      const bedExp = (method === 'immersion') ? 0.45 : (DRIPPER_CONFIGS[dripper]?.bedExponent || 0.45);
       return {
         flowScale: Math.pow(safeDose / 15, 0.35), // 15g: 1.00, 30g: 1.27, 12g: 0.92
-        bedScale: Math.pow(safeDose / 15, 0.45),  // 15g: 1.00, 30g: 1.37, 12g: 0.90
+        bedScale: Math.pow(safeDose / 15, bedExp),
         bloomBonus: Math.round((safeDose - 15) * 0.35) // 悶蒸排氣微調：15g: 0s, 30g: +5s, 10g: -2s
       };
     }
@@ -2327,8 +2425,60 @@
         btn.classList.toggle('active', btn.dataset.method === methodKey);
       });
       document.getElementById('selected-method-label').textContent = METHOD_CONFIGS[methodKey].name.split(' ')[0];
+      updateDripperUI();
       calculateAndRender();
       if (timerRunning) resetTimer();
+    }
+
+    function selectDripper(dripperKey) {
+      if (state.method === 'immersion') return;
+      state.dripper = dripperKey;
+      state.customGrind = null;
+      state.isCustomSteps = false;
+      state.isEditingSteps = false;
+      state.customStepsData = null;
+      updateDripperUI();
+      calculateAndRender();
+      if (timerRunning) resetTimer();
+    }
+
+    function updateDripperUI() {
+      const container = document.getElementById('dripper-selector-container');
+      const label = document.getElementById('selected-dripper-label');
+      if (state.method === 'immersion') {
+        if (container) container.classList.add('opacity-50', 'pointer-events-none');
+        if (label) label.textContent = 'Switch 止水閥 (固定)';
+      } else {
+        if (container) container.classList.remove('opacity-50', 'pointer-events-none');
+        const conf = DRIPPER_CONFIGS[state.dripper] || DRIPPER_CONFIGS['conical'];
+        if (label) label.textContent = conf.shortName;
+        document.querySelectorAll('[data-dripper]').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.dripper === state.dripper);
+        });
+      }
+    }
+
+    function selectBrewMode(mode) {
+      state.brewMode = mode;
+      state.isCustomSteps = false;
+      state.isEditingSteps = false;
+      state.customStepsData = null;
+      updateBrewModeUI();
+      calculateAndRender();
+      if (timerRunning) resetTimer();
+    }
+
+    function updateBrewModeUI() {
+      const label = document.getElementById('selected-brew-mode-label');
+      if (label) label.textContent = state.brewMode === 'iced' ? '急冷冰手沖' : '熱手沖';
+      document.querySelectorAll('[data-brew-mode]').forEach(btn => {
+        const isActive = btn.dataset.brewMode === state.brewMode;
+        if (isActive) {
+          btn.className = 'py-1.5 px-2 rounded-lg font-bold text-center transition bg-[#654D3F] text-white shadow-2xs flex items-center justify-center gap-1.5';
+        } else {
+          btn.className = 'py-1.5 px-2 rounded-lg font-semibold text-center transition text-[#7C6E64] hover:text-[#2C2521] flex items-center justify-center gap-1.5';
+        }
+      });
     }
 
     function selectRoast(roastKey) {
@@ -2441,6 +2591,9 @@
 
     function resetDefaults() {
       state.method = 'four_six';
+      state.dripper = 'conical';
+      state.brewMode = 'hot';
+      state.currentIceWeight = 0;
       state.roast = 'medium';
       state.dose = 15.0;
       state.flavor = 'balance';
@@ -2452,6 +2605,8 @@
       state.customStepsData = null;
       
       selectMethod('four_six');
+      updateDripperUI();
+      updateBrewModeUI();
       selectRoast('medium');
       selectFlavor('balance');
       onDoseChange(15);
@@ -2466,7 +2621,8 @@
     function stepCustomTemp(delta) {
       const roastConf = ROAST_CONFIGS[state.roast];
       const flavorConf = FLAVOR_CONFIGS[state.flavor];
-      const base = roastConf.baseTemp + flavorConf.tempDelta;
+      const icedTempBonus = (state.brewMode === 'iced') ? 1 : 0;
+      const base = roastConf.baseTemp + flavorConf.tempDelta + icedTempBonus;
       let current = base + state.tempAdjust;
       let target = current + delta;
       if (target < MIN_TEMP) target = MIN_TEMP;
@@ -2482,21 +2638,59 @@
       if (timerRunning) resetTimer();
     }
 
-    function editCustomTempPrompt() {
-      const current = parseInt(document.getElementById('param-temp').textContent) || 92;
-      const input = prompt(`請輸入自訂萃取水溫 (°C，範圍 ${MIN_TEMP} - ${MAX_TEMP})：`, current);
-      if (input !== null) {
-        const val = parseInt(input);
-        if (!isNaN(val)) {
-          const clamped = Math.max(MIN_TEMP, Math.min(MAX_TEMP, val));
+    function startInlineTempEdit() {
+      const paramTemp = document.getElementById('param-temp');
+      if (!paramTemp || paramTemp.querySelector('input')) return;
+      const current = parseInt(paramTemp.textContent) || 92;
+      paramTemp.innerHTML = `<input type="number" id="inline-temp-input" min="${MIN_TEMP}" max="${MAX_TEMP}" step="1" value="${current}" class="w-16 text-center font-bold font-mono-num bg-white border border-[#654D3F] rounded-md px-1 py-0.5 text-xl text-[#2C2521] outline-none shadow-xs">`;
+      const input = document.getElementById('inline-temp-input');
+      if (input) {
+        input.focus();
+        input.select();
+        let committed = false;
+        const commit = () => {
+          if (committed) return;
+          committed = true;
+          let val = parseInt(input.value, 10);
+          if (isNaN(val)) val = current;
+          let corrected = false;
+          let msg = '';
+          if (val < MIN_TEMP) {
+            val = MIN_TEMP;
+            corrected = true;
+            msg = `水溫最低為 ${MIN_TEMP}°C，已自動校正`;
+          } else if (val > MAX_TEMP) {
+            val = MAX_TEMP;
+            corrected = true;
+            msg = `水溫最高為 ${MAX_TEMP}°C，已自動校正`;
+          }
           const roastConf = ROAST_CONFIGS[state.roast];
           const flavorConf = FLAVOR_CONFIGS[state.flavor];
-          const base = roastConf.baseTemp + flavorConf.tempDelta;
-          state.tempAdjust = clamped - base;
+          const icedTempBonus = (state.brewMode === 'iced') ? 1 : 0;
+          const base = roastConf.baseTemp + flavorConf.tempDelta + icedTempBonus;
+          state.tempAdjust = val - base;
           calculateAndRender();
           if (timerRunning) resetTimer();
-        }
+          if (corrected) showCustomStepToast(msg);
+        };
+        input.onkeydown = (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            commit();
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            committed = true;
+            calculateAndRender();
+          }
+        };
+        input.onblur = () => {
+          commit();
+        };
       }
+    }
+
+    function editCustomTempPrompt() {
+      startInlineTempEdit();
     }
 
     function onCustomGrindSelect(val) {
@@ -2535,25 +2729,63 @@
       if (timerRunning) resetTimer();
     }
 
-    function editCustomRatioPrompt() {
-      const current = parseFloat(document.getElementById('param-ratio').textContent.replace('1:', '')) || 15;
-      const input = prompt(`請輸入自訂粉水比 (例：15 代表 1:15，範圍 ${MIN_RATIO} - ${MAX_RATIO})：`, current);
-      if (input !== null) {
-        const val = parseFloat(input);
-        if (!isNaN(val)) {
+    function startInlineRatioEdit() {
+      const paramRatio = document.getElementById('param-ratio');
+      if (!paramRatio || paramRatio.querySelector('input')) return;
+      const current = parseFloat(paramRatio.textContent.replace('1:', '')) || 15;
+      paramRatio.innerHTML = `1:<input type="number" id="inline-ratio-input" min="${MIN_RATIO}" max="${MAX_RATIO}" step="0.1" value="${current}" class="w-16 text-center font-bold font-mono-num bg-white border border-[#654D3F] rounded-md px-1 py-0.5 text-xl text-[#2C2521] outline-none shadow-xs">`;
+      const input = document.getElementById('inline-ratio-input');
+      if (input) {
+        input.focus();
+        input.select();
+        let committed = false;
+        const commit = () => {
+          if (committed) return;
+          committed = true;
+          let val = parseFloat(input.value);
+          if (isNaN(val)) val = current;
+          let corrected = false;
+          let msg = '';
+          if (val < MIN_RATIO) {
+            val = MIN_RATIO;
+            corrected = true;
+            msg = `粉水比最低為 1:${MIN_RATIO}，已自動校正`;
+          } else if (val > MAX_RATIO) {
+            val = MAX_RATIO;
+            corrected = true;
+            msg = `粉水比最高為 1:${MAX_RATIO}，已自動校正`;
+          }
+          val = Math.round(val * 10) / 10;
           state.isCustomSteps = false;
           state.isEditingSteps = false;
           state.customStepsData = null;
-          const clamped = Math.round(Math.max(MIN_RATIO, Math.min(MAX_RATIO, val)) * 10) / 10;
           const roastConf = ROAST_CONFIGS[state.roast];
           const methodConf = METHOD_CONFIGS[state.method];
           const flavorConf = FLAVOR_CONFIGS[state.flavor];
           const baseRatio = (roastConf.baseRatio + flavorConf.ratioDelta) * methodConf.ratioMultiplier;
-          state.ratioAdjust = Math.round((clamped - baseRatio) * 10) / 10;
+          state.ratioAdjust = Math.round((val - baseRatio) * 10) / 10;
           calculateAndRender();
           if (timerRunning) resetTimer();
-        }
+          if (corrected) showCustomStepToast(msg);
+        };
+        input.onkeydown = (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            commit();
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            committed = true;
+            calculateAndRender();
+          }
+        };
+        input.onblur = () => {
+          commit();
+        };
       }
+    }
+
+    function editCustomRatioPrompt() {
+      startInlineRatioEdit();
     }
 
     function toggleCustomStepsMode() {
@@ -2679,8 +2911,16 @@
       if (!toast) {
         toast = document.createElement('div');
         toast.id = 'custom-step-toast';
-        toast.className = 'fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 px-3.5 py-2 rounded-xl bg-[#2D231D] text-[#FAF6F2] text-xs font-medium shadow-xl border border-[#42332A] flex items-center gap-2 transition-all duration-300 opacity-0 translate-y-2 pointer-events-none';
+        toast.className = 'fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-[10000] px-3.5 py-2 rounded-xl bg-[#2D231D] text-[#FAF6F2] text-xs font-medium shadow-xl border border-[#42332A] flex items-center gap-2 transition-all duration-300 opacity-0 translate-y-2 pointer-events-none';
         document.body.appendChild(toast);
+      }
+      const zenModal = document.getElementById('zen-barista-modal');
+      const vaultModal = document.getElementById('recipe-vault-modal');
+      const hostElem = (zenModal && zenModal.open) ? zenModal
+                     : (vaultModal && vaultModal.open) ? vaultModal
+                     : document.body;
+      if (toast.parentElement !== hostElem) {
+        hostElem.appendChild(toast);
       }
       toast.innerHTML = `
         <svg class="w-4 h-4 text-amber-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -2695,6 +2935,70 @@
       toast._timer = setTimeout(() => {
         toast.classList.add('opacity-0', 'translate-y-2');
       }, 2500);
+    }
+
+    function onCustomStepNameChange(idx, val) {
+      if (!state.customStepsData) {
+        state.customStepsData = JSON.parse(JSON.stringify(currentStepsCache));
+      }
+      if (!state.customStepsData[idx]) return;
+      state.customStepsData[idx].name = val;
+      state.isCustomSteps = true;
+      if (currentStepsCache && currentStepsCache[idx]) {
+        currentStepsCache[idx].name = val;
+      }
+    }
+
+    function removeCustomStep(idx) {
+      if (!state.customStepsData) {
+        state.customStepsData = JSON.parse(JSON.stringify(currentStepsCache));
+      }
+      if (state.customStepsData.length <= 1) {
+        showCustomStepToast('至少需保留一個沖煮階段');
+        return;
+      }
+      state.customStepsData.splice(idx, 1);
+      state.isCustomSteps = true;
+      recalculateCustomStepsMetrics();
+      renderStepTimeline();
+      showCustomStepToast('已刪除沖煮階段');
+    }
+
+    function addCustomStep(type) {
+      if (!state.customStepsData) {
+        state.customStepsData = JSON.parse(JSON.stringify(currentStepsCache));
+      }
+      if (state.customStepsData.length >= 10) {
+        showCustomStepToast('最多支援 10 個沖煮階段');
+        return;
+      }
+      if (type === 'pour') {
+        state.customStepsData.push({
+          name: '自訂第 ' + (state.customStepsData.length + 1) + ' 段',
+          amount: 45,
+          durationSec: 25,
+          flowType: 'medium',
+          animType: 'spiral',
+          note: '穩定繞圈注水至目標克數',
+          actionTitle: '自訂注水階段',
+          actionTip: '穩定繞圈注水至目標克數'
+        });
+      } else {
+        state.customStepsData.push({
+          name: '滴濾收尾',
+          amount: 0,
+          durationSec: 20,
+          flowType: 'drain',
+          animType: 'drain_rest',
+          note: '靜置等待水層平穩濾乾，移開濾杯',
+          actionTitle: '靜置滴濾',
+          actionTip: '靜置等待水層平穩濾乾，移開濾杯'
+        });
+      }
+      state.isCustomSteps = true;
+      recalculateCustomStepsMetrics();
+      renderStepTimeline();
+      showCustomStepToast('已新增沖煮階段');
     }
 
     function onCustomStepNoteChange(idx, val) {
@@ -2788,11 +3092,32 @@
       // 動態連動總水量與粉水比
       const totalWater = curCum;
       const paramWater = document.getElementById('param-water');
-      if (paramWater) paramWater.textContent = `${totalWater}g`;
       const paramWaterNote = document.getElementById('param-water-note');
-      if (paramWaterNote) paramWaterNote.textContent = '依自訂步驟加總';
       const timerTotalGoal = document.getElementById('timer-total-water-goal');
-      if (timerTotalGoal) timerTotalGoal.textContent = totalWater;
+
+      if (state.brewMode === 'iced') {
+        const iceW = state.currentIceWeight || 0;
+        const customTotalMass = totalWater + iceW;
+        if (paramWater) paramWater.textContent = `${totalWater}g`;
+        if (paramWaterNote) paramWaterNote.textContent = `自訂熱水 + 下壺冰塊 ${iceW}g (總計 ${customTotalMass}g)`;
+        if (timerTotalGoal) timerTotalGoal.textContent = totalWater;
+
+        const calcRatio = Math.round((customTotalMass / state.dose) * 10) / 10;
+        const paramRatio = document.getElementById('param-ratio');
+        if (paramRatio) paramRatio.textContent = `1:${calcRatio}`;
+        const paramRatioNote = document.getElementById('param-ratio-note');
+        if (paramRatioNote) paramRatioNote.textContent = '自訂粉水比 (含冰塊)';
+      } else {
+        if (paramWater) paramWater.textContent = `${totalWater}g`;
+        if (paramWaterNote) paramWaterNote.textContent = '依自訂步驟加總';
+        if (timerTotalGoal) timerTotalGoal.textContent = totalWater;
+
+        const calcRatio = Math.round((totalWater / state.dose) * 10) / 10;
+        const paramRatio = document.getElementById('param-ratio');
+        if (paramRatio) paramRatio.textContent = `1:${calcRatio}`;
+        const paramRatioNote = document.getElementById('param-ratio-note');
+        if (paramRatioNote) paramRatioNote.textContent = '自訂粉水比';
+      }
 
       // 配方全域防呆：總水量若為 0g 則禁用計時開始按鈕，並提示
       const timerRunBtn = document.getElementById('timer-run-btn');
@@ -2809,12 +3134,6 @@
           timerRunBtn.classList.remove('opacity-40', 'cursor-not-allowed');
         }
       }
-
-      const calcRatio = Math.round((totalWater / state.dose) * 10) / 10;
-      const paramRatio = document.getElementById('param-ratio');
-      if (paramRatio) paramRatio.textContent = `1:${calcRatio}`;
-      const paramRatioNote = document.getElementById('param-ratio-note');
-      if (paramRatioNote) paramRatioNote.textContent = '自訂粉水比';
 
       const totalEst = document.getElementById('total-time-estimate');
       if (totalEst) totalEst.textContent = `約 ${formatTime(totalBrewSeconds)}`;
@@ -2838,17 +3157,20 @@
       return purePourSec + drainSec;
     }
 
-    function generateSteps(method, dose, totalWater, flavorKey = state.flavor, roastKey = state.roast) {
+    function generateSteps(method, dose, totalWater, flavorKey = state.flavor, roastKey = state.roast, dripperKey = state.dripper, isIced = (state.brewMode === 'iced'), iceWeight = 0, totalTargetMass = 0) {
       // 若處於自定義步驟模式，優先回傳已自定義的步驟資料
       if (state.isCustomSteps && state.customStepsData && state.customStepsData.length > 0) {
         return state.customStepsData;
       }
 
+      const refTotalMass = (isIced && totalTargetMass > 0) ? totalTargetMass : totalWater;
       const flavorConf = FLAVOR_CONFIGS[flavorKey] || FLAVOR_CONFIGS['balance'];
       const roastConf = ROAST_CONFIGS[roastKey] || ROAST_CONFIGS['medium'];
+      const dripperConf = DRIPPER_CONFIGS[dripperKey] || DRIPPER_CONFIGS['conical'];
       const tMod = flavorConf.timingModifier || { bloomDelta: 0, stepDelta: 0 };
-      const { flowScale, bedScale, bloomBonus } = getDoseScaleFactors(dose);
-      const effectiveBedScale = bedScale * (roastConf.drainScale || 1.0);
+      const { flowScale, bedScale, bloomBonus } = getDoseScaleFactors(dose, method, dripperKey);
+      const dripperDrainMultiplier = (method === 'immersion') ? 1.0 : (dripperConf.drainScale || 1.0);
+      const effectiveBedScale = bedScale * (roastConf.drainScale || 1.0) * dripperDrainMultiplier;
       const totalBloomAdjust = tMod.bloomDelta + bloomBonus + (roastConf.bloomRoastDelta || 0);
       let rawSteps = [];
 
@@ -2856,8 +3178,10 @@
         // 依風味動態分配前 40% 水量 (Kasuya 4:6 法則：酸質前大多、甜感前小後大)
         const p1Ratio = flavorConf.pourRatio46 ? flavorConf.pourRatio46[0] : 0.20;
         const p2Ratio = flavorConf.pourRatio46 ? flavorConf.pourRatio46[1] : 0.20;
-        const bloomWater = Math.round(totalWater * p1Ratio);
-        const pour2 = Math.round(totalWater * p2Ratio);
+        const rawBloom = isIced ? Math.max(Math.round(dose * 2.0), Math.round(totalWater * p1Ratio)) : Math.round(totalWater * p1Ratio);
+        const bloomWater = Math.min(rawBloom, Math.round(totalWater * 0.35));
+        const frontTotal = Math.round(totalWater * (p1Ratio + p2Ratio));
+        const pour2 = Math.max(0, frontTotal - bloomWater);
         const remaining = totalWater - bloomWater - pour2;
         const pour3 = Math.round(remaining / 3);
         const pour4 = Math.round(remaining / 3);
@@ -2933,7 +3257,7 @@
           }
         ];
       } else if (method === 'single_pour') {
-        const bloomWater = Math.min(Math.round(dose * 2.5), Math.round(totalWater * 0.22));
+        const bloomWater = Math.min(Math.round(dose * 2.5), Math.round(refTotalMass * 0.22), Math.round(totalWater * 0.35));
         const mainPour = totalWater - bloomWater;
         const bloomPure = Math.round(bloomWater / (FLOW_PROFILES.gentle.targetRate * flowScale));
         const bloomSec = Math.max(25, bloomPure + 12, 35 + totalBloomAdjust);
@@ -2979,7 +3303,7 @@
           }
         ];
       } else if (method === 'three_stage') {
-        const bloomWater = Math.min(Math.round(dose * 2.2), Math.round(totalWater * 0.20));
+        const bloomWater = Math.min(Math.round(dose * 2.2), Math.round(refTotalMass * 0.20), Math.round(totalWater * 0.35));
         const rest = totalWater - bloomWater;
         const pour1 = Math.round(rest * 0.55);
         const pour2 = totalWater - bloomWater - pour1;
@@ -3028,9 +3352,9 @@
           }
         ];
       } else if (method === 'hoffmann') {
-        const bloomWater = Math.min(Math.round(dose * 3.0), Math.round(totalWater * 0.20));
-        const pour1 = Math.round((totalWater * 0.6) - bloomWater);
-        const pour2 = totalWater - bloomWater - pour1;
+        const bloomWater = Math.min(Math.round(dose * 3.0), Math.round(refTotalMass * 0.20), Math.round(totalWater * 0.35));
+        const pour1 = Math.max(bloomWater, Math.round((totalWater * 0.6) - bloomWater));
+        const pour2 = Math.max(0, totalWater - bloomWater - pour1);
 
         const bloomPure = Math.round(bloomWater / (FLOW_PROFILES.medium.targetRate * flowScale));
         const bloomSec = Math.max(30, bloomPure + 12, 45 + totalBloomAdjust);
@@ -3089,66 +3413,127 @@
           }
         ];
       } else if (method === 'matsuya') {
-        const bloomWater = Math.min(Math.round(dose * 2.0), Math.round(totalWater * 0.18));
-        const extractWater = Math.round(totalWater * 0.55);
-        const bypassWater = totalWater - bloomWater - extractWater;
+        if (isIced) {
+          const bloomWater = Math.min(Math.round(dose * 2.0), Math.round(refTotalMass * 0.18), Math.round(totalWater * 0.35));
+          const extractWater = totalWater - bloomWater;
+          const dripSec = calcPourAndDrainSec(bloomWater, 'drip', 5, flowScale, effectiveBedScale, 0);
+          const steamSec = Math.max(120, 180 + tMod.bloomDelta * 2 + (roastConf.bloomRoastDelta || 0) * 5);
+          const steamTimeStr = (steamSec % 60 === 0) ? `${steamSec / 60} 分鐘` : `${formatTime(steamSec)} (${steamSec}秒)`;
+          const extSec = calcPourAndDrainSec(extractWater, 'fast', 19, flowScale, effectiveBedScale, tMod.stepDelta);
+          const icedBypassSec = 15;
 
-        const dripSec = calcPourAndDrainSec(bloomWater, 'drip', 5, flowScale, effectiveBedScale, 0);
-        const steamSec = Math.max(120, 180 + tMod.bloomDelta * 2 + (roastConf.bloomRoastDelta || 0) * 5);
-        const steamTimeStr = (steamSec % 60 === 0) ? `${steamSec / 60} 分鐘` : `${formatTime(steamSec)} (${steamSec}秒)`;
-        const extSec = calcPourAndDrainSec(extractWater, 'fast', 19, flowScale, effectiveBedScale, tMod.stepDelta);
-        const bypassSec = calcPourAndDrainSec(bypassWater, 'bypass', 3, flowScale, 1.0, 0);
+          rawSteps = [
+            {
+              name: '中心點滴潤濕',
+              amount: bloomWater,
+              durationSec: dripSec,
+              flowType: 'drip',
+              note: '細小點滴僅潤濕中心粉芯',
+              animType: 'drip_slow',
+              actionTitle: '中心點滴滴水 (Drop by Drop)',
+              actionTip: '手沖壺極輕微傾斜，一滴一滴如點滴般僅滴在中心粉芯，不可形成連續水柱。',
+              defaultAmount: bloomWater,
+              defaultDuration: dripSec
+            },
+            {
+              name: '加蓋深悶蒸',
+              amount: 0,
+              durationSec: steamSec,
+              flowType: 'drain',
+              note: `蓋上悶蒸蓋深層悶蒸 ${steamTimeStr}，排淨氣體`,
+              animType: 'bloom',
+              actionTitle: `深層悶蒸膨脹 (加蓋 ${steamTimeStr})`,
+              actionTip: '加蓋鎖住熱氣與蒸氣，讓咖啡粉內部深層均勻膨脹排氣，徹底釋放醇厚精華。',
+              defaultAmount: 0,
+              defaultDuration: steamSec
+            },
+            {
+              name: '核心萃取注水',
+              amount: extractWater,
+              durationSec: extSec,
+              flowType: 'fast',
+              note: '大水流僅在中心硬幣大小區域注水',
+              animType: 'steady_center',
+              actionTitle: '中心 50 圓大水流萃取',
+              actionTip: '大水流僅在中心 50 圓硬幣大小範圍穩定注水，迅速萃取出中段濃厚精華。',
+              defaultAmount: extractWater,
+              defaultDuration: extSec
+            },
+            {
+              name: '冰塊急冷 (Iced Bypass)',
+              amount: 0,
+              durationSec: icedBypassSec,
+              flowType: 'bypass',
+              note: `移開濾杯，向分享壺加入 ${iceWeight}g 冰塊充分攪拌急冷`,
+              animType: 'bypass_pot',
+              actionTitle: '加入冰塊急冷 (Iced Bypass)',
+              actionTip: `移開濾杯，向分享壺加入 ${iceWeight}g 冰塊充分攪拌急冷，讓高濃度咖啡液迅速降溫鎖香！`,
+              defaultAmount: 0,
+              defaultDuration: icedBypassSec
+            }
+          ];
+        } else {
+          const bloomWater = Math.min(Math.round(dose * 2.0), Math.round(refTotalMass * 0.18), Math.round(totalWater * 0.35));
+          const extractWater = Math.round(totalWater * 0.55);
+          const bypassWater = totalWater - bloomWater - extractWater;
 
-        rawSteps = [
-          {
-            name: '中心點滴潤濕',
-            amount: bloomWater,
-            durationSec: dripSec,
-            flowType: 'drip',
-            note: '細小點滴僅潤濕中心粉芯',
-            animType: 'drip_slow',
-            actionTitle: '中心點滴滴水 (Drop by Drop)',
-            actionTip: '手沖壺極輕微傾斜，一滴一滴如點滴般僅滴在中心粉芯，不可形成連續水柱。',
-            defaultAmount: bloomWater,
-            defaultDuration: dripSec
-          },
-          {
-            name: '加蓋深悶蒸',
-            amount: 0,
-            durationSec: steamSec,
-            flowType: 'drain',
-            note: `蓋上悶蒸蓋深層悶蒸 ${steamTimeStr}，排淨氣體`,
-            animType: 'bloom',
-            actionTitle: `深層悶蒸膨脹 (加蓋 ${steamTimeStr})`,
-            actionTip: '加蓋鎖住熱氣與蒸氣，讓咖啡粉內部深層均勻膨脹排氣，徹底釋放醇厚精華。',
-            defaultAmount: 0,
-            defaultDuration: steamSec
-          },
-          {
-            name: '核心萃取注水',
-            amount: extractWater,
-            durationSec: extSec,
-            flowType: 'fast',
-            note: '大水流僅在中心硬幣大小區域注水',
-            animType: 'steady_center',
-            actionTitle: '中心 50 圓大水流萃取',
-            actionTip: '大水流僅在中心 50 圓硬幣大小範圍穩定注水，迅速萃取出中段濃厚精華。',
-            defaultAmount: extractWater,
-            defaultDuration: extSec
-          },
-          {
-            name: '熱水稀釋 (Bypass)',
-            amount: bypassWater,
-            durationSec: bypassSec,
-            flowType: 'bypass',
-            note: '移開濾杯，向分享壺直接加入純淨熱水',
-            animType: 'bypass_pot',
-            actionTitle: '移開濾杯直接加熱水 (Bypass)',
-            actionTip: '立刻移開濾杯避免萃出尾段苦澀雜味，直接向分享壺加入純熱水稀釋至目標總克數！',
-            defaultAmount: bypassWater,
-            defaultDuration: bypassSec
-          }
-        ];
+          const dripSec = calcPourAndDrainSec(bloomWater, 'drip', 5, flowScale, effectiveBedScale, 0);
+          const steamSec = Math.max(120, 180 + tMod.bloomDelta * 2 + (roastConf.bloomRoastDelta || 0) * 5);
+          const steamTimeStr = (steamSec % 60 === 0) ? `${steamSec / 60} 分鐘` : `${formatTime(steamSec)} (${steamSec}秒)`;
+          const extSec = calcPourAndDrainSec(extractWater, 'fast', 19, flowScale, effectiveBedScale, tMod.stepDelta);
+          const bypassSec = calcPourAndDrainSec(bypassWater, 'bypass', 3, flowScale, 1.0, 0);
+
+          rawSteps = [
+            {
+              name: '中心點滴潤濕',
+              amount: bloomWater,
+              durationSec: dripSec,
+              flowType: 'drip',
+              note: '細小點滴僅潤濕中心粉芯',
+              animType: 'drip_slow',
+              actionTitle: '中心點滴滴水 (Drop by Drop)',
+              actionTip: '手沖壺極輕微傾斜，一滴一滴如點滴般僅滴在中心粉芯，不可形成連續水柱。',
+              defaultAmount: bloomWater,
+              defaultDuration: dripSec
+            },
+            {
+              name: '加蓋深悶蒸',
+              amount: 0,
+              durationSec: steamSec,
+              flowType: 'drain',
+              note: `蓋上悶蒸蓋深層悶蒸 ${steamTimeStr}，排淨氣體`,
+              animType: 'bloom',
+              actionTitle: `深層悶蒸膨脹 (加蓋 ${steamTimeStr})`,
+              actionTip: '加蓋鎖住熱氣與蒸氣，讓咖啡粉內部深層均勻膨脹排氣，徹底釋放醇厚精華。',
+              defaultAmount: 0,
+              defaultDuration: steamSec
+            },
+            {
+              name: '核心萃取注水',
+              amount: extractWater,
+              durationSec: extSec,
+              flowType: 'fast',
+              note: '大水流僅在中心硬幣大小區域注水',
+              animType: 'steady_center',
+              actionTitle: '中心 50 圓大水流萃取',
+              actionTip: '大水流僅在中心 50 圓硬幣大小範圍穩定注水，迅速萃取出中段濃厚精華。',
+              defaultAmount: extractWater,
+              defaultDuration: extSec
+            },
+            {
+              name: '熱水稀釋 (Bypass)',
+              amount: bypassWater,
+              durationSec: bypassSec,
+              flowType: 'bypass',
+              note: '移開濾杯，向分享壺直接加入純淨熱水',
+              animType: 'bypass_pot',
+              actionTitle: '移開濾杯直接加熱水 (Bypass)',
+              actionTip: '立刻移開濾杯避免萃出尾段苦澀雜味，直接向分享壺加入純熱水稀釋至目標總克數！',
+              defaultAmount: bypassWater,
+              defaultDuration: bypassSec
+            }
+          ];
+        }
       } else if (method === 'immersion') {
         const bloomWater = Math.round(totalWater * 0.4);
         const remaining = totalWater - bloomWater;
@@ -3201,6 +3586,17 @@
         ];
       }
 
+      if (isIced && method !== 'matsuya' && rawSteps.length > 0) {
+        const lastStep = rawSteps[rawSteps.length - 1];
+        const iceNote = `（下壺預置 ${iceWeight}g 冰塊，滴濾完成後搖晃融冰急冷）`;
+        if (lastStep && !lastStep.note.includes('下壺預置')) {
+          lastStep.note += iceNote;
+        }
+        if (lastStep && !lastStep.actionTip.includes('下壺預置')) {
+          lastStep.actionTip += iceNote;
+        }
+      }
+
       let curCumulativeWater = 0;
       let curStartSec = 0;
 
@@ -3229,14 +3625,17 @@
       return steps;
     }
 
-    function getStandardBalanceTotalSeconds(method = state.method, dose = state.dose, roast = state.roast) {
+    function getStandardBalanceTotalSeconds(method = state.method, dose = state.dose, roast = state.roast, dripper = state.dripper, brewMode = state.brewMode) {
       const rConf = ROAST_CONFIGS[roast] || ROAST_CONFIGS['medium'];
       const mConf = METHOD_CONFIGS[method] || METHOD_CONFIGS['four_six'];
       const stdRatio = Math.round((rConf.baseRatio * mConf.ratioMultiplier) * 10) / 10;
-      const stdWater = Math.round(dose * stdRatio);
+      let stdWater = Math.round(dose * stdRatio);
+      const isIced = (brewMode === 'iced');
+      const iceWeight = isIced ? Math.round(stdWater * 0.35) : 0;
+      const hotWater = isIced ? (stdWater - iceWeight) : stdWater;
       const prevCustom = state.isCustomSteps;
       state.isCustomSteps = false;
-      const stdSteps = generateSteps(method, dose, stdWater, 'balance', roast);
+      const stdSteps = generateSteps(method, dose, hotWater, 'balance', roast, dripper, isIced, iceWeight, stdWater);
       state.isCustomSteps = prevCustom;
       return stdSteps.reduce((sum, s) => sum + s.durationSec, 0);
     }
@@ -3248,16 +3647,18 @@
       const roastConf = ROAST_CONFIGS[state.roast];
       const methodConf = METHOD_CONFIGS[state.method];
       const flavorConf = FLAVOR_CONFIGS[state.flavor];
+      const dripperConf = DRIPPER_CONFIGS[state.dripper] || DRIPPER_CONFIGS['conical'];
 
-      // 1. 水溫計算 (基準 + 風味微調 + 使用者手動自定義微調，嚴格限制 MIN_TEMP ~ MAX_TEMP)
-      let finalTemp = roastConf.baseTemp + flavorConf.tempDelta + state.tempAdjust;
+      // 1. 水溫計算 (基準 + 風味微調 + 冰手沖高溫補償 + 使用者手動自定義微調，嚴格限制 MIN_TEMP ~ MAX_TEMP)
+      const icedTempBonus = (state.brewMode === 'iced') ? 1 : 0;
+      let finalTemp = roastConf.baseTemp + flavorConf.tempDelta + state.tempAdjust + icedTempBonus;
       if (finalTemp > MAX_TEMP) {
         finalTemp = MAX_TEMP;
-        state.tempAdjust = MAX_TEMP - (roastConf.baseTemp + flavorConf.tempDelta);
+        state.tempAdjust = MAX_TEMP - (roastConf.baseTemp + flavorConf.tempDelta + icedTempBonus);
       }
       if (finalTemp < MIN_TEMP) {
         finalTemp = MIN_TEMP;
-        state.tempAdjust = MIN_TEMP - (roastConf.baseTemp + flavorConf.tempDelta);
+        state.tempAdjust = MIN_TEMP - (roastConf.baseTemp + flavorConf.tempDelta + icedTempBonus);
       }
 
       // 2. 粉水比計算 (基準 + 風味微調 + 手法倍率 + 使用者自定義微調，嚴格限制 MIN_RATIO ~ MAX_RATIO)
@@ -3274,28 +3675,38 @@
       }
       let ratioStr = `1:${finalRatioVal}`;
 
-      // 3. 總水量計算
-      let totalWater = Math.round(state.dose * finalRatioVal);
+      // 3. 總水量與冰手沖拆分計算
+      const totalTargetMass = Math.round(state.dose * finalRatioVal);
+      const isIced = (state.brewMode === 'iced');
+      const iceWeight = isIced ? Math.round(totalTargetMass * 0.35) : 0;
+      if (!state.isCustomSteps) {
+        state.currentIceWeight = isIced ? iceWeight : 0;
+      }
+      const hotWaterTotal = isIced ? (totalTargetMass - iceWeight) : totalTargetMass;
+      let effectivePourWater = hotWaterTotal;
 
-      // 4. 研磨度計算 (使用者自訂優先，否則採用手法基準 + 烘焙度偏移 + 粉量厚度偏移的三維疊加計算模型)
+      // 4. 研磨度計算 (使用者自訂優先，否則採用手法基準 + 烘焙度偏移 + 濾杯偏移 + 粉量厚度偏移 + 冰手沖調細的五維疊加模型)
       const baseIdx = GRIND_LADDER.indexOf(methodConf.grindModifier);
       const safeBaseIdx = baseIdx !== -1 ? baseIdx : 3;
 
       const roastGrindShift = (state.method === 'matsuya') ? 0 : (roastConf.roastGrindShift || 0);
+      const dripperGrindShift = (state.method === 'immersion' || state.method === 'matsuya') ? 0 : (dripperConf.grindShift || 0);
+      const largeDoseLimit = (state.method === 'immersion') ? 28 : (dripperConf.largeDoseThreshold || 24);
 
       let doseGrindShift = 0;
-      if (state.method === 'immersion') {
-        if (state.dose >= 28) doseGrindShift = 1;
-      } else {
-        if (state.dose >= 24) doseGrindShift = 1;
-        else if (state.dose <= 12) doseGrindShift = -1;
+      if (state.dose >= largeDoseLimit) {
+        doseGrindShift = 1;
+      } else if (state.dose <= 12 && state.method !== 'immersion') {
+        doseGrindShift = -1;
       }
 
-      const totalGrindShift = roastGrindShift + doseGrindShift;
+      const icedGrindShift = (isIced && state.method !== 'matsuya') ? -1 : 0;
+
+      const totalGrindShift = roastGrindShift + dripperGrindShift + doseGrindShift + icedGrindShift;
       const shiftedIdx = Math.max(1, Math.min(GRIND_LADDER.length - 1, safeBaseIdx + totalGrindShift));
       const roastOnlyIdx = Math.max(1, Math.min(GRIND_LADDER.length - 1, safeBaseIdx + roastGrindShift));
       const effectiveRoastShift = roastOnlyIdx - safeBaseIdx;
-      const effectiveDoseShift = shiftedIdx - roastOnlyIdx;
+      const effectiveDoseShift = doseGrindShift;
       const actualShift = shiftedIdx - safeBaseIdx;
 
       let finalGrind;
@@ -3307,18 +3718,19 @@
       } else {
         finalGrind = GRIND_LADDER[shiftedIdx];
         if (actualShift === 0) {
-          if (roastGrindShift !== 0 && roastGrindShift === -doseGrindShift) {
-            grindNote = '烘焙度與粉量阻力互抵，維持基準研磨';
+          if (totalGrindShift !== 0) {
+            grindNote = '參數阻力互抵，維持基準研磨';
           } else {
             grindNote = methodConf.grindNote || roastConf.grindNote;
           }
         } else {
-          if (effectiveRoastShift !== 0 && effectiveDoseShift !== 0) {
-            grindNote = `${roastConf.name}${effectiveRoastShift < 0 ? '調細' : '調粗'} + ${effectiveDoseShift > 0 ? '大粉量調粗' : '小粉量調細'}`;
-          } else if (effectiveDoseShift !== 0) {
-            grindNote = effectiveDoseShift > 0 ? '粉層深水阻大，自動調粗一階' : '粉層淺流速快，自動調細一階';
-          } else if (effectiveRoastShift !== 0) {
-            grindNote = roastConf.grindNote;
+          const notes = [];
+          if (icedGrindShift !== 0) notes.push('冰手沖調細');
+          if (effectiveRoastShift !== 0) notes.push(`${roastConf.name}${effectiveRoastShift < 0 ? '調細' : '調粗'}`);
+          if (dripperGrindShift !== 0) notes.push(`${dripperConf.shortName}調粗`);
+          if (effectiveDoseShift !== 0) notes.push(effectiveDoseShift > 0 ? '大粉量調粗' : '小粉量調細');
+          if (notes.length > 0) {
+            grindNote = notes.join(' + ');
           } else {
             grindNote = methodConf.grindNote || roastConf.grindNote;
           }
@@ -3329,7 +3741,11 @@
       // 更新水溫 UI
       document.getElementById('param-temp').textContent = `${finalTemp}°C`;
       let tempNoteText = `${roastConf.name}標準水溫`;
-      if (state.tempAdjust !== 0) {
+      if (isIced) {
+        tempNoteText = (state.tempAdjust !== 0)
+          ? `自訂水溫 (${state.tempAdjust > 0 ? '+' : ''}${state.tempAdjust}°C) · 冰手沖高溫補償 (+1°C)`
+          : '冰手沖高溫補償 (+1°C)';
+      } else if (state.tempAdjust !== 0) {
         tempNoteText = `自訂水溫 (${state.tempAdjust > 0 ? '+' : ''}${state.tempAdjust}°C)`;
       } else if (flavorConf.tempDelta !== 0) {
         tempNoteText = `${flavorConf.name}推薦 (${flavorConf.tempDelta > 0 ? '+' : ''}${flavorConf.tempDelta}°C)`;
@@ -3387,13 +3803,23 @@
       let steps;
       if (state.isCustomSteps && state.customStepsData) {
         steps = state.customStepsData;
-        totalWater = steps.reduce((sum, s) => sum + s.amount, 0);
-        const customRatioVal = Math.round((totalWater / state.dose) * 10) / 10;
-        ratioStr = `1:${customRatioVal}`;
-        document.getElementById('param-ratio').textContent = ratioStr;
-        document.getElementById('param-ratio-note').textContent = '依自訂步驟換算';
+        const customHotWater = steps.reduce((sum, s) => sum + s.amount, 0);
+        effectivePourWater = customHotWater;
+        if (isIced) {
+          const iceW = state.currentIceWeight || 0;
+          const customTotalMass = customHotWater + iceW;
+          const customRatioVal = Math.round((customTotalMass / state.dose) * 10) / 10;
+          ratioStr = `1:${customRatioVal}`;
+          document.getElementById('param-ratio').textContent = ratioStr;
+          document.getElementById('param-ratio-note').textContent = '自訂粉水比 (含冰塊)';
+        } else {
+          const customRatioVal = Math.round((customHotWater / state.dose) * 10) / 10;
+          ratioStr = `1:${customRatioVal}`;
+          document.getElementById('param-ratio').textContent = ratioStr;
+          document.getElementById('param-ratio-note').textContent = '依自訂步驟換算';
+        }
       } else {
-        steps = generateSteps(state.method, state.dose, totalWater, state.flavor, state.roast);
+        steps = generateSteps(state.method, state.dose, effectivePourWater, state.flavor, state.roast, state.dripper, isIced, iceWeight, totalTargetMass);
       }
       currentStepsCache = steps;
 
@@ -3403,7 +3829,7 @@
       let dynTip = flavorConf.note;
       let dynTimingNote = flavorConf.timingNote;
 
-      const stdBalSec = getStandardBalanceTotalSeconds(state.method, state.dose, state.roast);
+      const stdBalSec = getStandardBalanceTotalSeconds(state.method, state.dose, state.roast, state.dripper, state.brewMode);
       const diffSec = totalBrewSeconds - stdBalSec;
       const diffStr = diffSec === 0 ? '' : (diffSec > 0 ? `+${diffSec}s` : `${diffSec}s`);
 
@@ -3445,11 +3871,24 @@
       if (flavorTimingElem) flavorTimingElem.textContent = dynTimingNote;
 
       const paramWaterElem = document.getElementById('param-water');
-      if (paramWaterElem) paramWaterElem.textContent = `${totalWater}g`;
       const paramWaterNoteElem = document.getElementById('param-water-note');
-      if (paramWaterNoteElem) paramWaterNoteElem.textContent = state.isCustomSteps ? '依自訂步驟加總' : `依 ${state.dose}g 粉計算`;
       const timerTotalWaterGoalElem = document.getElementById('timer-total-water-goal');
-      if (timerTotalWaterGoalElem) timerTotalWaterGoalElem.textContent = totalWater;
+
+      if (isIced) {
+        const iceW = state.isCustomSteps ? (state.currentIceWeight || 0) : iceWeight;
+        const totalMass = effectivePourWater + iceW;
+        if (paramWaterElem) paramWaterElem.textContent = `${effectivePourWater}g`;
+        if (paramWaterNoteElem) {
+          paramWaterNoteElem.textContent = state.isCustomSteps
+            ? `自訂熱水 + 下壺冰塊 ${iceW}g (總計 ${totalMass}g)`
+            : `熱水 + 下壺冰塊 ${iceWeight}g (總液重 ${totalTargetMass}g)`;
+        }
+        if (timerTotalWaterGoalElem) timerTotalWaterGoalElem.textContent = effectivePourWater;
+      } else {
+        if (paramWaterElem) paramWaterElem.textContent = `${effectivePourWater}g`;
+        if (paramWaterNoteElem) paramWaterNoteElem.textContent = state.isCustomSteps ? '依自訂步驟加總' : `依 ${state.dose}g 粉計算`;
+        if (timerTotalWaterGoalElem) timerTotalWaterGoalElem.textContent = effectivePourWater;
+      }
 
       const guideMethodElem = document.getElementById('guide-method-name');
       if (guideMethodElem) guideMethodElem.textContent = methodConf.name;
@@ -3462,7 +3901,12 @@
 
       const rateParamsElem = document.getElementById('rate-form-current-params');
       if (rateParamsElem) {
-        rateParamsElem.textContent = `${state.dose}g · ${finalTemp}°C · ${ratioStr} · ${totalWater}g`;
+        if (isIced) {
+          const iceW = state.isCustomSteps ? (state.currentIceWeight || 0) : iceWeight;
+          rateParamsElem.textContent = `${state.dose}g · ${finalTemp}°C · ${ratioStr} · 熱水 ${effectivePourWater}g + 冰 ${iceW}g`;
+        } else {
+          rateParamsElem.textContent = `${state.dose}g · ${finalTemp}°C · ${ratioStr} · ${effectivePourWater}g`;
+        }
       }
 
       renderStepTimeline();
@@ -3519,9 +3963,14 @@
               <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-1.5">
                   <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                  <span class="font-bold text-xs sm:text-sm text-[#2C2521]">${escapeHtml(st.name)}</span>
+                  <input type="text" value="${escapeHtml(st.name)}" oninput="onCustomStepNameChange(${idx}, this.value)" class="font-bold text-xs sm:text-sm text-[#2C2521] bg-white border border-[#E6E0D8] rounded-md px-2 py-0.5 w-32 focus:border-[#654D3F] outline-none">
                 </div>
-                <span class="text-[11px] text-[#8C7E75] font-mono-num font-medium" id="timeline-step-range-${idx}">(${st.timeRangeStr})</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-[11px] text-[#8C7E75] font-mono-num font-medium" id="timeline-step-range-${idx}">(${st.timeRangeStr})</span>
+                  <button type="button" onclick="removeCustomStep(${idx})" class="p-1 rounded-md text-stone-400 hover:text-red-600 hover:bg-red-50 transition ${(state.customStepsData ? state.customStepsData.length : currentStepsCache.length) <= 1 ? 'opacity-30 cursor-not-allowed' : ''}" title="刪除此段落">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  </button>
+                </div>
               </div>
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                 <div class="flex items-center gap-1.5">
@@ -3618,6 +4067,22 @@
         }
         container.appendChild(node);
       });
+
+      if (state.isEditingSteps) {
+        const addBar = document.createElement('div');
+        addBar.className = 'pt-2 flex flex-wrap items-center gap-2';
+        addBar.innerHTML = `
+          <button type="button" onclick="addCustomStep('pour')" class="flex-1 min-w-[130px] py-2 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 shadow-2xs">
+            <svg class="w-3.5 h-3.5 text-amber-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>＋ 新增注水段</span>
+          </button>
+          <button type="button" onclick="addCustomStep('drain')" class="flex-1 min-w-[130px] py-2 px-3 rounded-xl bg-stone-100 hover:bg-stone-200 border border-stone-300 text-stone-700 font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 shadow-2xs">
+            <svg class="w-3.5 h-3.5 text-stone-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v6l6 6 6-6V3"></path><path d="M6 21h12"></path></svg>
+            <span>＋ 新增靜置 / 滴濾段</span>
+          </button>
+        `;
+        container.appendChild(addBar);
+      }
     }
 
     function updateTimelineStepHighlight(activeIndex) {
@@ -4247,6 +4712,23 @@
         profile.cleanliness -= 0.4;
       }
 
+      // 2.5 濾杯幾何微調 (若非浸泡法)
+      if (method !== 'immersion') {
+        const dripperConf = DRIPPER_CONFIGS[state.dripper] || DRIPPER_CONFIGS['conical'];
+        if (dripperConf && dripperConf.sensoryDelta) {
+          Object.keys(dripperConf.sensoryDelta).forEach(k => {
+            profile[k] += dripperConf.sensoryDelta[k];
+          });
+        }
+      }
+
+      // 2.6 急冷冰手沖感官修正
+      if (state.brewMode === 'iced') {
+        profile.cleanliness += 0.25;
+        profile.acidity += 0.15;
+        profile.body -= 0.15;
+      }
+
       // 3. 真實水溫總溫差微調 (無論來自風味推薦還是手動微調，每度水溫的物理效應完全一致)
       const flavorConf = FLAVOR_CONFIGS[flavor] || { tempDelta: 0, ratioDelta: 0 };
       const totalTempDelta = (flavorConf.tempDelta || 0) + (state.tempAdjust || 0);
@@ -4357,7 +4839,7 @@
         }
 
         // 總萃取時間影響：快流速避開後段澀感，長浸泡增加厚實度 (依同條件平衡順口真實標準總秒數 ±10s 動態判斷)
-        const expectedBaseSec = getStandardBalanceTotalSeconds(method, state.dose, roast);
+        const expectedBaseSec = getStandardBalanceTotalSeconds(method, state.dose, roast, state.dripper, state.brewMode);
 
         if (totalSec <= expectedBaseSec - 10) {
           profile.cleanliness += 0.15;
@@ -5725,6 +6207,8 @@
       const roastConf = ROAST_CONFIGS[state.roast];
       const methodConf = METHOD_CONFIGS[state.method];
       const flavorConf = FLAVOR_CONFIGS[state.flavor];
+      const dripperConf = DRIPPER_CONFIGS[state.dripper] || DRIPPER_CONFIGS.conical;
+      const isIced = state.brewMode === 'iced';
       const temp = document.getElementById('param-temp').textContent;
       const ratio = document.getElementById('param-ratio').textContent;
       const grind = document.getElementById('param-grind-select') ? document.getElementById('param-grind-select').value : (state.customGrind || '標準研磨');
@@ -5734,6 +6218,8 @@
       let text = `【手沖咖啡調配指南】\n`;
       text += `-------------------------------------\n`;
       text += `· 沖煮手法：${methodConf.name}\n`;
+      text += `· 濾杯幾何：${state.method === 'immersion' ? 'Switch 浸泡止水閥 (固定)' : dripperConf.name}\n`;
+      text += `· 沖煮模式：${isIced ? '急冷冰手沖 (下壺預置冰塊)' : '熱手沖'}\n`;
       text += `· 咖啡烘焙：${roastConf.name}\n`;
       text += `· 咖啡粉量：${state.dose}g\n`;
       text += `· 風味取向：${flavorConf.name}\n`;
@@ -5742,7 +6228,14 @@
       text += `· 建議水溫：${temp}\n`;
       text += `· 研磨刻度：${grind}\n`;
       text += `· 建議粉水比：${ratio}\n`;
-      text += `· 總注水量：${water}\n`;
+      if (isIced) {
+        const customHotWater = currentStepsCache ? currentStepsCache.reduce((sum, s) => sum + s.amount, 0) : 0;
+        const iceW = state.currentIceWeight || Math.round(customHotWater * 0.54);
+        const totalTargetMass = customHotWater + iceW;
+        text += `· 總液重：${totalTargetMass}g (熱水量 ${customHotWater}g + 下壺預置冰塊 ${iceW}g)\n`;
+      } else {
+        text += `· 總注水量：${water}\n`;
+      }
       text += `· 預估總時間：${estTime} (共 ${totalBrewSeconds} 秒)\n`;
       text += `-------------------------------------\n`;
       text += `[詳細沖煮步驟]\n`;
@@ -5752,13 +6245,45 @@
       });
       text += `-------------------------------------`;
 
-      navigator.clipboard.writeText(text).then(() => {
-        const btnText = document.getElementById('copy-btn-text');
-        btnText.textContent = '已複製！';
-        setTimeout(() => { btnText.textContent = '複製參數'; }, 2000);
-      }).catch(err => {
-        alert('配方內容：\n\n' + text);
-      });
+      const fallbackCopy = (str) => {
+        const textarea = document.createElement('textarea');
+        textarea.value = str;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        try {
+          const successful = document.execCommand('copy');
+          if (successful) {
+            showCustomStepToast('完整沖煮參數已複製至剪貼簿');
+            const btnText = document.getElementById('copy-btn-text');
+            if (btnText) {
+              btnText.textContent = '已複製！';
+              setTimeout(() => { btnText.textContent = '複製參數'; }, 2000);
+            }
+          } else {
+            showCustomStepToast('複製失敗，請手動複製配方');
+          }
+        } catch (e) {
+          showCustomStepToast('複製失敗，請手動複製配方');
+        } finally {
+          document.body.removeChild(textarea);
+        }
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showCustomStepToast('完整沖煮參數已複製至剪貼簿');
+          const btnText = document.getElementById('copy-btn-text');
+          if (btnText) {
+            btnText.textContent = '已複製！';
+            setTimeout(() => { btnText.textContent = '複製參數'; }, 2000);
+          }
+        }).catch(() => fallbackCopy(text));
+      } else {
+        fallbackCopy(text);
+      }
     }
 
     // ==========================================
@@ -5949,8 +6474,10 @@
       const noteInput = document.getElementById('new-bean-note-input');
       const name = nameInput.value.trim();
       if (!name) {
-        alert('請輸入咖啡名稱（例如：耶加雪菲 粉紅炸彈）');
+        nameInput.classList.add('ring-2', 'ring-red-400');
         nameInput.focus();
+        setTimeout(() => nameInput.classList.remove('ring-2', 'ring-red-400'), 2500);
+        showCustomStepToast('請先輸入咖啡豆名稱（例：耶加雪菲 粉紅炸彈）');
         return;
       }
 
@@ -5970,13 +6497,36 @@
 
       nameInput.value = '';
       noteInput.value = '';
+      showCustomStepToast('已建立新咖啡豆專區');
     }
 
-    function deleteBean(beanId) {
-      if (!confirm('確定要刪除這支咖啡豆及其所有手法的評分紀錄嗎？')) return;
-      let beans = getSavedBeans();
-      beans = beans.filter(b => b.id !== beanId);
-      saveBeansToStorage(beans);
+    function deleteBean(beanId, btnElem) {
+      if (btnElem && btnElem.dataset.confirming === 'true') {
+        if (btnElem._resetTimer) clearTimeout(btnElem._resetTimer);
+        let beans = getSavedBeans();
+        beans = beans.filter(b => b.id !== beanId);
+        saveBeansToStorage(beans);
+        showCustomStepToast('已刪除咖啡豆專區及其所有評分');
+        return;
+      }
+
+      if (btnElem) {
+        btnElem.dataset.confirming = 'true';
+        btnElem._origHtml = btnElem.innerHTML;
+        btnElem._origClass = btnElem.className;
+        btnElem.className = 'px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold shadow-xs hover:bg-red-700 transition flex items-center gap-1';
+        btnElem.innerHTML = '<span>確認刪除？</span>';
+        btnElem._resetTimer = setTimeout(() => {
+          btnElem.dataset.confirming = 'false';
+          btnElem.className = btnElem._origClass;
+          btnElem.innerHTML = btnElem._origHtml;
+        }, 3000);
+      } else {
+        let beans = getSavedBeans();
+        beans = beans.filter(b => b.id !== beanId);
+        saveBeansToStorage(beans);
+        showCustomStepToast('已刪除咖啡豆專區');
+      }
     }
 
     // 渲染咖啡豆與多手法評分清單
@@ -6035,7 +6585,7 @@
                   <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                   <span>評分新手沖法</span>
                 </button>
-                <button onclick="deleteBean('${bean.id}')" class="text-stone-300 hover:text-red-500 text-xs transition p-1" title="刪除咖啡豆">
+                <button onclick="deleteBean('${bean.id}', this)" class="text-stone-300 hover:text-red-500 text-xs transition p-1" title="刪除咖啡豆">
                   <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
               </div>
@@ -6055,15 +6605,21 @@
                 const grind = (rate.params && rate.params.grind) || '標準研磨';
                 const stepsList = (rate.params && rate.params.customSteps) || rate.steps || null;
                 const isCustom = rate.isCustom || (rate.params && rate.params.isCustomSteps);
+                const dripperName = (rate.params && rate.params.dripper && DRIPPER_CONFIGS[rate.params.dripper])
+                  ? DRIPPER_CONFIGS[rate.params.dripper].shortName
+                  : '';
+                const isIcedRating = rate.params && rate.params.brewMode === 'iced';
 
                 return `
                   <div class="p-3 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] space-y-2">
                     
                     <div class="flex items-center justify-between gap-2">
-                      <div class="flex items-center gap-2 flex-wrap">
+                      <div class="flex items-center gap-1.5 flex-wrap">
                         <span class="px-2.5 py-0.5 rounded-md bg-[#E8E4DF] text-[#3D3028] text-xs font-bold">
                           ${escapeHtml(rate.methodName)}
                         </span>
+                        ${dripperName ? `<span class="px-1.5 py-0.5 rounded bg-[#EDE7DF] text-[#654D3F] text-[10px] font-semibold">${escapeHtml(dripperName)}</span>` : ''}
+                        ${isIcedRating ? `<span class="px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 text-[10px] font-semibold">🧊 冰手沖</span>` : ''}
                         ${isCustom ? `<span class="px-1.5 py-0.5 rounded bg-[#E6E0D8] text-[#654D3F] text-[10px] font-semibold">自訂步驟與參數</span>` : ''}
                         ${renderStarRating(rate.rating)}
                         <span class="text-xs font-bold text-[#2C2521]">${rate.rating}.0 分</span>
@@ -6071,7 +6627,7 @@
                       
                       <div class="flex items-center gap-2">
                         <span class="text-[10px] text-[#9B8D83]">${escapeHtml(rate.date)}</span>
-                        <button onclick="deleteMethodRating('${bean.id}', '${rate.id}')" class="text-stone-300 hover:text-red-500 text-xs transition p-1" title="刪除評分">
+                        <button onclick="deleteMethodRating('${bean.id}', '${rate.id}', this)" class="text-stone-300 hover:text-red-500 text-xs transition p-1" title="刪除評分">
                           <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                         </button>
                       </div>
@@ -6198,6 +6754,15 @@
       }
 
       if (rate.params) {
+        if (rate.params.dripper) {
+          state.dripper = rate.params.dripper;
+          updateDripperUI();
+        }
+        if (rate.params.brewMode) {
+          state.brewMode = rate.params.brewMode;
+          updateBrewModeUI();
+        }
+
         if (rate.params.roast) {
           state.roast = rate.params.roast;
           document.querySelectorAll('[data-roast]').forEach(btn => {
@@ -6242,6 +6807,7 @@
       calculateAndRender();
       if (timerRunning) resetTimer();
       closeRecipeVaultModal();
+      showCustomStepToast(`已成功套用【${rate.methodName}】沖煮參數`);
     }
 
     // 評分星等與標籤互動
@@ -6272,7 +6838,7 @@
       const beanSelect = document.getElementById('rate-target-bean-select');
       const beanId = beanSelect.value;
       if (!beanId) {
-        alert('請先選擇或建立要評分的咖啡豆！');
+        showCustomStepToast('請先選擇或建立要評分的咖啡豆！');
         return;
       }
 
@@ -6298,6 +6864,8 @@
         date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         isCustom: isCustomParams,
         params: {
+          dripper: state.dripper,
+          brewMode: state.brewMode,
           dose: state.dose,
           temp: document.getElementById('param-temp').textContent,
           ratio: document.getElementById('param-ratio').textContent,
@@ -6319,7 +6887,7 @@
       const beans = getSavedBeans();
       const targetBean = beans.find(b => b.id === beanId);
       if (!targetBean) {
-        alert('找不到該咖啡豆');
+        showCustomStepToast('找不到該咖啡豆');
         return;
       }
 
@@ -6338,15 +6906,41 @@
       updateVaultBadges();
       renderBeansList();
       switchVaultTab('beans');
+      showCustomStepToast('手法評分已儲存！');
     }
 
-    function deleteMethodRating(beanId, ratingId) {
-      if (!confirm('確定要刪除這筆手法評分嗎？')) return;
-      const beans = getSavedBeans();
-      const bean = beans.find(b => b.id === beanId);
-      if (bean && bean.methodRatings) {
-        bean.methodRatings = bean.methodRatings.filter(r => r.id !== ratingId);
-        saveBeansToStorage(beans);
+    function deleteMethodRating(beanId, ratingId, btnElem) {
+      if (btnElem && btnElem.dataset.confirming === 'true') {
+        if (btnElem._resetTimer) clearTimeout(btnElem._resetTimer);
+        const beans = getSavedBeans();
+        const bean = beans.find(b => b.id === beanId);
+        if (bean && bean.methodRatings) {
+          bean.methodRatings = bean.methodRatings.filter(r => r.id !== ratingId);
+          saveBeansToStorage(beans);
+          showCustomStepToast('已刪除手法評分紀錄');
+        }
+        return;
+      }
+
+      if (btnElem) {
+        btnElem.dataset.confirming = 'true';
+        btnElem._origHtml = btnElem.innerHTML;
+        btnElem._origClass = btnElem.className;
+        btnElem.className = 'px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold shadow-xs hover:bg-red-700 transition flex items-center gap-1';
+        btnElem.innerHTML = '<span>確認刪除？</span>';
+        btnElem._resetTimer = setTimeout(() => {
+          btnElem.dataset.confirming = 'false';
+          btnElem.className = btnElem._origClass;
+          btnElem.innerHTML = btnElem._origHtml;
+        }, 3000);
+      } else {
+        const beans = getSavedBeans();
+        const bean = beans.find(b => b.id === beanId);
+        if (bean && bean.methodRatings) {
+          bean.methodRatings = bean.methodRatings.filter(r => r.id !== ratingId);
+          saveBeansToStorage(beans);
+          showCustomStepToast('已刪除手法評分紀錄');
+        }
       }
     }
 
@@ -6402,6 +6996,8 @@
 
     // 初始化頁面
     window.addEventListener('DOMContentLoaded', () => {
+      updateDripperUI();
+      updateBrewModeUI();
       calculateAndRender();
       updateVaultBadges();
       // 啟動開場儀式自動過渡 (1.8 秒，簡約俐落無負擔)
