@@ -1544,15 +1544,24 @@
       <!-- 頂部資訊與控制列 (Top Header Bar) - 固定高度 48px -->
       <header class="h-12 px-4 sm:px-8 border-b border-[#241A14] flex items-center justify-between flex-shrink-0 bg-[#140F0D]">
         <div class="flex items-center gap-2.5">
-          <div class="w-7 h-7 rounded-lg bg-[#241913] text-amber-400 flex items-center justify-center border border-[#3A271E] shadow-2xs">
-            <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 6h16l-3.5 11h-9L4 6z"></path>
-              <circle cx="12" cy="20.5" r="1.5" fill="currentColor"></circle>
+          <!-- 官方 BrewCraft 品牌標誌 (最新雙微弧線與黃金水滴向量標誌，與全站 100% 一致) -->
+          <div class="w-8 h-8 rounded-xl bg-[#241913] text-[#FAF9F7] flex items-center justify-center border border-[#3A271E] shadow-xs flex-shrink-0">
+            <svg class="w-4.5 h-4.5 text-[#FAF9F7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <ellipse cx="12" cy="7.2" rx="7.2" ry="1.4" stroke="currentColor"></ellipse>
+              <path d="M5 7.4 L10 16 L14 16 L19 7.4" stroke="currentColor"></path>
+              <line x1="9" y1="16.6" x2="15" y2="16.6" stroke="currentColor" stroke-width="1.5"></line>
+              <!-- 雙對稱導流微弧線 (中軸留白呼吸) -->
+              <path d="M8.2 8.2 Q10.5 12 11.2 15.5" stroke="currentColor" stroke-width="1.1" stroke-opacity="0.75"></path>
+              <path d="M15.8 8.2 Q13.5 12 12.8 15.5" stroke="currentColor" stroke-width="1.1" stroke-opacity="0.75"></path>
+              <!-- 黃金水滴 -->
+              <path d="M12 18 C12 18 10.8 19.5 10.8 20.5 C10.8 21.3 11.3 22 12 22 C12.7 22 13.2 21.3 13.2 20.5 C13.2 19.5 12 18 12 18 Z" fill="#FCD34D" stroke="#D97706" stroke-width="0.5"></path>
             </svg>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-bold tracking-[0.16em] uppercase text-amber-400 font-mono" id="zen-modal-title">
-              BREWCRAFT
+          <div class="flex items-center gap-2.5">
+            <!-- 品牌字標：BrewCraft · 官方品牌字體與琥珀金點 -->
+            <span class="font-outfit text-base font-bold tracking-tight text-[#FAF6F2] flex items-center gap-1.5" id="zen-modal-title">
+              BrewCraft
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block"></span>
             </span>
             <span class="text-[#4D382B] text-xs font-light">|</span>
             <span class="text-xs text-[#A8988C] font-mono truncate max-w-xs sm:max-w-md" id="zen-recipe-summary">
