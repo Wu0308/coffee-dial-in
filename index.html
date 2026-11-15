@@ -1073,7 +1073,9 @@
             <div class="flex items-center gap-2">
               <div class="relative flex-1">
                 <input type="number" id="dose-input" min="8" max="50" step="0.5" value="15" 
-                       oninput="onDoseChange(this.value)"
+                       oninput="onDoseInput(this.value)"
+                       onchange="onDoseCommit(this.value)"
+                       onblur="onDoseCommit(this.value)"
                        class="w-full bg-white border border-[#E6E0D8] rounded-xl py-2 px-3 text-left font-mono-num text-sm text-[#2C2521] font-semibold focus:outline-none focus:border-[#CFC2B7] transition shadow-2xs">
                 <span class="absolute right-3 top-2.5 text-xs text-[#8C7E75] font-medium pointer-events-none">g</span>
               </div>
@@ -2001,9 +2003,9 @@
 
     // 專業自訂沖煮步驟物理上下限 (防呆保護)
     const MIN_STEP_DURATION = 5;    // 單段時長下限 5 秒 (人體手沖注水動作物理極限)
-    const MAX_STEP_DURATION = 180;  // 單段時長上限 180 秒 (3 分鐘，避免水溫驟降失溫與木質雜味溶出)
+    const MAX_STEP_DURATION = 240;  // 單段時長上限 240 秒 (4 分鐘，支援松屋流長悶蒸與大粉量)
     const MIN_STEP_AMOUNT = 0;      // 單段水量下限 0g (允許純滴濾靜置或斷水)
-    const MAX_STEP_AMOUNT = 350;    // 單段水量上限 350g (手沖濾杯容量極限)
+    const MAX_STEP_AMOUNT = 650;    // 單段水量上限 650g (支援 30g-50g 分享壺單段大注水)
 
     // 系統狀態
     const state = {
@@ -2024,37 +2026,52 @@
       light: {
         name: '淺焙',
         baseTemp: 93,
-        baseRatio: 15.0,
-        grind: '中細研磨',
-        grindNote: '類似白砂糖 / 細海鹽'
+        baseRatio: 16.0,
+        grind: '細研磨',
+        roastGrindShift: -1,   // 豆質緊密難萃，較手法基準調細 1 階
+        drainScale: 1.08,      // 需較長粉水接觸時間 (+8%)
+        bloomRoastDelta: 3,    // 結構緊密吸水慢，悶蒸微延 +3s
+        grindNote: '豆質緊密，調細以提升花果酸香萃取率'
       },
       medium_light: {
         name: '中淺焙',
         baseTemp: 92,
-        baseRatio: 15.0,
+        baseRatio: 15.5,
         grind: '中細研磨',
-        grindNote: '類似白砂糖'
+        roastGrindShift: -1,   // 較手法基準微調細 1 階
+        drainScale: 1.04,      // 接觸時間微幅延長 (+4%)
+        bloomRoastDelta: 2,    // 悶蒸微延 +2s
+        grindNote: '顆粒偏細，兼顧明亮酸質與果甜感'
       },
       medium: {
         name: '中焙',
         baseTemp: 90,
         baseRatio: 15.0,
-        grind: '偏粗研磨',
-        grindNote: '類似粗海鹽'
+        grind: '中度研磨',
+        roastGrindShift: 0,    // 標準烘焙基準 (0 階偏移)
+        drainScale: 1.00,      // 標準接觸時間 (1.00x)
+        bloomRoastDelta: 0,    // 標準悶蒸時間
+        grindNote: '標準研磨刻度，酸甜醇厚平衡'
       },
       medium_dark: {
         name: '中深焙',
         baseTemp: 88,
-        baseRatio: 15.5,
-        grind: '中度研磨',
-        grindNote: '顆粒均勻避免過萃'
+        baseRatio: 14.5,
+        grind: '中粗研磨',
+        roastGrindShift: 1,    // 孔隙較大易溶出，較手法基準調粗 1 階
+        drainScale: 0.94,      // 加快落水避免尾段雜苦 (-6%)
+        bloomRoastDelta: -2,   // 排氣快、易溶出，悶蒸微縮 -2s
+        grindNote: '調粗降低阻力，避免後段苦澀溶出'
       },
       dark: {
         name: '深焙',
         baseTemp: 85,
-        baseRatio: 16.0,
+        baseRatio: 14.0,
         grind: '偏粗研磨',
-        grindNote: '粗顆粒避免焦苦'
+        roastGrindShift: 2,    // 結構疏鬆極易過萃，較手法基準調粗 2 階
+        drainScale: 0.88,      // 快速落水避開焦苦味 (-12%)
+        bloomRoastDelta: -4,   // 縮短悶蒸與前段接觸時間 -4s
+        grindNote: '粗顆粒快流速，鎖住醇厚並避開焦苦'
       }
     };
 
@@ -2161,6 +2178,28 @@
         timingNote: '標準金杯秒數節奏 · 層次分明'
       }
     };
+
+    // ========================================================
+    // 研磨度階梯定義 (Grind Size Ladder)
+    // 對齊全域研磨刻度選項，支援粉層厚度水力阻抗自動補償
+    // ========================================================
+    const GRIND_LADDER = [
+      '極細研磨', '細研磨', '中細偏細', '中細研磨',
+      '中度研磨', '中粗研磨', '偏粗研磨', '粗研磨'
+    ];
+
+    // ========================================================
+    // 手沖粉量動力學縮放核心 (Dose-Adaptive Scaling Dynamics)
+    // 依據粉層厚度 (達西定律 Darcy's Law) 與粉床表面積動態計算流速與時間微調係數
+    // ========================================================
+    function getDoseScaleFactors(dose = state.dose) {
+      const safeDose = Math.max(8, Math.min(50, dose || 15));
+      return {
+        flowScale: Math.pow(safeDose / 15, 0.35), // 15g: 1.00, 30g: 1.27, 12g: 0.92
+        bedScale: Math.pow(safeDose / 15, 0.45),  // 15g: 1.00, 30g: 1.37, 12g: 0.90
+        bloomBonus: Math.round((safeDose - 15) * 0.35) // 悶蒸排氣微調：15g: 0s, 30g: +5s, 10g: -2s
+      };
+    }
 
     // ========================================================
     // 精品手沖水流型態定義 (Specialty Flow Profiles)
@@ -2279,6 +2318,7 @@
 
     function selectMethod(methodKey) {
       state.method = methodKey;
+      state.ratioAdjust = 0;
       state.customGrind = null;
       state.isCustomSteps = false;
       state.isEditingSteps = false;
@@ -2294,7 +2334,11 @@
     function selectRoast(roastKey) {
       state.roast = roastKey;
       state.tempAdjust = 0;
+      state.ratioAdjust = 0;
       state.customGrind = null;
+      state.isCustomSteps = false;
+      state.isEditingSteps = false;
+      state.customStepsData = null;
       document.querySelectorAll('[data-roast]').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.roast === roastKey);
       });
@@ -2305,6 +2349,9 @@
 
     function selectFlavor(flavorKey) {
       state.flavor = flavorKey;
+      state.isCustomSteps = false;
+      state.isEditingSteps = false;
+      state.customStepsData = null;
       document.querySelectorAll('[data-flavor]').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.flavor === flavorKey);
       });
@@ -2314,11 +2361,16 @@
       if (timerRunning) resetTimer();
     }
 
-        function onDoseInput(val) {
+    function onDoseInput(val) {
       let num = parseFloat(val);
-      if (!isNaN(num) && num >= 5 && num <= 60) {
+      if (!isNaN(num) && num >= 8 && num <= 50) {
         state.dose = num;
-        document.getElementById('dose-range').value = Math.min(Math.max(num, 10), 35);
+        state.isCustomSteps = false;
+        state.isEditingSteps = false;
+        state.customStepsData = null;
+        const doseRange = document.getElementById('dose-range');
+        if (doseRange) doseRange.value = Math.min(Math.max(num, 10), 35);
+        updateQuickDosePills(num);
         calculateAndRender();
         if (timerRunning) resetTimer();
       }
@@ -2338,12 +2390,17 @@
     function onDoseCommit(val) {
       let num = parseFloat(val);
       if (isNaN(num)) num = 15.0;
-      if (num < 5) num = 5;
-      if (num > 60) num = 60;
+      if (num < 8) num = 8;
+      if (num > 50) num = 50;
       num = Math.round(num * 10) / 10;
       state.dose = num;
-      document.getElementById('dose-input').value = num;
-      document.getElementById('dose-range').value = Math.min(Math.max(num, 10), 35);
+      state.isCustomSteps = false;
+      state.isEditingSteps = false;
+      state.customStepsData = null;
+      const doseInp = document.getElementById('dose-input');
+      if (doseInp) doseInp.value = num;
+      const doseRange = document.getElementById('dose-range');
+      if (doseRange) doseRange.value = Math.min(Math.max(num, 10), 35);
       updateQuickDosePills(num);
       calculateAndRender();
       if (timerRunning) resetTimer();
@@ -2354,7 +2411,7 @@
     }
 
     function stepDose(delta) {
-      onDoseChange(state.dose + delta);
+      onDoseCommit(state.dose + delta);
     }
 
     function quickTuneTemp(delta) {
@@ -2453,6 +2510,9 @@
     }
 
     function stepCustomRatio(delta) {
+      state.isCustomSteps = false;
+      state.isEditingSteps = false;
+      state.customStepsData = null;
       const roastConf = ROAST_CONFIGS[state.roast];
       const methodConf = METHOD_CONFIGS[state.method];
       const flavorConf = FLAVOR_CONFIGS[state.flavor];
@@ -2467,6 +2527,9 @@
     }
 
     function resetCustomRatio() {
+      state.isCustomSteps = false;
+      state.isEditingSteps = false;
+      state.customStepsData = null;
       state.ratioAdjust = 0;
       calculateAndRender();
       if (timerRunning) resetTimer();
@@ -2478,6 +2541,9 @@
       if (input !== null) {
         const val = parseFloat(input);
         if (!isNaN(val)) {
+          state.isCustomSteps = false;
+          state.isEditingSteps = false;
+          state.customStepsData = null;
           const clamped = Math.round(Math.max(MIN_RATIO, Math.min(MAX_RATIO, val)) * 10) / 10;
           const roastConf = ROAST_CONFIGS[state.roast];
           const methodConf = METHOD_CONFIGS[state.method];
@@ -2679,9 +2745,10 @@
         if (warnElem) {
           const tPour = getStepPourDuration(st);
           const flowProfile = getStepFlowProfile(st);
+          const { flowScale } = getDoseScaleFactors(state.dose);
           if (st.amount > 0 && tPour > 0) {
             const flowRate = st.amount / tPour;
-            const maxSafe = (st.flowType === 'bypass') ? 12.0 : (flowProfile.maxRateSafe || 5.5);
+            const maxSafe = (st.flowType === 'bypass') ? 12.0 : ((flowProfile.maxRateSafe || 5.5) * Math.min(1.3, flowScale));
             const minSafe = flowProfile.minRateSafe || 1.4;
 
             if (flowRate > maxSafe) {
@@ -2692,7 +2759,7 @@
                     <line x1="12" y1="9" x2="12" y2="13"></line>
                     <line x1="12" y1="17" x2="12.01" y2="17"></line>
                   </svg>
-                  <span>此段建議流速過急 (~${flowRate.toFixed(1)} g/s，超出${flowProfile.name}安全極限 ${maxSafe} g/s)：水流衝擊力過大易穿孔造成通道效應與苦澀味。建議延長秒數或減少注水量。</span>
+                  <span>此段建議流速過急 (~${flowRate.toFixed(1)} g/s，超出${flowProfile.name}安全極限 ${maxSafe.toFixed(1)} g/s)：水流衝擊力過大易穿孔造成通道效應與苦澀味。建議延長秒數或減少注水量。</span>
                 </div>
               `;
             } else if (flowRate < minSafe && st.amount >= 20 && st.flowType !== 'drip') {
@@ -2762,14 +2829,27 @@
       if (timerRunning) resetTimer();
     }
 
-    function generateSteps(method, dose, totalWater, flavorKey = state.flavor) {
+    function calcPourAndDrainSec(amount, flowType, baseDrainSec, flowScale, effectiveBedScale, stepDelta = 0) {
+      const profile = FLOW_PROFILES[flowType] || FLOW_PROFILES.medium;
+      const targetRate = (profile.targetRate || 3.3) * flowScale;
+      const purePourSec = amount > 0 ? Math.max(2, Math.round(amount / targetRate)) : 0;
+      const minBuffer = profile.drainMinSec || 3;
+      const drainSec = Math.max(minBuffer, Math.round(baseDrainSec * effectiveBedScale) + stepDelta);
+      return purePourSec + drainSec;
+    }
+
+    function generateSteps(method, dose, totalWater, flavorKey = state.flavor, roastKey = state.roast) {
       // 若處於自定義步驟模式，優先回傳已自定義的步驟資料
       if (state.isCustomSteps && state.customStepsData && state.customStepsData.length > 0) {
         return state.customStepsData;
       }
 
       const flavorConf = FLAVOR_CONFIGS[flavorKey] || FLAVOR_CONFIGS['balance'];
+      const roastConf = ROAST_CONFIGS[roastKey] || ROAST_CONFIGS['medium'];
       const tMod = flavorConf.timingModifier || { bloomDelta: 0, stepDelta: 0 };
+      const { flowScale, bedScale, bloomBonus } = getDoseScaleFactors(dose);
+      const effectiveBedScale = bedScale * (roastConf.drainScale || 1.0);
+      const totalBloomAdjust = tMod.bloomDelta + bloomBonus + (roastConf.bloomRoastDelta || 0);
       let rawSteps = [];
 
       if (method === 'four_six') {
@@ -2783,11 +2863,12 @@
         const pour4 = Math.round(remaining / 3);
         const pour5 = totalWater - (bloomWater + pour2 + pour3 + pour4);
 
-        const bloomSec = Math.max(30, 45 + tMod.bloomDelta);
-        const step2Sec = Math.max(25, 40 + tMod.stepDelta);
-        const step3Sec = Math.max(20, 30 + tMod.stepDelta);
-        const step4Sec = Math.max(18, 25 + tMod.stepDelta);
-        const step5Sec = Math.max(18, 25 + tMod.stepDelta);
+        const bloomPure = Math.round(bloomWater / (FLOW_PROFILES.medium.targetRate * flowScale));
+        const bloomSec = Math.max(30, bloomPure + 12, 45 + totalBloomAdjust);
+        const step2Sec = calcPourAndDrainSec(pour2, 'medium', 26, flowScale, effectiveBedScale, tMod.stepDelta);
+        const step3Sec = calcPourAndDrainSec(pour3, 'fast', 21, flowScale, effectiveBedScale, tMod.stepDelta);
+        const step4Sec = calcPourAndDrainSec(pour4, 'fast', 16, flowScale, effectiveBedScale, tMod.stepDelta);
+        const step5Sec = calcPourAndDrainSec(pour5, 'fast', 16, flowScale, effectiveBedScale, tMod.stepDelta);
 
         rawSteps = [
           {
@@ -2852,11 +2933,12 @@
           }
         ];
       } else if (method === 'single_pour') {
-        const bloomWater = Math.round(dose * 2.5);
+        const bloomWater = Math.min(Math.round(dose * 2.5), Math.round(totalWater * 0.22));
         const mainPour = totalWater - bloomWater;
-        const bloomSec = Math.max(25, 35 + tMod.bloomDelta);
-        const mainSec = Math.max(45, 65 + tMod.stepDelta * 2);
-        const drainSec = Math.max(15, 20 + tMod.stepDelta);
+        const bloomPure = Math.round(bloomWater / (FLOW_PROFILES.gentle.targetRate * flowScale));
+        const bloomSec = Math.max(25, bloomPure + 12, 35 + totalBloomAdjust);
+        const mainSec = calcPourAndDrainSec(mainPour, 'gentle', 5, flowScale, effectiveBedScale, tMod.stepDelta * 2);
+        const drainSec = Math.max(15, Math.round(20 * effectiveBedScale) + tMod.stepDelta);
 
         rawSteps = [
           {
@@ -2897,14 +2979,15 @@
           }
         ];
       } else if (method === 'three_stage') {
-        const bloomWater = Math.round(dose * 2.2);
+        const bloomWater = Math.min(Math.round(dose * 2.2), Math.round(totalWater * 0.20));
         const rest = totalWater - bloomWater;
         const pour1 = Math.round(rest * 0.55);
         const pour2 = totalWater - bloomWater - pour1;
 
-        const bloomSec = Math.max(28, 40 + tMod.bloomDelta);
-        const pour1Sec = Math.max(35, 50 + tMod.stepDelta);
-        const pour2Sec = Math.max(35, 50 + tMod.stepDelta);
+        const bloomPure = Math.round(bloomWater / (FLOW_PROFILES.medium.targetRate * flowScale));
+        const bloomSec = Math.max(28, bloomPure + 12, 40 + totalBloomAdjust);
+        const pour1Sec = calcPourAndDrainSec(pour1, 'medium', 17, flowScale, effectiveBedScale, tMod.stepDelta);
+        const pour2Sec = calcPourAndDrainSec(pour2, 'gentle', 14, flowScale, effectiveBedScale, tMod.stepDelta);
 
         rawSteps = [
           {
@@ -2945,14 +3028,15 @@
           }
         ];
       } else if (method === 'hoffmann') {
-        const bloomWater = Math.round(dose * 3.0);
+        const bloomWater = Math.min(Math.round(dose * 3.0), Math.round(totalWater * 0.20));
         const pour1 = Math.round((totalWater * 0.6) - bloomWater);
         const pour2 = totalWater - bloomWater - pour1;
 
-        const bloomSec = Math.max(30, 45 + tMod.bloomDelta);
-        const p1Sec = Math.max(25, 35 + tMod.stepDelta);
-        const p2Sec = Math.max(25, 35 + tMod.stepDelta);
-        const drainSec = Math.max(35, 50 + tMod.stepDelta);
+        const bloomPure = Math.round(bloomWater / (FLOW_PROFILES.medium.targetRate * flowScale));
+        const bloomSec = Math.max(30, bloomPure + 12, 45 + totalBloomAdjust);
+        const p1Sec = calcPourAndDrainSec(pour1, 'fast', 16, flowScale, effectiveBedScale, tMod.stepDelta);
+        const p2Sec = calcPourAndDrainSec(pour2, 'gentle', 5, flowScale, effectiveBedScale, tMod.stepDelta);
+        const drainSec = Math.max(30, Math.round(50 * effectiveBedScale) + tMod.stepDelta);
 
         rawSteps = [
           {
@@ -3005,33 +3089,37 @@
           }
         ];
       } else if (method === 'matsuya') {
-        const bloomWater = Math.round(dose * 2.0);
+        const bloomWater = Math.min(Math.round(dose * 2.0), Math.round(totalWater * 0.18));
         const extractWater = Math.round(totalWater * 0.55);
         const bypassWater = totalWater - bloomWater - extractWater;
 
-        const steamSec = Math.max(120, 180 + tMod.bloomDelta * 2);
+        const dripSec = calcPourAndDrainSec(bloomWater, 'drip', 5, flowScale, effectiveBedScale, 0);
+        const steamSec = Math.max(120, 180 + tMod.bloomDelta * 2 + (roastConf.bloomRoastDelta || 0) * 5);
+        const steamTimeStr = (steamSec % 60 === 0) ? `${steamSec / 60} 分鐘` : `${formatTime(steamSec)} (${steamSec}秒)`;
+        const extSec = calcPourAndDrainSec(extractWater, 'fast', 19, flowScale, effectiveBedScale, tMod.stepDelta);
+        const bypassSec = calcPourAndDrainSec(bypassWater, 'bypass', 3, flowScale, 1.0, 0);
 
         rawSteps = [
           {
             name: '中心點滴潤濕',
             amount: bloomWater,
-            durationSec: 30,
+            durationSec: dripSec,
             flowType: 'drip',
             note: '細小點滴僅潤濕中心粉芯',
             animType: 'drip_slow',
             actionTitle: '中心點滴滴水 (Drop by Drop)',
             actionTip: '手沖壺極輕微傾斜，一滴一滴如點滴般僅滴在中心粉芯，不可形成連續水柱。',
             defaultAmount: bloomWater,
-            defaultDuration: 30
+            defaultDuration: dripSec
           },
           {
             name: '加蓋深悶蒸',
             amount: 0,
             durationSec: steamSec,
             flowType: 'drain',
-            note: `蓋上悶蒸蓋深層悶蒸 ${Math.round(steamSec / 60)} 分鐘，排淨氣體`,
+            note: `蓋上悶蒸蓋深層悶蒸 ${steamTimeStr}，排淨氣體`,
             animType: 'bloom',
-            actionTitle: `深層悶蒸膨脹 (加蓋 ${Math.round(steamSec / 60)} 分鐘)`,
+            actionTitle: `深層悶蒸膨脹 (加蓋 ${steamTimeStr})`,
             actionTip: '加蓋鎖住熱氣與蒸氣，讓咖啡粉內部深層均勻膨脹排氣，徹底釋放醇厚精華。',
             defaultAmount: 0,
             defaultDuration: steamSec
@@ -3039,33 +3127,39 @@
           {
             name: '核心萃取注水',
             amount: extractWater,
-            durationSec: 45,
+            durationSec: extSec,
             flowType: 'fast',
             note: '大水流僅在中心硬幣大小區域注水',
             animType: 'steady_center',
             actionTitle: '中心 50 圓大水流萃取',
             actionTip: '大水流僅在中心 50 圓硬幣大小範圍穩定注水，迅速萃取出中段濃厚精華。',
             defaultAmount: extractWater,
-            defaultDuration: 45
+            defaultDuration: extSec
           },
           {
             name: '熱水稀釋 (Bypass)',
             amount: bypassWater,
-            durationSec: 15,
+            durationSec: bypassSec,
             flowType: 'bypass',
             note: '移開濾杯，向分享壺直接加入純淨熱水',
             animType: 'bypass_pot',
             actionTitle: '移開濾杯直接加熱水 (Bypass)',
             actionTip: '立刻移開濾杯避免萃出尾段苦澀雜味，直接向分享壺加入純熱水稀釋至目標總克數！',
             defaultAmount: bypassWater,
-            defaultDuration: 15
+            defaultDuration: bypassSec
           }
         ];
       } else if (method === 'immersion') {
         const bloomWater = Math.round(totalWater * 0.4);
         const remaining = totalWater - bloomWater;
-        const bloomSec = Math.max(25, 35 + tMod.bloomDelta);
-        const steepSec = Math.max(60, 85 + tMod.stepDelta * 3);
+        const bloomPure = Math.round(bloomWater / (FLOW_PROFILES.medium.targetRate * flowScale));
+        const bloomSec = Math.max(25, bloomPure + 8, 35 + totalBloomAdjust);
+
+        const remPure = Math.ceil(remaining / (FLOW_PROFILES.fast.targetRate * flowScale));
+        const remPure15 = 29; // 15g 基準下的純注水秒數 (135g / 4.8 g/s)
+        const pourTimeDiff = Math.max(0, remPure - remPure15);
+        const steepSec = Math.max(60, 85 + tMod.stepDelta * 3 + pourTimeDiff);
+        const drainSec = Math.max(15, Math.round(30 * effectiveBedScale));
 
         rawSteps = [
           {
@@ -3095,14 +3189,14 @@
           {
             name: '開閥釋放滴濾',
             amount: 0,
-            durationSec: 30,
+            durationSec: drainSec,
             flowType: 'drain',
             note: '按下開關，重力自然過濾落水完成',
             animType: 'switch_open',
             actionTitle: '按下開關釋放咖啡液 (開閥落水)',
             actionTip: '按下 Switch 開關，重力讓濃郁咖啡液瞬間過濾釋放至分享壺！',
             defaultAmount: 0,
-            defaultDuration: 30
+            defaultDuration: drainSec
           }
         ];
       }
@@ -3133,6 +3227,18 @@
       });
 
       return steps;
+    }
+
+    function getStandardBalanceTotalSeconds(method = state.method, dose = state.dose, roast = state.roast) {
+      const rConf = ROAST_CONFIGS[roast] || ROAST_CONFIGS['medium'];
+      const mConf = METHOD_CONFIGS[method] || METHOD_CONFIGS['four_six'];
+      const stdRatio = Math.round((rConf.baseRatio * mConf.ratioMultiplier) * 10) / 10;
+      const stdWater = Math.round(dose * stdRatio);
+      const prevCustom = state.isCustomSteps;
+      state.isCustomSteps = false;
+      const stdSteps = generateSteps(method, dose, stdWater, 'balance', roast);
+      state.isCustomSteps = prevCustom;
+      return stdSteps.reduce((sum, s) => sum + s.durationSec, 0);
     }
 
     let currentStepsCache = [];
@@ -3171,9 +3277,54 @@
       // 3. 總水量計算
       let totalWater = Math.round(state.dose * finalRatioVal);
 
-      // 4. 研磨度計算 (使用者自訂優先，否則採用手法/烘焙度推薦)
-      let finalGrind = state.customGrind || methodConf.grindModifier || roastConf.grind;
-      let grindNote = state.customGrind ? '使用者自訂研磨度' : (methodConf.grindNote || roastConf.grindNote);
+      // 4. 研磨度計算 (使用者自訂優先，否則採用手法基準 + 烘焙度偏移 + 粉量厚度偏移的三維疊加計算模型)
+      const baseIdx = GRIND_LADDER.indexOf(methodConf.grindModifier);
+      const safeBaseIdx = baseIdx !== -1 ? baseIdx : 3;
+
+      const roastGrindShift = (state.method === 'matsuya') ? 0 : (roastConf.roastGrindShift || 0);
+
+      let doseGrindShift = 0;
+      if (state.method === 'immersion') {
+        if (state.dose >= 28) doseGrindShift = 1;
+      } else {
+        if (state.dose >= 24) doseGrindShift = 1;
+        else if (state.dose <= 12) doseGrindShift = -1;
+      }
+
+      const totalGrindShift = roastGrindShift + doseGrindShift;
+      const shiftedIdx = Math.max(1, Math.min(GRIND_LADDER.length - 1, safeBaseIdx + totalGrindShift));
+      const roastOnlyIdx = Math.max(1, Math.min(GRIND_LADDER.length - 1, safeBaseIdx + roastGrindShift));
+      const effectiveRoastShift = roastOnlyIdx - safeBaseIdx;
+      const effectiveDoseShift = shiftedIdx - roastOnlyIdx;
+      const actualShift = shiftedIdx - safeBaseIdx;
+
+      let finalGrind;
+      let grindNote;
+
+      if (state.customGrind !== null) {
+        finalGrind = state.customGrind;
+        grindNote = '使用者自訂研磨度';
+      } else {
+        finalGrind = GRIND_LADDER[shiftedIdx];
+        if (actualShift === 0) {
+          if (roastGrindShift !== 0 && roastGrindShift === -doseGrindShift) {
+            grindNote = '烘焙度與粉量阻力互抵，維持基準研磨';
+          } else {
+            grindNote = methodConf.grindNote || roastConf.grindNote;
+          }
+        } else {
+          if (effectiveRoastShift !== 0 && effectiveDoseShift !== 0) {
+            grindNote = `${roastConf.name}${effectiveRoastShift < 0 ? '調細' : '調粗'} + ${effectiveDoseShift > 0 ? '大粉量調粗' : '小粉量調細'}`;
+          } else if (effectiveDoseShift !== 0) {
+            grindNote = effectiveDoseShift > 0 ? '粉層深水阻大，自動調粗一階' : '粉層淺流速快，自動調細一階';
+          } else if (effectiveRoastShift !== 0) {
+            grindNote = roastConf.grindNote;
+          } else {
+            grindNote = methodConf.grindNote || roastConf.grindNote;
+          }
+        }
+      }
+      state.effectiveGrind = finalGrind;
 
       // 更新水溫 UI
       document.getElementById('param-temp').textContent = `${finalTemp}°C`;
@@ -3232,23 +3383,66 @@
         btnRatioPlus.classList.toggle('cursor-not-allowed', finalRatioVal >= MAX_RATIO);
       }
 
-      // 更新風味偏好說明卡片 (位於風味偏好下方)
-      const flavorTipElem = document.getElementById('flavor-adjustment-tip');
-      if (flavorTipElem) flavorTipElem.textContent = flavorConf.note;
-      const flavorTimingElem = document.getElementById('flavor-timing-adjustment-note');
-      if (flavorTimingElem) flavorTimingElem.textContent = flavorConf.timingNote;
-
       // 5. 步驟計算與快取
       let steps;
       if (state.isCustomSteps && state.customStepsData) {
         steps = state.customStepsData;
         totalWater = steps.reduce((sum, s) => sum + s.amount, 0);
+        const customRatioVal = Math.round((totalWater / state.dose) * 10) / 10;
+        ratioStr = `1:${customRatioVal}`;
+        document.getElementById('param-ratio').textContent = ratioStr;
+        document.getElementById('param-ratio-note').textContent = '依自訂步驟換算';
       } else {
-        steps = generateSteps(state.method, state.dose, totalWater, state.flavor);
+        steps = generateSteps(state.method, state.dose, totalWater, state.flavor, state.roast);
       }
       currentStepsCache = steps;
 
       totalBrewSeconds = steps.reduce((sum, s) => sum + s.durationSec, 0);
+
+      // 更新風味偏好說明卡片 (位於風味偏好下方，同步當前實際悶蒸/深悶蒸秒數與真實秒數差)
+      let dynTip = flavorConf.note;
+      let dynTimingNote = flavorConf.timingNote;
+
+      const stdBalSec = getStandardBalanceTotalSeconds(state.method, state.dose, state.roast);
+      const diffSec = totalBrewSeconds - stdBalSec;
+      const diffStr = diffSec === 0 ? '' : (diffSec > 0 ? `+${diffSec}s` : `${diffSec}s`);
+
+      if (state.method === 'matsuya') {
+        const steamStep = steps[1];
+        const actualSteamSec = steamStep ? steamStep.durationSec : 180;
+        const steamDisplay = (actualSteamSec % 60 === 0) ? `${actualSteamSec / 60}分鐘` : `${formatTime(actualSteamSec)} (${actualSteamSec}秒)`;
+        dynTip = dynTip.replace(/悶蒸至\s*\d+s/g, `深悶蒸 ${steamDisplay}`).replace(/縮短悶蒸/g, '縮短深悶蒸').replace(/延長悶蒸/g, '延長深悶蒸');
+        dynTimingNote = dynTimingNote.replace(/悶蒸(?:縮短至|延長至)?\s*\d+s/g, `深悶蒸 ${steamDisplay}`);
+      } else {
+        const actualBloomSec = (steps[0] && steps[0].durationSec) ? steps[0].durationSec : 45;
+        dynTip = dynTip.replace(/悶蒸至\s*\d+s/g, `悶蒸至 ${actualBloomSec}s`);
+        dynTimingNote = dynTimingNote.replace(/悶蒸(?:縮短至|延長至)?\s*\d+s/g, (match) => {
+          if (match.includes('縮短')) return `悶蒸縮短至 ${actualBloomSec}s`;
+          if (match.includes('延長')) return `悶蒸延長至 ${actualBloomSec}s`;
+          return `悶蒸 ${actualBloomSec}s`;
+        });
+      }
+
+      // 替換寫死的秒數差文字
+      if (diffStr) {
+        dynTip = dynTip.replace(/[（(][+-]?\d+s[）)]/g, `（${diffStr}）`);
+        dynTimingNote = dynTimingNote.replace(/[（(][+-]?\d+s[）)]/g, `(${diffStr})`);
+      } else {
+        dynTip = dynTip.replace(/[（(][+-]?\d+s[）)]/g, '');
+        dynTimingNote = dynTimingNote.replace(/[（(][+-]?\d+s[）)]/g, '');
+      }
+
+      // 非四六法文案處理：非四六法無前段水比分配機制
+      if (state.method !== 'four_six') {
+        dynTip = dynTip
+          .replace(/，前段加大注水/g, '，加快落水節奏')
+          .replace(/，前小後大注水/g, '，溫和浸潤萃取');
+      }
+
+      const flavorTipElem = document.getElementById('flavor-adjustment-tip');
+      if (flavorTipElem) flavorTipElem.textContent = dynTip;
+      const flavorTimingElem = document.getElementById('flavor-timing-adjustment-note');
+      if (flavorTimingElem) flavorTimingElem.textContent = dynTimingNote;
 
       const paramWaterElem = document.getElementById('param-water');
       if (paramWaterElem) paramWaterElem.textContent = `${totalWater}g`;
@@ -3333,7 +3527,7 @@
                 <div class="flex items-center gap-1.5">
                   <span class="text-xs text-[#8C7E75] font-medium">水量:</span>
                   <div class="relative flex items-center">
-                    <input type="number" min="0" max="350" step="5" value="${st.amount}" 
+                    <input type="number" min="0" max="${MAX_STEP_AMOUNT}" step="5" value="${st.amount}" 
                            oninput="onCustomStepAmountChange(${idx}, this.value)"
                            onblur="onCustomStepAmountBlur(${idx}, this)"
                            class="w-18 px-2 py-1 text-center font-mono-num font-bold rounded-lg border border-[#D8CCC4] bg-white text-xs text-[#2C2521] focus:border-[#654D3F] focus:ring-1 focus:ring-[#654D3F] outline-none shadow-2xs">
@@ -3343,7 +3537,7 @@
                 <div class="flex items-center gap-1.5">
                   <span class="text-xs text-[#8C7E75] font-medium">時長:</span>
                   <div class="relative flex items-center">
-                    <input type="number" min="5" max="180" step="5" value="${st.durationSec}" 
+                    <input type="number" min="5" max="${MAX_STEP_DURATION}" step="5" value="${st.durationSec}" 
                            oninput="onCustomStepDurationChange(${idx}, this.value)"
                            onblur="onCustomStepDurationBlur(${idx}, this)"
                            class="w-16 px-2 py-1 text-center font-mono-num font-bold rounded-lg border border-[#D8CCC4] bg-white text-xs text-[#2C2521] focus:border-[#654D3F] focus:ring-1 focus:ring-[#654D3F] outline-none shadow-2xs">
@@ -3502,8 +3696,9 @@
       const dur = Math.max(1, step.durationSec || 5);
       const amt = step.amount;
 
+      const { flowScale } = getDoseScaleFactors(state.dose);
       const profile = getStepFlowProfile(step);
-      const targetRate = profile.targetRate || 3.3;
+      const targetRate = (profile.targetRate || 3.3) * flowScale;
 
       // 依目標水流基準流速推算所需出水秒數
       let estPour = Math.round(amt / targetRate);
@@ -3514,8 +3709,8 @@
 
       estPour = Math.max(2, Math.min(estPour, maxAllowedPour));
 
-      // 物理極限流速保護鎖 (Bypass 最高 12g/s, 一般注水上限 6.5g/s)
-      const maxPhysicalRate = (profile.key === 'bypass') ? 12.0 : (profile.maxRateSafe || 6.5);
+      // 物理極限流速保護鎖 (Bypass 最高 12g/s, 一般注水上限 6.5g/s * Math.min(1.3, flowScale))
+      const maxPhysicalRate = (profile.key === 'bypass') ? 12.0 : ((profile.maxRateSafe || 6.5) * Math.min(1.3, flowScale));
       const minTimeByMaxRate = Math.ceil(amt / maxPhysicalRate);
       if (estPour < minTimeByMaxRate) {
         estPour = minTimeByMaxRate;
@@ -4083,7 +4278,7 @@
       }
 
       // 5. 研磨粗細微調 (接觸面積與萃取動力學)
-      const effectiveGrind = state.customGrind || (METHOD_CONFIGS[method] && METHOD_CONFIGS[method].grindModifier) || (ROAST_CONFIGS[roast] && ROAST_CONFIGS[roast].grind) || '中細研磨';
+      const effectiveGrind = state.customGrind || state.effectiveGrind || (METHOD_CONFIGS[method] && METHOD_CONFIGS[method].grindModifier) || (ROAST_CONFIGS[roast] && ROAST_CONFIGS[roast].grind) || '中細研磨';
       const GRIND_EFFECTS = {
         '極細研磨': { body: +0.6, sweetness: +0.3, aftertaste: +0.3, acidity: -0.4, cleanliness: -0.6 },
         '細研磨':   { body: +0.4, sweetness: +0.3, aftertaste: +0.2, acidity: -0.2, cleanliness: -0.4 },
@@ -4103,39 +4298,71 @@
         profile.cleanliness += grindEffect.cleanliness;
       }
 
-      // 6. 注水結構與時間動力學 (Kasuya 4:6 前段注水分配比率與悶蒸/萃取時長)
+      // 6. 注水結構與時間動力學 (Kasuya 4:6 前段注水分配比率與各手法預期時長動力學)
       if (currentStepsCache && currentStepsCache.length > 0) {
         const totalW = currentStepsCache.reduce((sum, s) => sum + s.amount, 0);
         const p1Ratio = totalW > 0 ? (currentStepsCache[0].amount / totalW) : 0.20;
         const bloomSec = currentStepsCache[0].durationSec || 45;
         const totalSec = currentStepsCache.reduce((sum, s) => sum + s.durationSec, 0);
 
-        // Kasuya 4:6 前段水量配比影響：前大注水萃出更多酸質，前小注水萃出更多甜感
-        if (p1Ratio > 0.21) {
-          // 前注偏大 (如 24% vs 20%)：第一注大水量萃出更多前段果酸
-          profile.acidity += Math.min(0.35, (p1Ratio - 0.20) * 5.0);
-          profile.sweetness -= Math.min(0.2, (p1Ratio - 0.20) * 2.5);
-        } else if (p1Ratio < 0.19) {
-          // 前注偏小 (如 16% vs 20%)：第一注少第二注多，充分萃出焦糖甜感
-          profile.sweetness += Math.min(0.35, (0.20 - p1Ratio) * 5.0);
-          profile.acidity -= Math.min(0.2, (0.20 - p1Ratio) * 2.5);
+        if (method === 'four_six') {
+          // Kasuya 4:6 前段水量配比影響：前大注水萃出更多酸質，前小注水萃出更多甜感
+          if (p1Ratio > 0.21) {
+            // 前注偏大 (如 24% vs 20%)：第一注大水量萃出更多前段果酸
+            profile.acidity += Math.min(0.35, (p1Ratio - 0.20) * 5.0);
+            profile.sweetness -= Math.min(0.2, (p1Ratio - 0.20) * 2.5);
+          } else if (p1Ratio < 0.19) {
+            // 前注偏小 (如 16% vs 20%)：第一注少第二注多，充分萃出焦糖甜感
+            profile.sweetness += Math.min(0.35, (0.20 - p1Ratio) * 5.0);
+            profile.acidity -= Math.min(0.2, (0.20 - p1Ratio) * 2.5);
+          }
+        } else {
+          // 非四六法：依風味偏好給予適當感官回饋
+          if (flavor === 'acid') {
+            profile.acidity += 0.2;
+          } else if (flavor === 'sweet') {
+            profile.sweetness += 0.25;
+          }
         }
 
-        // 悶蒸與接觸時間影響：短悶蒸 (<=38s) 避苦提酸，長悶蒸 (>=50s) 增甜增醇
-        if (bloomSec <= 38) {
-          profile.acidity += 0.15;
-          profile.cleanliness += 0.15;
-          profile.body -= 0.1;
-        } else if (bloomSec >= 50) {
-          profile.sweetness += 0.15;
-          profile.body += 0.1;
+        // 悶蒸與接觸時間影響：松屋流讀取加蓋深悶蒸，其餘手法依基準悶蒸秒數 ±5s 判斷
+        if (method === 'matsuya') {
+          const steamSec = (currentStepsCache[1] && currentStepsCache[1].durationSec) || 180;
+          const baseSteam = 180 + ((ROAST_CONFIGS[roast] && ROAST_CONFIGS[roast].bloomRoastDelta) || 0) * 5;
+          if (steamSec <= baseSteam - 10) {
+            profile.acidity += 0.15;
+            profile.cleanliness += 0.15;
+            profile.body -= 0.1;
+          } else if (steamSec >= baseSteam + 10) {
+            profile.sweetness += 0.15;
+            profile.body += 0.1;
+          }
+        } else {
+          const METHOD_BASE_BLOOM = {
+            four_six: 45,
+            single_pour: 35,
+            three_stage: 40,
+            hoffmann: 45,
+            immersion: 35
+          };
+          const baseBloom = METHOD_BASE_BLOOM[method] || 40;
+          if (bloomSec <= baseBloom - 5) {
+            profile.acidity += 0.15;
+            profile.cleanliness += 0.15;
+            profile.body -= 0.1;
+          } else if (bloomSec >= baseBloom + 5) {
+            profile.sweetness += 0.15;
+            profile.body += 0.1;
+          }
         }
 
-        // 總萃取時間影響：快流速避開後段澀感，長浸泡增加厚實度
-        if (totalSec < 150) {
+        // 總萃取時間影響：快流速避開後段澀感，長浸泡增加厚實度 (依同條件平衡順口真實標準總秒數 ±10s 動態判斷)
+        const expectedBaseSec = getStandardBalanceTotalSeconds(method, state.dose, roast);
+
+        if (totalSec <= expectedBaseSec - 10) {
           profile.cleanliness += 0.15;
           profile.body -= 0.1;
-        } else if (totalSec > 180) {
+        } else if (totalSec >= expectedBaseSec + 10) {
           profile.body += 0.15;
           profile.aftertaste += 0.15;
         }
@@ -4195,7 +4422,7 @@
         }
       }
 
-      if (currentStepsCache && currentStepsCache.length > 0) {
+      if (state.method === 'four_six' && currentStepsCache && currentStepsCache.length > 0) {
         const totalW = currentStepsCache.reduce((sum, s) => sum + s.amount, 0);
         const p1Ratio = totalW > 0 ? (currentStepsCache[0].amount / totalW) : 0.20;
         if (p1Ratio > 0.21) {
