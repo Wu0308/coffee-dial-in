@@ -50,6 +50,7 @@
     }
     body {
       background-color: var(--bg-page);
+      background-image: radial-gradient(ellipse at 50% 0%, #F3ECE4 0%, #FAF9F7 65%);
       color: var(--text-main);
       font-family: 'Outfit', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -139,7 +140,31 @@
 
     /* Custom range input slider */
     input[type=range] {
-      accent-color: #654D3F;
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      height: 5px;
+      border-radius: 999px;
+      background: #E6DFD6;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 2.5px solid #654D3F;
+      box-shadow: 0 2px 5px rgba(44, 37, 33, 0.18);
+      margin-top: -6.5px;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.12);
+      background: #FAF6F2;
     }
 
     /* Refined tactile button styling (Taste Skill & Impeccable) */
@@ -164,25 +189,58 @@
       transform: scale(0.98);
     }
     .dial-btn.active, .dial-btn.active {
-      background-color: var(--btn-active-bg);
-      border-color: var(--btn-active-border);
+      background-color: #F4EFEA;
+      border-color: #8C705F;
       color: var(--btn-active-text);
       font-weight: 600;
-      box-shadow: inset 0 1px 2px rgba(61, 48, 40, 0.05), 0 1px 3px rgba(61, 48, 40, 0.08);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                  0 0 0 1px rgba(101, 77, 63, 0.15),
+                  0 2px 6px rgba(61, 48, 40, 0.06);
+    }
+    .dial-btn.active::after {
+      content: '';
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 5px;
+      height: 5px;
+      border-radius: 9999px;
+      background-color: #D97706;
+      box-shadow: 0 0 4px rgba(217, 119, 6, 0.5);
     }
 
     /* Refined card styling */
     .brew-card, .dial-card {
       background-color: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 18px;
+      border-radius: 20px;
       padding: 1.25rem;
-      box-shadow: 0 1px 3px rgba(44, 37, 33, 0.02), 0 4px 12px -2px rgba(44, 37, 33, 0.03);
-      transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
+                  0 1px 3px rgba(44, 37, 33, 0.02),
+                  0 6px 18px -3px rgba(44, 37, 33, 0.04);
+      transition: box-shadow 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
     }
     .brew-card:hover, .dial-card:hover {
       border-color: #DFD5C8;
-      box-shadow: 0 2px 6px rgba(44, 37, 33, 0.03), 0 8px 20px -3px rgba(44, 37, 33, 0.05);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 1),
+                  0 3px 8px rgba(44, 37, 33, 0.03),
+                  0 12px 24px -4px rgba(44, 37, 33, 0.06);
+    }
+    /* 左欄內凹分艙托盤 (Recessed Tray) */
+    .control-tray {
+      background-color: #FAF8F5;
+      border: 1px solid #EFEAE3;
+      border-radius: 16px;
+      padding: 0.875rem;
+      box-shadow: inset 0 1px 2px rgba(44, 37, 33, 0.02);
+    }
+
+    @keyframes stepCardSlideUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .anim-step-card {
+      animation: stepCardSlideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
     /* Step active highlight during timer */
@@ -713,69 +771,71 @@
 
     <!-- 互動式沖煮計時器模式 (支援換段提示音與倒數提示) -->
     <section id="timer-bar" class="hidden mb-6 brew-card p-5 sm:p-6 border-[#DDD4CA] bg-[#FAF8F5] shadow-sm transition-all duration-300">
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div>
-          <div class="text-xs font-bold text-[#654D3F] flex items-center gap-2">
-            <span id="timer-status-dot" class="w-2.5 h-2.5 rounded-full bg-stone-400"></span>
-            <span id="timer-status-title">即時注水指引計時器</span>
+      <div class="sticky top-2 z-30 bg-[#FAF8F5]/95 backdrop-blur-md p-2.5 -m-2.5 rounded-2xl border border-transparent">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <div class="text-xs font-bold text-[#654D3F] flex items-center gap-2">
+              <span id="timer-status-dot" class="w-2.5 h-2.5 rounded-full bg-stone-400"></span>
+              <span id="timer-status-title">即時注水指引計時器</span>
+            </div>
+            <div class="text-xs text-[#8C7E75] mt-1" id="timer-step-desc">
+              點擊「開始沖煮」，系統將隨秒數自動換段並發出提示音
+            </div>
           </div>
-          <div class="text-xs text-[#8C7E75] mt-1" id="timer-step-desc">
-            點擊「開始沖煮」，系統將隨秒數自動換段並發出提示音
-          </div>
-        </div>
-        
-        <!-- 計時器主控群組 (響應式設計：手機端自適應換行與寬度，保證 100% 容納於螢幕內不溢出) -->
-        <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
-          <!-- 碼錶數字 (Barista Stopwatch) -->
-          <div class="text-2xl sm:text-4xl font-mono-num font-bold text-[#2C2521] tracking-tight bg-[#FAF9F7] px-3 sm:px-4 py-1.5 rounded-xl border border-[#EDE8E2] text-center flex-shrink-0" id="timer-digits">
-            00:00
-          </div>
-
-          <!-- 主控制鍵：開始 / 暫停沖煮 -->
-          <button id="timer-run-btn" onclick="toggleTimer()" 
-                  class="flex-1 sm:flex-initial px-3.5 sm:px-4 py-2 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
-            <span id="timer-run-icon">
-              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
-            </span>
-            <span id="timer-run-text">開始沖煮</span>
-          </button>
           
-          <!-- 次要控制按鈕組 (手機端平分寬度，桌面端水平排列) -->
-          <div class="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-start mt-1 sm:mt-0">
-            <!-- 重設按鈕 -->
-            <button onclick="resetTimer()" 
-                    class="flex-1 sm:flex-initial px-2 sm:px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-[#685B52] text-xs hover:border-[#CFC2B7] transition flex items-center justify-center gap-1.5 cursor-pointer"
-                    title="重設計時與步驟">
-              <svg class="w-3.5 h-3.5 text-[#8C7E75]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                <path d="M3 3v5h5"></path>
-              </svg>
-              <span>重設</span>
-            </button>
+          <!-- 計時器主控群組 (響應式設計：手機端自適應換行與寬度，保證 100% 容納於螢幕內不溢出) -->
+          <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            <!-- 碼錶數字 (Barista Stopwatch) -->
+            <div class="text-2xl sm:text-4xl font-mono-num font-bold text-[#2C2521] tracking-tight bg-[#FAF9F7] px-3 sm:px-4 py-1.5 rounded-xl border border-[#EDE8E2] text-center flex-shrink-0" id="timer-digits">
+              00:00
+            </div>
 
-            <!-- 提示音開關按鈕 -->
-            <button onclick="toggleAudio()" id="audio-btn" 
-                    class="flex-1 sm:flex-initial px-2 sm:px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-xs hover:border-[#CFC2B7] text-[#685B52] transition flex items-center justify-center gap-1.5 cursor-pointer" 
-                    title="點擊開關步驟提示音">
-              <span id="audio-icon">
-                <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-                </svg>
+            <!-- 主控制鍵：開始 / 暫停沖煮 -->
+            <button id="timer-run-btn" onclick="toggleTimer()" 
+                    class="flex-1 sm:flex-initial px-3.5 sm:px-4 py-2 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
+              <span id="timer-run-icon">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
               </span>
-              <span id="audio-text" class="text-[11px] font-medium">提示音</span>
+              <span id="timer-run-text">開始沖煮</span>
             </button>
+            
+            <!-- 次要控制按鈕組 (手機端平分寬度，桌面端水平排列) -->
+            <div class="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-start mt-1 sm:mt-0">
+              <!-- 重設按鈕 -->
+              <button onclick="resetTimer()" 
+                      class="flex-1 sm:flex-initial px-2 sm:px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-[#685B52] text-xs hover:border-[#CFC2B7] transition flex items-center justify-center gap-1.5 cursor-pointer"
+                      title="重設計時與步驟">
+                <svg class="w-3.5 h-3.5 text-[#8C7E75]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                  <path d="M3 3v5h5"></path>
+                </svg>
+                <span>重設</span>
+              </button>
 
-            <!-- 吧台專注模式 (Zen HUD) 按鈕 -->
-            <button onclick="openZenBaristaMode()" id="open-zen-btn" 
-                    class="flex-1 sm:flex-initial px-2.5 sm:px-3 py-2 rounded-xl bg-[#2D231D] hover:bg-[#1E1713] text-amber-300 text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-2xs border border-[#42332A] cursor-pointer" 
-                    title="開啟吧台大字專注模式 (遠距清晰 HUD)">
-              <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
-              </svg>
-              <span class="font-medium">專注模式</span>
-            </button>
+              <!-- 提示音開關按鈕 -->
+              <button onclick="toggleAudio()" id="audio-btn" 
+                      class="flex-1 sm:flex-initial px-2 sm:px-3 py-2 rounded-xl bg-white border border-[#E6E0D8] text-xs hover:border-[#CFC2B7] text-[#685B52] transition flex items-center justify-center gap-1.5 cursor-pointer" 
+                      title="點擊開關步驟提示音">
+                <span id="audio-icon">
+                  <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                  </svg>
+                </span>
+                <span id="audio-text" class="text-[11px] font-medium">提示音</span>
+              </button>
+
+              <!-- 吧台專注模式 (Zen HUD) 按鈕 -->
+              <button onclick="openZenBaristaMode()" id="open-zen-btn" 
+                      class="flex-1 sm:flex-initial px-2.5 sm:px-3 py-2 rounded-xl bg-[#2D231D] hover:bg-[#1E1713] text-amber-300 text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-2xs border border-[#42332A] cursor-pointer" 
+                      title="開啟吧台大字專注模式 (遠距清晰 HUD)">
+                <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                </svg>
+                <span class="font-medium">專注模式</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -923,299 +983,350 @@
         
         <div class="brew-card p-5 sm:p-6 space-y-5">
 
-          <!-- 1. 沖煮手法 -->
-          <div>
-            <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
-              <span>沖煮手法</span>
-              <span id="selected-method-label" class="text-xs font-normal text-[#8C7E75]">四六法</span>
-            </div>
-            <!-- 手法按鈕網格 (6 種主流手法，附專屬自製向量小圖示) -->
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <button onclick="selectMethod('four_six')" class="dial-btn active p-2.5 rounded-xl text-left flex items-center gap-2.5 group transition" data-method="four_six">
-                <div class="w-8 h-8 rounded-lg bg-[#F5EFE8] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-[#785E4F] flex items-center justify-center flex-shrink-0 transition">
-                  <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M4 4h16l-3.5 13h-9L4 4z"></path>
-                    <line x1="6.5" y1="10" x2="17.5" y2="10"></line>
-                    <line x1="8" y1="14" x2="16" y2="14"></line>
-                  </svg>
+          <!-- 分艙 A（器具與手法艙） -->
+          <div class="control-tray space-y-4">
+            <!-- 1. 沖煮手法 -->
+            <div>
+              <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-mono font-bold text-amber-700/80 bg-amber-500/10 px-1.5 py-0.5 rounded">01</span>
+                  <span>沖煮手法</span>
                 </div>
-                <div class="min-w-0">
-                  <div class="font-bold text-xs text-[#2C2521] leading-tight">四六法</div>
-                  <div class="text-[10px] text-[#8C7E75] truncate leading-tight mt-0.5">粕谷哲分段</div>
-                </div>
-              </button>
-
-              <button onclick="selectMethod('single_pour')" class="dial-btn p-2.5 rounded-xl text-left flex items-center gap-2.5 group transition" data-method="single_pour">
-                <div class="w-8 h-8 rounded-lg bg-[#F5EFE8] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-[#785E4F] flex items-center justify-center flex-shrink-0 transition">
-                  <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M4 4h16l-3.5 13h-9L4 4z"></path>
-                    <line x1="12" y1="2" x2="12" y2="16"></line>
-                    <polyline points="9 13 12 16 15 13"></polyline>
-                  </svg>
-                </div>
-                <div class="min-w-0">
-                  <div class="font-bold text-xs text-[#2C2521] leading-tight">一刀流</div>
-                  <div class="text-[10px] text-[#8C7E75] truncate leading-tight mt-0.5">極致純淨</div>
-                </div>
-              </button>
-
-              <button onclick="selectMethod('three_stage')" class="dial-btn p-2.5 rounded-xl text-left flex items-center gap-2.5 group transition" data-method="three_stage">
-                <div class="w-8 h-8 rounded-lg bg-[#F5EFE8] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-[#785E4F] flex items-center justify-center flex-shrink-0 transition">
-                  <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M4 4h16l-3.5 13h-9L4 4z"></path>
-                    <path d="M7 8c1.5.8 3.5.8 5 0s3.5-.8 5 0"></path>
-                    <path d="M8 12c1.2.6 2.8.6 4 0s2.8-.6 4 0"></path>
-                  </svg>
-                </div>
-                <div class="min-w-0">
-                  <div class="font-bold text-xs text-[#2C2521] leading-tight">經典三段式</div>
-                  <div class="text-[10px] text-[#8C7E75] truncate leading-tight mt-0.5">層次飽滿</div>
-                </div>
-              </button>
-
-              <button onclick="selectMethod('hoffmann')" class="dial-btn p-2.5 rounded-xl text-left flex items-center gap-2.5 group transition" data-method="hoffmann">
-                <div class="w-8 h-8 rounded-lg bg-[#F5EFE8] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-[#785E4F] flex items-center justify-center flex-shrink-0 transition">
-                  <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M21 4v5h-5"></path>
-                    <path d="M20.5 14a8 8 0 1 1-1.8-6.8L21 9"></path>
-                    <circle cx="12" cy="12" r="2.5" fill="currentColor"></circle>
-                  </svg>
-                </div>
-                <div class="min-w-0">
-                  <div class="font-bold text-xs text-[#2C2521] leading-tight">Hoffmann法</div>
-                  <div class="text-[10px] text-[#8C7E75] truncate leading-tight mt-0.5">漩渦均勻</div>
-                </div>
-              </button>
-
-              <button onclick="selectMethod('matsuya')" class="dial-btn p-2.5 rounded-xl text-left flex items-center gap-2.5 group transition" data-method="matsuya">
-                <div class="w-8 h-8 rounded-lg bg-[#F5EFE8] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-[#785E4F] flex items-center justify-center flex-shrink-0 transition">
-                  <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M5 7h14"></path>
-                    <path d="M7 7c0-2.5 2.2-4.5 5-4.5s5 2 5 4.5"></path>
-                    <path d="M6 7l2.5 11h7L18 7"></path>
-                    <circle cx="12" cy="13" r="1.5" fill="currentColor"></circle>
-                  </svg>
-                </div>
-                <div class="min-w-0">
-                  <div class="font-bold text-xs text-[#2C2521] leading-tight">松屋流</div>
-                  <div class="text-[10px] text-[#8C7E75] truncate leading-tight mt-0.5">點滴深悶</div>
-                </div>
-              </button>
-
-              <button onclick="selectMethod('immersion')" class="dial-btn p-2.5 rounded-xl text-left flex items-center gap-2.5 group transition" data-method="immersion">
-                <div class="w-8 h-8 rounded-lg bg-[#F5EFE8] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-[#785E4F] flex items-center justify-center flex-shrink-0 transition">
-                  <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M5 4h14l-2 10H7L5 4z"></path>
-                    <rect x="9" y="14" width="6" height="4" rx="1" fill="currentColor"></rect>
-                    <line x1="12" y1="18" x2="12" y2="22"></line>
-                    <line x1="9" y1="22" x2="15" y2="22"></line>
-                  </svg>
-                </div>
-                <div class="min-w-0">
-                  <div class="font-bold text-xs text-[#2C2521] leading-tight">浸泡法</div>
-                  <div class="text-[10px] text-[#8C7E75] truncate leading-tight mt-0.5">Switch閥門</div>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          <!-- 1.5 濾杯幾何 (三大濾杯幾何結構) -->
-          <div id="dripper-selector-container">
-            <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
-              <span>濾杯幾何</span>
-              <span id="selected-dripper-label" class="text-xs font-normal text-[#8C7E75]">錐形 V60</span>
-            </div>
-            <div class="grid grid-cols-3 gap-1.5 text-xs">
-              <button type="button" onclick="selectDripper('conical')" class="dial-btn active py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-dripper="conical">
-                <div class="w-6 h-6 rounded-md bg-[#FAF4EE] flex items-center justify-center text-[#654D3F] transition group-[.active]:scale-110">
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M4 4h16l-7 14h-2L4 4z"></path>
-                    <line x1="8" y1="21" x2="16" y2="21"></line>
-                  </svg>
-                </div>
-                <span class="text-[11px] font-semibold">錐形 V60</span>
-                <span class="text-[9px] text-[#8C7E75] scale-90 -mt-1 group-[.active]:text-[#654D3F]">流速快·層次明</span>
-              </button>
-
-              <button type="button" onclick="selectDripper('flat_wave')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-dripper="flat_wave">
-                <div class="w-6 h-6 rounded-md bg-[#FAF4EE] flex items-center justify-center text-[#654D3F] transition group-[.active]:scale-110">
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M4 5h16l-3 12H7L4 5z"></path>
-                    <line x1="5" y1="20" x2="19" y2="20"></line>
-                  </svg>
-                </div>
-                <span class="text-[11px] font-semibold">平底蛋糕</span>
-                <span class="text-[9px] text-[#8C7E75] scale-90 -mt-1 group-[.active]:text-[#654D3F]">均勻·甜感飽滿</span>
-              </button>
-
-              <button type="button" onclick="selectDripper('trapezoid')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-dripper="trapezoid">
-                <div class="w-6 h-6 rounded-md bg-[#FAF4EE] flex items-center justify-center text-[#654D3F] transition group-[.active]:scale-110">
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M5 5h14l-4 13H9L5 5z"></path>
-                    <line x1="7" y1="21" x2="17" y2="21"></line>
-                  </svg>
-                </div>
-                <span class="text-[11px] font-semibold">梯形扇形</span>
-                <span class="text-[9px] text-[#8C7E75] scale-90 -mt-1 group-[.active]:text-[#654D3F]">半浸泡·醇厚</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- 2. 烘焙度 (5 階，附烘焙色相咖啡豆向量小圖示) -->
-          <div>
-            <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
-              <span>烘焙度</span>
-              <span id="selected-roast-label" class="text-xs font-normal text-[#8C7E75]">中焙</span>
-            </div>
-            <div class="grid grid-cols-5 gap-1.5 text-xs">
-              <button onclick="selectRoast('light')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-roast="light">
-                <div class="w-6 h-6 rounded-md bg-[#FAF4EE] flex items-center justify-center text-[#C99E75] transition group-[.active]:scale-110">
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/><path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/></svg>
-                </div>
-                <span class="text-[11px] font-semibold">淺焙</span>
-              </button>
-
-              <button onclick="selectRoast('medium_light')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-roast="medium_light">
-                <div class="w-6 h-6 rounded-md bg-[#F6EDE4] flex items-center justify-center text-[#B57C4C] transition group-[.active]:scale-110">
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/><path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/></svg>
-                </div>
-                <span class="text-[11px] font-semibold">中淺</span>
-              </button>
-
-              <button onclick="selectRoast('medium')" class="dial-btn active py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-roast="medium">
-                <div class="w-6 h-6 rounded-md bg-[#F2E5D9] flex items-center justify-center text-[#8C5D3B] transition group-[.active]:scale-110">
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/><path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/></svg>
-                </div>
-                <span class="text-[11px] font-semibold">中焙</span>
-              </button>
-
-              <button onclick="selectRoast('medium_dark')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-roast="medium_dark">
-                <div class="w-6 h-6 rounded-md bg-[#EFE0D3] flex items-center justify-center text-[#633F26] transition group-[.active]:scale-110">
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/><path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/></svg>
-                </div>
-                <span class="text-[11px] font-semibold">中深</span>
-              </button>
-
-              <button onclick="selectRoast('dark')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-roast="dark">
-                <div class="w-6 h-6 rounded-md bg-[#EAD8CA] flex items-center justify-center text-[#3B2213] transition group-[.active]:scale-110">
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/><path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/></svg>
-                </div>
-                <span class="text-[11px] font-semibold">深焙</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- 3. 咖啡粉量 (含 熱 / 冰 雙向切換膠囊) -->
-          <div>
-            <!-- 沖煮模式切換 (熱手沖 vs 急冷冰手沖) -->
-            <div class="mb-3">
-              <div class="text-sm font-semibold text-[#2C2521] mb-2 flex items-center justify-between">
-                <span>沖煮模式</span>
-                <span id="selected-brew-mode-label" class="text-xs font-normal text-[#8C7E75]">熱手沖</span>
+                <span id="selected-method-label" class="text-xs font-normal text-[#8C7E75]">四六法</span>
               </div>
-              <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-[#F0EAE3] text-xs">
-                <button type="button" onclick="selectBrewMode('hot')" data-brew-mode="hot" class="py-1.5 px-2 rounded-lg font-bold text-center transition bg-[#654D3F] text-white shadow-2xs flex items-center justify-center gap-1.5">
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
-                  <span>熱手沖 (Hot)</span>
+              <!-- 手法按鈕網格 (6 種主流手法，附專屬自製向量小圖示) -->
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <button onclick="selectMethod('four_six')" class="dial-btn active p-2.5 rounded-xl text-left flex items-center gap-2.5 group transition" data-method="four_six">
+                  <div class="w-8 h-8 rounded-lg bg-[#F5EFE8] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-[#785E4F] flex items-center justify-center flex-shrink-0 transition">
+                    <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M4 4h16l-3.5 13h-9L4 4z"></path>
+                      <line x1="6.5" y1="10" x2="17.5" y2="10"></line>
+                      <line x1="8" y1="14" x2="16" y2="14"></line>
+                    </svg>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="font-bold text-xs text-[#2C2521] leading-tight">四六法</div>
+                    <div class="text-[10px] text-[#8C7E75] truncate leading-tight mt-0.5">粕谷哲分段</div>
+                  </div>
                 </button>
-                <button type="button" onclick="selectBrewMode('iced')" data-brew-mode="iced" class="py-1.5 px-2 rounded-lg font-semibold text-center transition text-[#7C6E64] hover:text-[#2C2521] flex items-center justify-center gap-1.5">
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="19.07" y1="4.93" x2="4.93" y2="19.07"></line></svg>
-                  <span>急冷冰手沖 (Iced)</span>
+
+                <button onclick="selectMethod('single_pour')" class="dial-btn p-2.5 rounded-xl text-left flex items-center gap-2.5 group transition" data-method="single_pour">
+                  <div class="w-8 h-8 rounded-lg bg-[#F5EFE8] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-[#785E4F] flex items-center justify-center flex-shrink-0 transition">
+                    <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M4 4h16l-3.5 13h-9L4 4z"></path>
+                      <line x1="12" y1="2" x2="12" y2="16"></line>
+                      <polyline points="9 13 12 16 15 13"></polyline>
+                    </svg>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="font-bold text-xs text-[#2C2521] leading-tight">一刀流</div>
+                    <div class="text-[10px] text-[#8C7E75] truncate leading-tight mt-0.5">極致純淨</div>
+                  </div>
+                </button>
+
+                <button onclick="selectMethod('three_stage')" class="dial-btn p-2.5 rounded-xl text-left flex items-center gap-2.5 group transition" data-method="three_stage">
+                  <div class="w-8 h-8 rounded-lg bg-[#F5EFE8] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-[#785E4F] flex items-center justify-center flex-shrink-0 transition">
+                    <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M4 4h16l-3.5 13h-9L4 4z"></path>
+                      <path d="M7 8c1.5.8 3.5.8 5 0s3.5-.8 5 0"></path>
+                      <path d="M8 12c1.2.6 2.8.6 4 0s2.8-.6 4 0"></path>
+                    </svg>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="font-bold text-xs text-[#2C2521] leading-tight">經典三段式</div>
+                    <div class="text-[10px] text-[#8C7E75] truncate leading-tight mt-0.5">層次飽滿</div>
+                  </div>
+                </button>
+
+                <button onclick="selectMethod('hoffmann')" class="dial-btn p-2.5 rounded-xl text-left flex items-center gap-2.5 group transition" data-method="hoffmann">
+                  <div class="w-8 h-8 rounded-lg bg-[#F5EFE8] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-[#785E4F] flex items-center justify-center flex-shrink-0 transition">
+                    <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 4v5h-5"></path>
+                      <path d="M20.5 14a8 8 0 1 1-1.8-6.8L21 9"></path>
+                      <circle cx="12" cy="12" r="2.5" fill="currentColor"></circle>
+                    </svg>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="font-bold text-xs text-[#2C2521] leading-tight">Hoffmann法</div>
+                    <div class="text-[10px] text-[#8C7E75] truncate leading-tight mt-0.5">漩渦均勻</div>
+                  </div>
+                </button>
+
+                <button onclick="selectMethod('matsuya')" class="dial-btn p-2.5 rounded-xl text-left flex items-center gap-2.5 group transition" data-method="matsuya">
+                  <div class="w-8 h-8 rounded-lg bg-[#F5EFE8] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-[#785E4F] flex items-center justify-center flex-shrink-0 transition">
+                    <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M5 7h14"></path>
+                      <path d="M7 7c0-2.5 2.2-4.5 5-4.5s5 2 5 4.5"></path>
+                      <path d="M6 7l2.5 11h7L18 7"></path>
+                      <circle cx="12" cy="13" r="1.5" fill="currentColor"></circle>
+                    </svg>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="font-bold text-xs text-[#2C2521] leading-tight">松屋流</div>
+                    <div class="text-[10px] text-[#8C7E75] truncate leading-tight mt-0.5">點滴深悶</div>
+                  </div>
+                </button>
+
+                <button onclick="selectMethod('immersion')" class="dial-btn p-2.5 rounded-xl text-left flex items-center gap-2.5 group transition" data-method="immersion">
+                  <div class="w-8 h-8 rounded-lg bg-[#F5EFE8] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-[#785E4F] flex items-center justify-center flex-shrink-0 transition">
+                    <svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M5 4h14l-2 10H7L5 4z"></path>
+                      <rect x="9" y="14" width="6" height="4" rx="1" fill="currentColor"></rect>
+                      <line x1="12" y1="18" x2="12" y2="22"></line>
+                      <line x1="9" y1="22" x2="15" y2="22"></line>
+                    </svg>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="font-bold text-xs text-[#2C2521] leading-tight">浸泡法</div>
+                    <div class="text-[10px] text-[#8C7E75] truncate leading-tight mt-0.5">Switch閥門</div>
+                  </div>
                 </button>
               </div>
             </div>
 
-            <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
-              <span>咖啡粉量</span>
-              <span class="text-xs font-normal text-[#8C7E75]">建議 1-2 杯</span>
-            </div>
-            
-            <div class="flex items-center gap-2">
-              <div class="relative flex-1">
-                <input type="number" id="dose-input" min="8" max="50" step="0.5" value="15" 
-                       oninput="onDoseInput(this.value)"
-                       onchange="onDoseCommit(this.value)"
-                       onblur="onDoseCommit(this.value)"
-                       class="w-full bg-white border border-[#E6E0D8] rounded-xl py-2 px-3 text-left font-mono-num text-sm text-[#2C2521] font-semibold focus:outline-none focus:border-[#CFC2B7] transition shadow-2xs">
-                <span class="absolute right-3 top-2.5 text-xs text-[#8C7E75] font-medium pointer-events-none">g</span>
+            <!-- 1.5 濾杯幾何 (三大濾杯幾何結構) -->
+            <div id="dripper-selector-container">
+              <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-mono font-bold text-amber-700/80 bg-amber-500/10 px-1.5 py-0.5 rounded">02</span>
+                  <span>濾杯幾何</span>
+                </div>
+                <span id="selected-dripper-label" class="text-xs font-normal text-[#8C7E75]">錐形 V60</span>
               </div>
-              <button onclick="stepDose(-1)" aria-label="減少粉量" class="w-9 h-9 rounded-xl border border-[#E6E0D8] bg-white hover:border-[#CFC2B7] text-[#685B52] flex items-center justify-center font-bold text-base transition active:scale-95 shadow-2xs">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              </button>
-              <button onclick="stepDose(1)" aria-label="增加粉量" class="w-9 h-9 rounded-xl border border-[#E6E0D8] bg-white hover:border-[#CFC2B7] text-[#685B52] flex items-center justify-center font-bold text-base transition active:scale-95 shadow-2xs">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              </button>
-            </div>
+              <div class="grid grid-cols-3 gap-1.5 text-xs">
+                <button type="button" onclick="selectDripper('conical')" class="dial-btn active py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-dripper="conical">
+                  <div class="w-6 h-6 rounded-md bg-[#FAF4EE] group-[.active]:bg-[#654D3F] group-[.active]:text-white flex items-center justify-center text-[#654D3F] transition-colors group-[.active]:scale-110">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M4 4h16l-7 14h-2L4 4z"></path>
+                      <line x1="8" y1="21" x2="16" y2="21"></line>
+                    </svg>
+                  </div>
+                  <span class="text-[11px] font-semibold">錐形 V60</span>
+                  <span class="text-[9px] text-[#8C7E75] scale-90 -mt-1 group-[.active]:text-[#654D3F]">流速快·層次明</span>
+                </button>
 
-            <!-- 快捷粉量推薦標籤 -->
-            <div class="flex items-center gap-1.5 mt-2 flex-wrap" id="quick-dose-container">
-              <button type="button" onclick="onDoseChange(12)" data-dose="12" class="quick-dose-pill px-2.5 py-1 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#786B63] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num cursor-pointer">12g 淺嚐</button>
-              <button type="button" onclick="onDoseChange(15)" data-dose="15" class="quick-dose-pill px-2.5 py-1 rounded-lg bg-[#654D3F] text-white border border-[#654D3F] text-[10px] font-bold transition font-mono-num shadow-2xs cursor-pointer">15g 金杯</button>
-              <button type="button" onclick="onDoseChange(18)" data-dose="18" class="quick-dose-pill px-2.5 py-1 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#786B63] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num cursor-pointer">18g 濃郁</button>
-              <button type="button" onclick="onDoseChange(20)" data-dose="20" class="quick-dose-pill px-2.5 py-1 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#786B63] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num cursor-pointer">20g 雙人</button>
-              <button type="button" onclick="onDoseChange(30)" data-dose="30" class="quick-dose-pill px-2.5 py-1 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#786B63] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num cursor-pointer">30g 分享壺</button>
-            </div>
+                <button type="button" onclick="selectDripper('flat_wave')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-dripper="flat_wave">
+                  <div class="w-6 h-6 rounded-md bg-[#FAF4EE] group-[.active]:bg-[#654D3F] group-[.active]:text-white flex items-center justify-center text-[#654D3F] transition-colors group-[.active]:scale-110">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M4 5h16l-3 12H7L4 5z"></path>
+                      <line x1="5" y1="20" x2="19" y2="20"></line>
+                    </svg>
+                  </div>
+                  <span class="text-[11px] font-semibold">平底蛋糕</span>
+                  <span class="text-[9px] text-[#8C7E75] scale-90 -mt-1 group-[.active]:text-[#654D3F]">均勻·甜感飽滿</span>
+                </button>
 
-            <!-- 微調滑桿 -->
-            <div class="mt-2.5">
-              <input type="range" id="dose-range" min="10" max="35" step="1" value="15" 
-                     oninput="onDoseChange(this.value)"
-                     class="w-full h-1.5 bg-[#EAE4DC] rounded-lg cursor-pointer">
-              <div class="flex justify-between text-[10px] text-[#9B8D83] mt-1 font-mono-num">
-                <span>10g</span>
-                <span>20g</span>
-                <span>35g</span>
+                <button type="button" onclick="selectDripper('trapezoid')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-dripper="trapezoid">
+                  <div class="w-6 h-6 rounded-md bg-[#FAF4EE] group-[.active]:bg-[#654D3F] group-[.active]:text-white flex items-center justify-center text-[#654D3F] transition-colors group-[.active]:scale-110">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M5 5h14l-4 13H9L5 5z"></path>
+                      <line x1="7" y1="21" x2="17" y2="21"></line>
+                    </svg>
+                  </div>
+                  <span class="text-[11px] font-semibold">梯形扇形</span>
+                  <span class="text-[9px] text-[#8C7E75] scale-90 -mt-1 group-[.active]:text-[#654D3F]">半浸泡·醇厚</span>
+                </button>
               </div>
             </div>
           </div>
 
-          <!-- 4. 風味偏好 (附專屬自製向量小圖示) -->
-          <div>
-            <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
-              <span>風味偏好</span>
-              <span id="selected-flavor-label" class="text-xs font-normal text-[#8C7E75]">平衡順口</span>
+          <!-- 分艙 B（豆況與水粉艙） -->
+          <div class="control-tray space-y-4">
+            <!-- 2. 烘焙度 (5 階，附烘焙色相咖啡豆向量小圖示) -->
+            <div>
+              <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-mono font-bold text-amber-700/80 bg-amber-500/10 px-1.5 py-0.5 rounded">03</span>
+                  <span>烘焙度</span>
+                </div>
+                <span id="selected-roast-label" class="text-xs font-normal text-[#8C7E75]">中焙</span>
+              </div>
+              <div class="grid grid-cols-5 gap-1.5 text-xs">
+                <button onclick="selectRoast('light')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-roast="light">
+                  <div class="w-6 h-6 rounded-md bg-[#FAF4EE] flex items-center justify-center text-[#C99E75] transition group-[.active]:scale-110">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/><path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/></svg>
+                  </div>
+                  <span class="text-[11px] font-semibold">淺焙</span>
+                </button>
+
+                <button onclick="selectRoast('medium_light')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-roast="medium_light">
+                  <div class="w-6 h-6 rounded-md bg-[#F6EDE4] flex items-center justify-center text-[#B57C4C] transition group-[.active]:scale-110">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/><path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/></svg>
+                  </div>
+                  <span class="text-[11px] font-semibold">中淺</span>
+                </button>
+
+                <button onclick="selectRoast('medium')" class="dial-btn active py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-roast="medium">
+                  <div class="w-6 h-6 rounded-md bg-[#F2E5D9] flex items-center justify-center text-[#8C5D3B] transition group-[.active]:scale-110">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/><path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/></svg>
+                  </div>
+                  <span class="text-[11px] font-semibold">中焙</span>
+                </button>
+
+                <button onclick="selectRoast('medium_dark')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-roast="medium_dark">
+                  <div class="w-6 h-6 rounded-md bg-[#EFE0D3] flex items-center justify-center text-[#633F26] transition group-[.active]:scale-110">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/><path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/></svg>
+                  </div>
+                  <span class="text-[11px] font-semibold">中深</span>
+                </button>
+
+                <button onclick="selectRoast('dark')" class="dial-btn py-2 px-1 rounded-xl text-center flex flex-col items-center gap-1 group transition" data-roast="dark">
+                  <div class="w-6 h-6 rounded-md bg-[#EAD8CA] flex items-center justify-center text-[#3B2213] transition group-[.active]:scale-110">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/><path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/></svg>
+                  </div>
+                  <span class="text-[11px] font-semibold">深焙</span>
+                </button>
+              </div>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <button onclick="selectFlavor('acid')" class="dial-btn py-2 px-2.5 rounded-xl text-left flex items-center gap-2 group transition" data-flavor="acid">
-                <div class="w-7 h-7 rounded-lg bg-[#FAF4EE] text-amber-600 flex items-center justify-center flex-shrink-0">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 12 7.5 4.5"></path><path d="M12 12 16.5 4.5"></path><path d="M12 12 21 10.5"></path><path d="M12 12 19 16.5"></path><path d="M12 12 12 21"></path><path d="M12 12 5 16.5"></path><path d="M12 12 3 10.5"></path></svg>
-                </div>
-                <div>
-                  <div class="font-bold text-xs text-[#2C2521] leading-tight">強調酸質</div>
-                  <div class="text-[10px] text-[#8C7E75] leading-tight mt-0.5">明亮果香</div>
-                </div>
-              </button>
 
-              <button onclick="selectFlavor('sweet')" class="dial-btn py-2 px-2.5 rounded-xl text-left flex items-center gap-2 group transition" data-flavor="sweet">
-                <div class="w-7 h-7 rounded-lg bg-[#FAF4EE] text-amber-600 flex items-center justify-center flex-shrink-0">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path><circle cx="12" cy="14" r="2.5"></circle></svg>
+            <!-- 3. 咖啡粉量 (含 熱 / 冰 雙向切換膠囊) -->
+            <div>
+              <!-- 沖煮模式切換 (熱手沖 vs 急冷冰手沖) -->
+              <div class="mb-3">
+                <div class="text-sm font-semibold text-[#2C2521] mb-2 flex items-center justify-between">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-mono font-bold text-amber-700/80 bg-amber-500/10 px-1.5 py-0.5 rounded">04</span>
+                    <span>沖煮模式與粉量</span>
+                  </div>
+                  <span id="selected-brew-mode-label" class="text-xs font-normal text-[#8C7E75]">熱手沖</span>
                 </div>
-                <div>
-                  <div class="font-bold text-xs text-[#2C2521] leading-tight">突出甜感</div>
-                  <div class="text-[10px] text-[#8C7E75] leading-tight mt-0.5">蜜香焦糖</div>
+                <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-[#F0EAE3] text-xs">
+                  <button type="button" onclick="selectBrewMode('hot')" data-brew-mode="hot" class="py-1.5 px-2 rounded-lg font-bold text-center transition bg-[#654D3F] text-white shadow-2xs flex items-center justify-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
+                    <span>熱手沖 (Hot)</span>
+                  </button>
+                  <button type="button" onclick="selectBrewMode('iced')" data-brew-mode="iced" class="py-1.5 px-2 rounded-lg font-semibold text-center transition text-[#7C6E64] hover:text-[#2C2521] flex items-center justify-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line><line x1="19.07" y1="4.93" x2="4.93" y2="19.07"></line></svg>
+                    <span>急冷冰手沖 (Iced)</span>
+                  </button>
                 </div>
-              </button>
+              </div>
 
-              <button onclick="selectFlavor('body')" class="dial-btn py-2 px-2.5 rounded-xl text-left flex items-center gap-2 group transition" data-flavor="body">
-                <div class="w-7 h-7 rounded-lg bg-[#FAF4EE] text-amber-800 flex items-center justify-center flex-shrink-0">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
+              <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
+                <span>咖啡粉量</span>
+                <span class="text-xs font-normal text-[#8C7E75]">建議 1-2 杯</span>
+              </div>
+              
+              <div class="flex items-center gap-2">
+                <div class="relative flex-1">
+                  <input type="number" id="dose-input" min="8" max="50" step="0.5" value="15" 
+                         oninput="onDoseInput(this.value)"
+                         onchange="onDoseCommit(this.value)"
+                         onblur="onDoseCommit(this.value)"
+                         class="w-full bg-white border border-[#E6E0D8] rounded-xl py-2 px-3 text-left font-mono-num text-sm text-[#2C2521] font-semibold focus:outline-none focus:border-[#CFC2B7] transition shadow-2xs">
+                  <span class="absolute right-3 top-2.5 text-xs text-[#8C7E75] font-medium pointer-events-none">g</span>
                 </div>
-                <div>
-                  <div class="font-bold text-xs text-[#2C2521] leading-tight">追求厚實</div>
-                  <div class="text-[10px] text-[#8C7E75] leading-tight mt-0.5">濃郁醇厚</div>
-                </div>
-              </button>
+                <button onclick="stepDose(-1)" aria-label="減少粉量" class="w-9 h-9 rounded-xl border border-[#E6E0D8] bg-white hover:border-[#CFC2B7] text-[#685B52] flex items-center justify-center font-bold text-base transition active:scale-95 shadow-2xs">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+                <button onclick="stepDose(1)" aria-label="增加粉量" class="w-9 h-9 rounded-xl border border-[#E6E0D8] bg-white hover:border-[#CFC2B7] text-[#685B52] flex items-center justify-center font-bold text-base transition active:scale-95 shadow-2xs">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+              </div>
 
-              <button onclick="selectFlavor('balance')" class="dial-btn active py-2 px-2.5 rounded-xl text-left flex items-center gap-2 group transition" data-flavor="balance">
-                <div class="w-7 h-7 rounded-lg bg-[#FAF4EE] text-emerald-700 flex items-center justify-center flex-shrink-0">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="M7 21h10"></path><path d="M12 3v18"></path><path d="M3 7h18"></path></svg>
+              <!-- 快捷粉量推薦標籤 -->
+              <div class="flex items-center gap-1.5 mt-2 flex-wrap" id="quick-dose-container">
+                <button type="button" onclick="onDoseChange(12)" data-dose="12" class="quick-dose-pill px-2.5 py-1 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#786B63] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num cursor-pointer">12g 淺嚐</button>
+                <button type="button" onclick="onDoseChange(15)" data-dose="15" class="quick-dose-pill px-2.5 py-1 rounded-lg bg-[#654D3F] text-white border border-[#654D3F] text-[10px] font-bold transition font-mono-num shadow-2xs cursor-pointer">15g 金杯</button>
+                <button type="button" onclick="onDoseChange(18)" data-dose="18" class="quick-dose-pill px-2.5 py-1 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#786B63] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num cursor-pointer">18g 濃郁</button>
+                <button type="button" onclick="onDoseChange(20)" data-dose="20" class="quick-dose-pill px-2.5 py-1 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#786B63] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num cursor-pointer">20g 雙人</button>
+                <button type="button" onclick="onDoseChange(30)" data-dose="30" class="quick-dose-pill px-2.5 py-1 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] text-[10px] text-[#786B63] hover:text-[#2C2521] hover:border-[#CFC2B7] transition font-mono-num cursor-pointer">30g 分享壺</button>
+              </div>
+
+              <!-- 微調滑桿 -->
+              <div class="mt-2.5">
+                <input type="range" id="dose-range" min="10" max="35" step="1" value="15" 
+                       oninput="onDoseChange(this.value)"
+                       class="w-full h-1.5 bg-[#EAE4DC] rounded-lg cursor-pointer">
+                <div class="flex justify-between text-[10px] text-[#9B8D83] mt-1 font-mono-num">
+                  <span>10g</span>
+                  <span>20g</span>
+                  <span>35g</span>
                 </div>
-                <div>
-                  <div class="font-bold text-xs text-[#2C2521] leading-tight">平衡順口</div>
-                  <div class="text-[10px] text-[#8C7E75] leading-tight mt-0.5">黃金比例</div>
-                </div>
-              </button>
+              </div>
             </div>
+          </div>
+
+          <!-- 分艙 C（感官微調艙） -->
+          <div class="control-tray space-y-3">
+            <!-- 4. 風味偏好 (附專屬自製向量小圖示) -->
+            <div>
+              <div class="text-sm font-semibold text-[#2C2521] mb-2.5 flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-mono font-bold text-amber-700/80 bg-amber-500/10 px-1.5 py-0.5 rounded">05</span>
+                  <span>風味偏好</span>
+                </div>
+                <span id="selected-flavor-label" class="text-xs font-normal text-[#8C7E75]">平衡順口</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <button onclick="selectFlavor('acid')" class="dial-btn py-2 px-2.5 rounded-xl text-left flex items-center gap-2 group transition" data-flavor="acid">
+                  <div class="w-7 h-7 rounded-lg bg-[#FAF4EE] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-amber-600 flex items-center justify-center flex-shrink-0 transition-colors">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 12 7.5 4.5"></path><path d="M12 12 16.5 4.5"></path><path d="M12 12 21 10.5"></path><path d="M12 12 19 16.5"></path><path d="M12 12 12 21"></path><path d="M12 12 5 16.5"></path><path d="M12 12 3 10.5"></path></svg>
+                  </div>
+                  <div>
+                    <div class="font-bold text-xs text-[#2C2521] leading-tight">強調酸質</div>
+                    <div class="text-[10px] text-[#8C7E75] leading-tight mt-0.5">明亮果香</div>
+                  </div>
+                </button>
+
+                <button onclick="selectFlavor('sweet')" class="dial-btn py-2 px-2.5 rounded-xl text-left flex items-center gap-2 group transition" data-flavor="sweet">
+                  <div class="w-7 h-7 rounded-lg bg-[#FAF4EE] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-amber-600 flex items-center justify-center flex-shrink-0 transition-colors">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path><circle cx="12" cy="14" r="2.5"></circle></svg>
+                  </div>
+                  <div>
+                    <div class="font-bold text-xs text-[#2C2521] leading-tight">突出甜感</div>
+                    <div class="text-[10px] text-[#8C7E75] leading-tight mt-0.5">蜜香焦糖</div>
+                  </div>
+                </button>
+
+                <button onclick="selectFlavor('body')" class="dial-btn py-2 px-2.5 rounded-xl text-left flex items-center gap-2 group transition" data-flavor="body">
+                  <div class="w-7 h-7 rounded-lg bg-[#FAF4EE] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-amber-800 flex items-center justify-center flex-shrink-0 transition-colors">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
+                  </div>
+                  <div>
+                    <div class="font-bold text-xs text-[#2C2521] leading-tight">追求厚實</div>
+                    <div class="text-[10px] text-[#8C7E75] leading-tight mt-0.5">濃郁醇厚</div>
+                  </div>
+                </button>
+
+                <button onclick="selectFlavor('balance')" class="dial-btn active py-2 px-2.5 rounded-xl text-left flex items-center gap-2 group transition" data-flavor="balance">
+                  <div class="w-7 h-7 rounded-lg bg-[#FAF4EE] group-[.active]:bg-[#654D3F] group-[.active]:text-white text-emerald-700 flex items-center justify-center flex-shrink-0 transition-colors">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="M7 21h10"></path><path d="M12 3v18"></path><path d="M3 7h18"></path></svg>
+                  </div>
+                  <div>
+                    <div class="font-bold text-xs text-[#2C2521] leading-tight">平衡順口</div>
+                    <div class="text-[10px] text-[#8C7E75] leading-tight mt-0.5">黃金比例</div>
+                  </div>
+                </button>
+              </div>
+
+              <!-- 風味萃取導引提示卡片 (Flattened) -->
+              <div class="mt-3.5 pt-3 border-t border-[#F0EAE3] text-xs text-[#685B52] space-y-2">
+                <div class="flex items-start gap-2">
+                  <svg class="w-4 h-4 text-[#654D3F] flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M9 18h6"></path>
+                    <path d="M10 22h4"></path>
+                    <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path>
+                  </svg>
+                  <div class="flex-1 leading-relaxed text-pretty" id="flavor-adjustment-tip">
+                    金杯標準平衡萃取，標準水溫與黃金秒數節奏，酸、甜、甘、醇四大維度均衡展現。
+                  </div>
+                </div>
+                <div class="text-[11px] text-[#8C7E75] pl-6 flex items-center justify-between border-t border-[#EDE8E2]/60 pt-1.5">
+                  <div class="flex items-center gap-1.5" id="flavor-timing-adjustment-container">
+                    <svg class="w-3.5 h-3.5 text-[#8C7E75] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span id="flavor-timing-adjustment-note">標準金杯秒數節奏 · 層次分明</span>
+                  </div>
+                  <button onclick="stepCustomTemp(1)" class="text-[11px] text-[#654D3F] hover:underline font-medium">
+                    +1°C 提高萃取
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
             <!-- 風味萃取導引提示卡片 (Flattened) -->
             <div class="mt-3.5 pt-3 border-t border-[#F0EAE3] text-xs text-[#685B52] space-y-2">
@@ -1299,7 +1410,7 @@
                   <span class="text-2xl font-bold text-[#2C2521] font-mono-num cursor-pointer hover:underline" id="param-temp" title="點擊自訂水溫 (範圍 80°C - 98°C)" onclick="startInlineTempEdit()">92°C</span>
                   <button id="btn-temp-plus" onclick="stepCustomTemp(1)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#E8E4DF] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="增加 1°C (上限 98°C)">+</button>
                 </div>
-                <div class="text-[11px] text-[#9B8D83] mt-0.5 truncate" id="param-temp-note">標準萃取水溫</div>
+                <div class="text-[11px] text-[#8C7E75] mt-1.5 leading-snug text-pretty min-h-[2rem] flex items-center flex-wrap gap-1" id="param-temp-note">標準萃取水溫</div>
               </div>
             </div>
 
@@ -1316,17 +1427,25 @@
                 <button id="reset-grind-btn" onclick="resetCustomGrind()" class="hidden text-[10px] text-[#8C7E75] hover:text-[#654D3F] transition inline-flex items-center gap-0.5"><svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg><span>推薦</span></button>
               </div>
               <div class="mt-2">
-                <select id="param-grind-select" onchange="onCustomGrindSelect(this.value)" class="text-sm sm:text-base font-bold text-[#2C2521] bg-transparent border-b border-dashed border-[#CFC2B7] focus:outline-none cursor-pointer py-0.5 w-full">
-                  <option value="極細研磨">極細研磨</option>
-                  <option value="細研磨">細研磨</option>
-                  <option value="中細偏細">中細偏細</option>
-                  <option value="中細研磨">中細研磨</option>
-                  <option value="中度研磨">中度研磨</option>
-                  <option value="中粗研磨">中粗研磨</option>
-                  <option value="偏粗研磨" selected>偏粗研磨</option>
-                  <option value="粗研磨">粗研磨</option>
-                </select>
-                <div class="text-[11px] text-[#9B8D83] mt-0.5 truncate" id="param-grind-note">每段等水排乾，顆粒偏粗</div>
+                <div class="relative flex items-center">
+                  <select id="param-grind-select" onchange="onCustomGrindSelect(this.value)" class="appearance-none w-full text-sm sm:text-base font-bold text-[#2C2521] bg-[#FAF8F5] hover:bg-[#F3EFEA] border border-[#E6E0D8] rounded-xl px-2.5 py-1 pr-7 focus:outline-none focus:border-[#654D3F] cursor-pointer transition shadow-2xs">
+                    <option value="極細研磨">極細研磨</option>
+                    <option value="細研磨">細研磨</option>
+                    <option value="中細偏細">中細偏細</option>
+                    <option value="中細研磨">中細研磨</option>
+                    <option value="中度研磨">中度研磨</option>
+                    <option value="中粗研磨">中粗研磨</option>
+                    <option value="偏粗研磨" selected>偏粗研磨</option>
+                    <option value="粗研磨">粗研磨</option>
+                  </select>
+                  <div class="pointer-events-none absolute right-2 flex items-center text-[#8C7E75]">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <polyline points="7 15 12 20 17 15"></polyline>
+                      <polyline points="7 9 12 4 17 9"></polyline>
+                    </svg>
+                  </div>
+                </div>
+                <div class="text-[11px] text-[#8C7E75] mt-1.5 leading-snug text-pretty min-h-[2rem] flex items-center flex-wrap gap-1" id="param-grind-note">每段等水排乾，顆粒偏粗</div>
               </div>
             </div>
 
@@ -1351,7 +1470,7 @@
                   <span class="text-2xl font-bold text-[#2C2521] font-mono-num cursor-pointer hover:underline" id="param-ratio" title="點擊自訂粉水比 (範圍 1:10 - 1:20)" onclick="startInlineRatioEdit()">1:15</span>
                   <button id="btn-ratio-plus" onclick="stepCustomRatio(0.5)" class="w-6 h-6 rounded-md bg-[#FAF9F7] border border-[#E6E0D8] text-[#654D3F] hover:bg-[#E8E4DF] flex items-center justify-center font-bold text-xs active:scale-95 transition" title="增加 0.5 (上限 1:20)">+</button>
                 </div>
-                <div class="text-[11px] text-[#9B8D83] mt-0.5 truncate" id="param-ratio-note">金杯平衡萃取</div>
+                <div class="text-[11px] text-[#8C7E75] mt-1.5 leading-snug text-pretty min-h-[2rem] flex items-center flex-wrap gap-1" id="param-ratio-note">金杯平衡萃取</div>
               </div>
             </div>
 
@@ -1365,7 +1484,7 @@
               </div>
               <div class="mt-2">
                 <div class="text-2xl font-bold text-[#2C2521] font-mono-num" id="param-water">225g</div>
-                <div class="text-[11px] text-[#9B8D83] mt-0.5 truncate" id="param-water-note">依 15g 粉計算</div>
+                <div class="text-[11px] text-[#8C7E75] mt-1.5 leading-snug text-pretty min-h-[2rem] flex items-center flex-wrap gap-1" id="param-water-note">依 15g 粉計算</div>
               </div>
             </div>
 
@@ -3099,7 +3218,9 @@
         const iceW = state.currentIceWeight || 0;
         const customTotalMass = totalWater + iceW;
         if (paramWater) paramWater.textContent = `${totalWater}g`;
-        if (paramWaterNote) paramWaterNote.textContent = `自訂熱水 + 下壺冰塊 ${iceW}g (總計 ${customTotalMass}g)`;
+        if (paramWaterNote) {
+          paramWaterNote.innerHTML = `<span class="px-1.5 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200/80 font-mono-num font-semibold text-[10px]">🧊 冰塊 ${iceW}g</span> <span class="text-[10px] text-[#8C7E75]">總液重 ${customTotalMass}g</span>`;
+        }
         if (timerTotalGoal) timerTotalGoal.textContent = totalWater;
 
         const calcRatio = Math.round((customTotalMass / state.dose) * 10) / 10;
@@ -3679,7 +3800,7 @@
       const totalTargetMass = Math.round(state.dose * finalRatioVal);
       const isIced = (state.brewMode === 'iced');
       const iceWeight = isIced ? Math.round(totalTargetMass * 0.35) : 0;
-      if (!state.isCustomSteps) {
+      if (!state.isCustomSteps || (isIced && !state.currentIceWeight)) {
         state.currentIceWeight = isIced ? iceWeight : 0;
       }
       const hotWaterTotal = isIced ? (totalTargetMass - iceWeight) : totalTargetMass;
@@ -3879,9 +4000,7 @@
         const totalMass = effectivePourWater + iceW;
         if (paramWaterElem) paramWaterElem.textContent = `${effectivePourWater}g`;
         if (paramWaterNoteElem) {
-          paramWaterNoteElem.textContent = state.isCustomSteps
-            ? `自訂熱水 + 下壺冰塊 ${iceW}g (總計 ${totalMass}g)`
-            : `熱水 + 下壺冰塊 ${iceWeight}g (總液重 ${totalTargetMass}g)`;
+          paramWaterNoteElem.innerHTML = `<span class="px-1.5 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200/80 font-mono-num font-semibold text-[10px]">🧊 冰塊 ${iceW}g</span> <span class="text-[10px] text-[#8C7E75]">總液重 ${totalMass}g</span>`;
         }
         if (timerTotalWaterGoalElem) timerTotalWaterGoalElem.textContent = effectivePourWater;
       } else {
@@ -3926,10 +4045,13 @@
       if (!container || !currentStepsCache) return;
       container.innerHTML = '';
 
+      const totalWater = currentStepsCache.length > 0 ? (currentStepsCache[currentStepsCache.length - 1].cumulative || 1) : 1;
+
       currentStepsCache.forEach((st, idx) => {
         const node = document.createElement('div');
         node.id = `timeline-node-${idx}`;
-        node.className = 'relative transition-all duration-300';
+        node.className = 'relative transition-all duration-300 anim-step-card';
+        node.style.animationDelay = `${idx * 35}ms`;
 
         const stepIcon = STEP_ICONS[st.animType] || STEP_ICONS.pour;
 
@@ -3959,7 +4081,7 @@
             <div id="timeline-bullet-${idx}" class="absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-amber-100 border border-amber-300 text-amber-900 flex items-center justify-center text-xs font-mono-num font-bold shadow-2xs">
               ${idx + 1}
             </div>
-            <div id="timeline-card-${idx}" class="p-3.5 sm:p-4 rounded-xl border border-amber-300/80 bg-[#FFFDF9] shadow-2xs space-y-3">
+            <div id="timeline-card-${idx}" class="p-3.5 sm:p-4 rounded-xl border border-amber-300/80 bg-[#FFFDF9] shadow-2xs space-y-3 relative overflow-hidden">
               <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-1.5">
                   <span class="w-2 h-2 rounded-full bg-amber-500"></span>
@@ -4023,11 +4145,13 @@
                </div>`
             : `<span class="inline-flex items-center gap-1 text-[#8C7E75]">${flowProfile.iconSvg} 靜置滴漏 (~0.0 g/s)</span>`;
 
+          const waterPct = Math.min(100, Math.round((st.cumulative / totalWater) * 100));
+
           node.innerHTML = `
             <div id="timeline-bullet-${idx}" class="absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#FAF8F5] border border-[#DDD3CA] text-[#7C6E64] flex items-center justify-center text-xs font-mono-num font-bold shadow-2xs transition-all duration-200">
               ${idx + 1}
             </div>
-            <div id="timeline-card-${idx}" class="p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7] hover:bg-white transition-all duration-200 shadow-2xs space-y-2">
+            <div id="timeline-card-${idx}" class="p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7] hover:bg-white transition-all duration-200 shadow-2xs space-y-2 relative overflow-hidden">
               <div class="flex flex-wrap items-center justify-between gap-1.5">
                 <div class="flex items-center gap-2">
                   <span class="w-6 h-6 rounded-md bg-white border border-[#EBE3D7] flex items-center justify-center flex-shrink-0 text-[#654D3F]">
@@ -4043,14 +4167,14 @@
               </div>
 
               <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
-                <div class="flex items-center gap-3 font-mono-num">
-                  <div>
-                    <span class="text-[#8C7E75] text-[11px]">本段注入：</span>
-                    <span class="font-bold text-[#2C2521] text-sm">${st.amount > 0 ? '+' + st.amount + 'g' : '-'}</span>
-                  </div>
-                  <div>
-                    <span class="text-[#8C7E75] text-[11px]">累計目標：</span>
-                    <span class="font-bold text-amber-800 text-sm">${st.cumulative}g</span>
+                <div>
+                  <div class="inline-flex items-center rounded-lg border border-[#E2D9CE] bg-white overflow-hidden shadow-2xs font-mono-num text-xs">
+                    <div class="px-2.5 py-1 bg-[#FAF8F5] text-[#685B52] border-r border-[#E2D9CE]">
+                      本段 <strong class="text-[#2C2521] font-bold">${st.amount > 0 ? '+' + st.amount + 'g' : '0g'}</strong>
+                    </div>
+                    <div class="px-2.5 py-1 bg-amber-50/70 text-amber-900">
+                      累計 <strong class="font-bold text-amber-950">${st.cumulative}g</strong>
+                    </div>
                   </div>
                 </div>
                 <div class="text-[11px] text-[#8C7E75] flex items-center gap-1 font-mono-num">
@@ -4061,6 +4185,10 @@
 
               <div class="text-xs text-[#7C6E64] pt-1 border-t border-[#F0EAE3]/80 leading-relaxed">
                 ${escapeHtml(st.note)}
+              </div>
+
+              <div class="h-1 w-full bg-[#EFEAE3] rounded-full overflow-hidden mt-1" title="累計水量進度 ${waterPct}%">
+                <div class="h-full bg-gradient-to-r from-[#8C705F] to-amber-600 rounded-full transition-all duration-300" style="width: ${waterPct}%"></div>
               </div>
             </div>
           `;
@@ -4101,7 +4229,7 @@
           // 全部未開始
           bullet.className = 'absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#FAF8F5] border border-[#DDD3CA] text-[#7C6E64] flex items-center justify-center text-xs font-mono-num font-bold shadow-2xs transition-all duration-200';
           bullet.textContent = idx + 1;
-          card.className = 'p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7] hover:bg-white transition-all duration-200 shadow-2xs space-y-2';
+          card.className = 'p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7] hover:bg-white transition-all duration-200 shadow-2xs space-y-2 relative overflow-hidden';
           if (statusSpan) {
             statusSpan.className = 'hidden';
             statusSpan.innerHTML = '';
@@ -4115,8 +4243,8 @@
             </svg>
           `;
           card.className = isAllDone
-            ? 'p-3.5 sm:p-4 rounded-xl border border-emerald-300/80 bg-emerald-50/30 transition-all duration-200 shadow-2xs space-y-2'
-            : 'p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7]/70 opacity-80 transition-all duration-200 shadow-2xs space-y-2';
+            ? 'p-3.5 sm:p-4 rounded-xl border border-emerald-300/80 bg-emerald-50/30 transition-all duration-200 shadow-2xs space-y-2 relative overflow-hidden'
+            : 'p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7]/70 opacity-80 transition-all duration-200 shadow-2xs space-y-2 relative overflow-hidden';
           if (statusSpan) {
             statusSpan.className = 'inline-flex items-center gap-1 text-emerald-800 bg-emerald-50 border border-emerald-300/80 px-2 py-0.5 rounded-md text-[11px] font-bold shadow-2xs';
             statusSpan.innerHTML = `
@@ -4130,7 +4258,7 @@
           // 當前活躍步驟：深焙高亮邊框 + 琥珀脈衝外環
           bullet.className = 'absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#3D2C22] text-[#FAF6F2] ring-4 ring-amber-500/30 border border-amber-500 flex items-center justify-center text-xs font-mono-num font-bold shadow-md scale-110 transition-all duration-200';
           bullet.textContent = idx + 1;
-          card.className = 'p-3.5 sm:p-4 rounded-xl border-2 border-amber-600/70 bg-white ring-2 ring-amber-500/20 shadow-md transition-all duration-200 space-y-2';
+          card.className = 'p-3.5 sm:p-4 rounded-xl border-2 border-amber-600/70 bg-white ring-2 ring-amber-500/20 shadow-md transition-all duration-200 space-y-2 relative overflow-hidden';
           if (statusSpan) {
             statusSpan.className = 'inline-flex items-center gap-1 text-amber-800 bg-amber-50 border border-amber-400/60 px-2 py-0.5 rounded-md text-[11px] font-bold animate-pulse shadow-2xs';
             statusSpan.innerHTML = `
@@ -4142,7 +4270,7 @@
           // 尚未開始之未來步驟
           bullet.className = 'absolute -left-6 sm:-left-8 top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#FAF8F5] border border-[#DDD3CA] text-[#7C6E64] flex items-center justify-center text-xs font-mono-num font-bold shadow-2xs transition-all duration-200';
           bullet.textContent = idx + 1;
-          card.className = 'p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7] hover:bg-white transition-all duration-200 shadow-2xs space-y-2';
+          card.className = 'p-3.5 sm:p-4 rounded-xl border border-[#EDE8E2] bg-[#FAF9F7] hover:bg-white transition-all duration-200 shadow-2xs space-y-2 relative overflow-hidden';
           if (statusSpan) {
             statusSpan.className = 'hidden';
             statusSpan.innerHTML = '';
