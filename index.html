@@ -4691,10 +4691,21 @@
 
     function skipToPreviousStep() {
       if (!currentStepsCache || currentStepsCache.length === 0) return;
-      let activeIndex = currentStepsCache.findIndex(st => timerSeconds >= st.startSec && timerSeconds < st.endSec);
-      if (activeIndex === -1) {
-        activeIndex = timerSeconds >= totalBrewSeconds ? currentStepsCache.length - 1 : 0;
+
+      // 若處於完成或超時收尾狀態，上一段應退回至最後一段起點
+      if (timerSeconds >= totalBrewSeconds) {
+        const lastStep = currentStepsCache[currentStepsCache.length - 1];
+        timerSeconds = lastStep.startSec;
+        timerStartTime = Date.now() - (timerSeconds * 1000);
+        document.getElementById('timer-digits').textContent = formatTimerDigits(timerSeconds);
+        updateTimerStepHighlight();
+        updateZenBaristaUI();
+        playStepChangeSound();
+        return;
       }
+
+      let activeIndex = currentStepsCache.findIndex(st => timerSeconds >= st.startSec && timerSeconds < st.endSec);
+      if (activeIndex === -1) activeIndex = 0;
 
       if (activeIndex > 0) {
         const prevStep = currentStepsCache[activeIndex - 1];
