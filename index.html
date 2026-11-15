@@ -1073,7 +1073,9 @@
             <div class="flex items-center gap-2">
               <div class="relative flex-1">
                 <input type="number" id="dose-input" min="8" max="50" step="0.5" value="15" 
-                       oninput="onDoseChange(this.value)"
+                       oninput="onDoseInput(this.value)"
+                       onchange="onDoseCommit(this.value)"
+                       onblur="onDoseCommit(this.value)"
                        class="w-full bg-white border border-[#E6E0D8] rounded-xl py-2 px-3 text-left font-mono-num text-sm text-[#2C2521] font-semibold focus:outline-none focus:border-[#CFC2B7] transition shadow-2xs">
                 <span class="absolute right-3 top-2.5 text-xs text-[#8C7E75] font-medium pointer-events-none">g</span>
               </div>
@@ -2163,6 +2165,28 @@
     };
 
     // ========================================================
+    // 研磨度階梯定義 (Grind Size Ladder)
+    // 對齊全域研磨刻度選項，支援粉層厚度水力阻抗自動補償
+    // ========================================================
+    const GRIND_LADDER = [
+      '極細研磨', '細研磨', '中細偏細', '中細研磨',
+      '中度研磨', '中粗研磨', '偏粗研磨', '粗研磨'
+    ];
+
+    // ========================================================
+    // 手沖粉量動力學縮放核心 (Dose-Adaptive Scaling Dynamics)
+    // 依據粉層厚度 (達西定律 Darcy's Law) 與粉床表面積動態計算流速與時間微調係數
+    // ========================================================
+    function getDoseScaleFactors(dose = state.dose) {
+      const safeDose = Math.max(8, Math.min(50, dose || 15));
+      return {
+        flowScale: Math.pow(safeDose / 15, 0.35), // 15g: 1.00, 30g: 1.27, 12g: 0.92
+        bedScale: Math.pow(safeDose / 15, 0.45),  // 15g: 1.00, 30g: 1.37, 12g: 0.90
+        bloomBonus: Math.round((safeDose - 15) * 0.35) // 悶蒸排氣微調：15g: 0s, 30g: +5s, 10g: -2s
+      };
+    }
+
+    // ========================================================
     // 精品手沖水流型態定義 (Specialty Flow Profiles)
     // 依據手沖物理動力學，為不同手法與階段賦予精準的水流強度與建議流速
     // ========================================================
@@ -2314,11 +2338,13 @@
       if (timerRunning) resetTimer();
     }
 
-        function onDoseInput(val) {
+    function onDoseInput(val) {
       let num = parseFloat(val);
-      if (!isNaN(num) && num >= 5 && num <= 60) {
+      if (!isNaN(num) && num >= 8 && num <= 50) {
         state.dose = num;
-        document.getElementById('dose-range').value = Math.min(Math.max(num, 10), 35);
+        const doseRange = document.getElementById('dose-range');
+        if (doseRange) doseRange.value = Math.min(Math.max(num, 10), 35);
+        updateQuickDosePills(num);
         calculateAndRender();
         if (timerRunning) resetTimer();
       }
@@ -2338,12 +2364,14 @@
     function onDoseCommit(val) {
       let num = parseFloat(val);
       if (isNaN(num)) num = 15.0;
-      if (num < 5) num = 5;
-      if (num > 60) num = 60;
+      if (num < 8) num = 8;
+      if (num > 50) num = 50;
       num = Math.round(num * 10) / 10;
       state.dose = num;
-      document.getElementById('dose-input').value = num;
-      document.getElementById('dose-range').value = Math.min(Math.max(num, 10), 35);
+      const doseInp = document.getElementById('dose-input');
+      if (doseInp) doseInp.value = num;
+      const doseRange = document.getElementById('dose-range');
+      if (doseRange) doseRange.value = Math.min(Math.max(num, 10), 35);
       updateQuickDosePills(num);
       calculateAndRender();
       if (timerRunning) resetTimer();
@@ -2354,7 +2382,7 @@
     }
 
     function stepDose(delta) {
-      onDoseChange(state.dose + delta);
+      onDoseCommit(state.dose + delta);
     }
 
     function quickTuneTemp(delta) {
@@ -2679,9 +2707,10 @@
         if (warnElem) {
           const tPour = getStepPourDuration(st);
           const flowProfile = getStepFlowProfile(st);
+          const { flowScale } = getDoseScaleFactors(state.dose);
           if (st.amount > 0 && tPour > 0) {
             const flowRate = st.amount / tPour;
-            const maxSafe = (st.flowType === 'bypass') ? 12.0 : (flowProfile.maxRateSafe || 5.5);
+            const maxSafe = (st.flowType === 'bypass') ? 12.0 : ((flowProfile.maxRateSafe || 5.5) * Math.min(1.3, flowScale));
             const minSafe = flowProfile.minRateSafe || 1.4;
 
             if (flowRate > maxSafe) {
@@ -2692,7 +2721,7 @@
                     <line x1="12" y1="9" x2="12" y2="13"></line>
                     <line x1="12" y1="17" x2="12.01" y2="17"></line>
                   </svg>
-                  <span>此段建議流速過急 (~${flowRate.toFixed(1)} g/s，超出${flowProfile.name}安全極限 ${maxSafe} g/s)：水流衝擊力過大易穿孔造成通道效應與苦澀味。建議延長秒數或減少注水量。</span>
+                  <span>此段建議流速過急 (~${flowRate.toFixed(1)} g/s，超出${flowProfile.name}安全極限 ${maxSafe.toFixed(1)} g/s)：水流衝擊力過大易穿孔造成通道效應與苦澀味。建議延長秒數或減少注水量。</span>
                 </div>
               `;
             } else if (flowRate < minSafe && st.amount >= 20 && st.flowType !== 'drip') {
@@ -2770,6 +2799,7 @@
 
       const flavorConf = FLAVOR_CONFIGS[flavorKey] || FLAVOR_CONFIGS['balance'];
       const tMod = flavorConf.timingModifier || { bloomDelta: 0, stepDelta: 0 };
+      const { flowScale, bedScale, bloomBonus } = getDoseScaleFactors(dose);
       let rawSteps = [];
 
       if (method === 'four_six') {
@@ -2783,11 +2813,19 @@
         const pour4 = Math.round(remaining / 3);
         const pour5 = totalWater - (bloomWater + pour2 + pour3 + pour4);
 
-        const bloomSec = Math.max(30, 45 + tMod.bloomDelta);
-        const step2Sec = Math.max(25, 40 + tMod.stepDelta);
-        const step3Sec = Math.max(20, 30 + tMod.stepDelta);
-        const step4Sec = Math.max(18, 25 + tMod.stepDelta);
-        const step5Sec = Math.max(18, 25 + tMod.stepDelta);
+        const bloomSec = Math.max(30, 45 + tMod.bloomDelta + bloomBonus);
+
+        const p2Pure = Math.ceil(pour2 / (FLOW_PROFILES.medium.targetRate * flowScale));
+        const step2Sec = Math.max(20, p2Pure + Math.round(26 * bedScale) + tMod.stepDelta);
+
+        const p3Pure = Math.ceil(pour3 / (FLOW_PROFILES.fast.targetRate * flowScale));
+        const step3Sec = Math.max(18, p3Pure + Math.round(20 * bedScale) + tMod.stepDelta);
+
+        const p4Pure = Math.ceil(pour4 / (FLOW_PROFILES.fast.targetRate * flowScale));
+        const step4Sec = Math.max(18, p4Pure + Math.round(15 * bedScale) + tMod.stepDelta);
+
+        const p5Pure = Math.ceil(pour5 / (FLOW_PROFILES.fast.targetRate * flowScale));
+        const step5Sec = Math.max(18, p5Pure + Math.round(15 * bedScale) + tMod.stepDelta);
 
         rawSteps = [
           {
@@ -2854,9 +2892,11 @@
       } else if (method === 'single_pour') {
         const bloomWater = Math.round(dose * 2.5);
         const mainPour = totalWater - bloomWater;
-        const bloomSec = Math.max(25, 35 + tMod.bloomDelta);
-        const mainSec = Math.max(45, 65 + tMod.stepDelta * 2);
-        const drainSec = Math.max(15, 20 + tMod.stepDelta);
+        const bloomSec = Math.max(25, 35 + tMod.bloomDelta + bloomBonus);
+
+        const mainPure = Math.ceil(mainPour / (FLOW_PROFILES.gentle.targetRate * flowScale));
+        const mainSec = Math.max(45, mainPure + Math.round(5 * bedScale) + tMod.stepDelta * 2);
+        const drainSec = Math.max(15, Math.round(20 * bedScale) + tMod.stepDelta);
 
         rawSteps = [
           {
@@ -2902,9 +2942,11 @@
         const pour1 = Math.round(rest * 0.55);
         const pour2 = totalWater - bloomWater - pour1;
 
-        const bloomSec = Math.max(28, 40 + tMod.bloomDelta);
-        const pour1Sec = Math.max(35, 50 + tMod.stepDelta);
-        const pour2Sec = Math.max(35, 50 + tMod.stepDelta);
+        const bloomSec = Math.max(28, 40 + tMod.bloomDelta + bloomBonus);
+        const p1Pure = Math.ceil(pour1 / (FLOW_PROFILES.medium.targetRate * flowScale));
+        const pour1Sec = Math.max(30, p1Pure + Math.round(17 * bedScale) + tMod.stepDelta);
+        const p2Pure = Math.ceil(pour2 / (FLOW_PROFILES.gentle.targetRate * flowScale));
+        const pour2Sec = Math.max(30, p2Pure + Math.round(14 * bedScale) + tMod.stepDelta);
 
         rawSteps = [
           {
@@ -2949,10 +2991,12 @@
         const pour1 = Math.round((totalWater * 0.6) - bloomWater);
         const pour2 = totalWater - bloomWater - pour1;
 
-        const bloomSec = Math.max(30, 45 + tMod.bloomDelta);
-        const p1Sec = Math.max(25, 35 + tMod.stepDelta);
-        const p2Sec = Math.max(25, 35 + tMod.stepDelta);
-        const drainSec = Math.max(35, 50 + tMod.stepDelta);
+        const bloomSec = Math.max(30, 45 + tMod.bloomDelta + bloomBonus);
+        const p1Pure = Math.ceil(pour1 / (FLOW_PROFILES.fast.targetRate * flowScale));
+        const p1Sec = Math.max(25, p1Pure + Math.round(16 * bedScale) + tMod.stepDelta);
+        const p2Pure = Math.ceil(pour2 / (FLOW_PROFILES.gentle.targetRate * flowScale));
+        const p2Sec = Math.max(25, p2Pure + Math.round(5 * bedScale) + tMod.stepDelta);
+        const drainSec = Math.max(30, Math.round(50 * bedScale) + tMod.stepDelta);
 
         rawSteps = [
           {
@@ -3009,20 +3053,25 @@
         const extractWater = Math.round(totalWater * 0.55);
         const bypassWater = totalWater - bloomWater - extractWater;
 
+        const dripPure = Math.ceil(bloomWater / (FLOW_PROFILES.drip.targetRate * flowScale));
+        const dripSec = Math.max(15, dripPure + Math.round(5 * bedScale));
         const steamSec = Math.max(120, 180 + tMod.bloomDelta * 2);
+        const extPure = Math.ceil(extractWater / (FLOW_PROFILES.fast.targetRate * flowScale));
+        const extSec = Math.max(25, extPure + Math.round(19 * bedScale) + tMod.stepDelta);
+        const bypassSec = Math.max(15, Math.ceil(bypassWater / FLOW_PROFILES.bypass.targetRate));
 
         rawSteps = [
           {
             name: '中心點滴潤濕',
             amount: bloomWater,
-            durationSec: 30,
+            durationSec: dripSec,
             flowType: 'drip',
             note: '細小點滴僅潤濕中心粉芯',
             animType: 'drip_slow',
             actionTitle: '中心點滴滴水 (Drop by Drop)',
             actionTip: '手沖壺極輕微傾斜，一滴一滴如點滴般僅滴在中心粉芯，不可形成連續水柱。',
             defaultAmount: bloomWater,
-            defaultDuration: 30
+            defaultDuration: dripSec
           },
           {
             name: '加蓋深悶蒸',
@@ -3039,33 +3088,38 @@
           {
             name: '核心萃取注水',
             amount: extractWater,
-            durationSec: 45,
+            durationSec: extSec,
             flowType: 'fast',
             note: '大水流僅在中心硬幣大小區域注水',
             animType: 'steady_center',
             actionTitle: '中心 50 圓大水流萃取',
             actionTip: '大水流僅在中心 50 圓硬幣大小範圍穩定注水，迅速萃取出中段濃厚精華。',
             defaultAmount: extractWater,
-            defaultDuration: 45
+            defaultDuration: extSec
           },
           {
             name: '熱水稀釋 (Bypass)',
             amount: bypassWater,
-            durationSec: 15,
+            durationSec: bypassSec,
             flowType: 'bypass',
             note: '移開濾杯，向分享壺直接加入純淨熱水',
             animType: 'bypass_pot',
             actionTitle: '移開濾杯直接加熱水 (Bypass)',
             actionTip: '立刻移開濾杯避免萃出尾段苦澀雜味，直接向分享壺加入純熱水稀釋至目標總克數！',
             defaultAmount: bypassWater,
-            defaultDuration: 15
+            defaultDuration: bypassSec
           }
         ];
       } else if (method === 'immersion') {
         const bloomWater = Math.round(totalWater * 0.4);
         const remaining = totalWater - bloomWater;
-        const bloomSec = Math.max(25, 35 + tMod.bloomDelta);
-        const steepSec = Math.max(60, 85 + tMod.stepDelta * 3);
+        const bloomSec = Math.max(25, 35 + tMod.bloomDelta + bloomBonus);
+
+        const remPure = Math.ceil(remaining / (FLOW_PROFILES.fast.targetRate * flowScale));
+        const remPure15 = 29; // 15g 基準下的純注水秒數 (135g / 4.8 g/s)
+        const pourTimeDiff = Math.max(0, remPure - remPure15);
+        const steepSec = Math.max(60, 85 + tMod.stepDelta * 3 + pourTimeDiff);
+        const drainSec = Math.max(15, Math.round(30 * bedScale));
 
         rawSteps = [
           {
@@ -3095,14 +3149,14 @@
           {
             name: '開閥釋放滴濾',
             amount: 0,
-            durationSec: 30,
+            durationSec: drainSec,
             flowType: 'drain',
             note: '按下開關，重力自然過濾落水完成',
             animType: 'switch_open',
             actionTitle: '按下開關釋放咖啡液 (開閥落水)',
             actionTip: '按下 Switch 開關，重力讓濃郁咖啡液瞬間過濾釋放至分享壺！',
             defaultAmount: 0,
-            defaultDuration: 30
+            defaultDuration: drainSec
           }
         ];
       }
@@ -3171,9 +3225,36 @@
       // 3. 總水量計算
       let totalWater = Math.round(state.dose * finalRatioVal);
 
-      // 4. 研磨度計算 (使用者自訂優先，否則採用手法/烘焙度推薦)
-      let finalGrind = state.customGrind || methodConf.grindModifier || roastConf.grind;
-      let grindNote = state.customGrind ? '使用者自訂研磨度' : (methodConf.grindNote || roastConf.grindNote);
+      // 4. 研磨度計算 (使用者自訂優先，否則採用手法/烘焙度推薦並依粉量深度進行水力阻抗補償)
+      const baseGrind = methodConf.grindModifier || roastConf.grind;
+      let doseGrindShift = 0;
+      if (state.method === 'immersion') {
+        if (state.dose >= 28) doseGrindShift = 1;
+      } else {
+        if (state.dose >= 24) doseGrindShift = 1;
+        else if (state.dose <= 12) doseGrindShift = -1;
+      }
+
+      let finalGrind;
+      let grindNote;
+
+      if (state.customGrind !== null) {
+        finalGrind = state.customGrind;
+        grindNote = '使用者自訂研磨度';
+      } else {
+        const baseIdx = GRIND_LADDER.indexOf(baseGrind);
+        const safeBaseIdx = baseIdx !== -1 ? baseIdx : 3;
+        const shiftedIdx = Math.max(0, Math.min(GRIND_LADDER.length - 1, safeBaseIdx + doseGrindShift));
+        finalGrind = GRIND_LADDER[shiftedIdx];
+        if (doseGrindShift > 0) {
+          grindNote = '粉層深水阻大，自動調粗一階';
+        } else if (doseGrindShift < 0) {
+          grindNote = '粉層淺流速快，自動調細一階';
+        } else {
+          grindNote = methodConf.grindNote || roastConf.grindNote;
+        }
+      }
+      state.effectiveGrind = finalGrind;
 
       // 更新水溫 UI
       document.getElementById('param-temp').textContent = `${finalTemp}°C`;
@@ -3502,8 +3583,9 @@
       const dur = Math.max(1, step.durationSec || 5);
       const amt = step.amount;
 
+      const { flowScale } = getDoseScaleFactors(state.dose);
       const profile = getStepFlowProfile(step);
-      const targetRate = profile.targetRate || 3.3;
+      const targetRate = (profile.targetRate || 3.3) * flowScale;
 
       // 依目標水流基準流速推算所需出水秒數
       let estPour = Math.round(amt / targetRate);
@@ -3514,8 +3596,8 @@
 
       estPour = Math.max(2, Math.min(estPour, maxAllowedPour));
 
-      // 物理極限流速保護鎖 (Bypass 最高 12g/s, 一般注水上限 6.5g/s)
-      const maxPhysicalRate = (profile.key === 'bypass') ? 12.0 : (profile.maxRateSafe || 6.5);
+      // 物理極限流速保護鎖 (Bypass 最高 12g/s, 一般注水上限 6.5g/s * Math.min(1.3, flowScale))
+      const maxPhysicalRate = (profile.key === 'bypass') ? 12.0 : ((profile.maxRateSafe || 6.5) * Math.min(1.3, flowScale));
       const minTimeByMaxRate = Math.ceil(amt / maxPhysicalRate);
       if (estPour < minTimeByMaxRate) {
         estPour = minTimeByMaxRate;
@@ -4083,7 +4165,7 @@
       }
 
       // 5. 研磨粗細微調 (接觸面積與萃取動力學)
-      const effectiveGrind = state.customGrind || (METHOD_CONFIGS[method] && METHOD_CONFIGS[method].grindModifier) || (ROAST_CONFIGS[roast] && ROAST_CONFIGS[roast].grind) || '中細研磨';
+      const effectiveGrind = state.customGrind || state.effectiveGrind || (METHOD_CONFIGS[method] && METHOD_CONFIGS[method].grindModifier) || (ROAST_CONFIGS[roast] && ROAST_CONFIGS[roast].grind) || '中細研磨';
       const GRIND_EFFECTS = {
         '極細研磨': { body: +0.6, sweetness: +0.3, aftertaste: +0.3, acidity: -0.4, cleanliness: -0.6 },
         '細研磨':   { body: +0.4, sweetness: +0.3, aftertaste: +0.2, acidity: -0.2, cleanliness: -0.4 },
@@ -4131,11 +4213,14 @@
           profile.body += 0.1;
         }
 
-        // 總萃取時間影響：快流速避開後段澀感，長浸泡增加厚實度
-        if (totalSec < 150) {
+        // 總萃取時間影響：快流速避開後段澀感，長浸泡增加厚實度 (依粉層厚度動態調整合理萃取基準線)
+        const { bedScale } = getDoseScaleFactors(state.dose);
+        const expectedBaseSec = 165 * Math.pow(bedScale, 0.85); // 15g 約 165s; 30g 約 215s; 12g 約 150s
+
+        if (totalSec < expectedBaseSec * 0.88) {
           profile.cleanliness += 0.15;
           profile.body -= 0.1;
-        } else if (totalSec > 180) {
+        } else if (totalSec > expectedBaseSec * 1.12) {
           profile.body += 0.15;
           profile.aftertaste += 0.15;
         }
