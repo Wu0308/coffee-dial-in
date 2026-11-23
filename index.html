@@ -78,8 +78,8 @@
       background: transparent;
       padding: 0;
       margin: auto;
-      max-width: 42rem;
-      width: calc(100% - 2rem);
+      max-width: 52rem;
+      width: calc(100% - 1.5rem);
       max-height: 92vh;
     }
     dialog#recipe-vault-modal:modal {
@@ -91,6 +91,39 @@
       -webkit-backdrop-filter: blur(4px);
       overflow: hidden;
       overscroll-behavior: contain;
+    }
+    .vault-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238C7E75' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.65rem center;
+      padding-right: 1.85rem;
+    }
+    .tasting-card {
+      background: #FFFFFF;
+      border: 1px solid #EAE3DA;
+      box-shadow: 0 1px 2px rgba(44, 37, 33, 0.03), 0 4px 12px -2px rgba(44, 37, 33, 0.04);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    .tasting-card:hover {
+      transform: translateY(-1px);
+      border-color: #DCD2C6;
+      box-shadow: 0 3px 8px rgba(44, 37, 33, 0.05), 0 8px 18px -4px rgba(44, 37, 33, 0.06);
+    }
+    .process-pill {
+      background: #FFFFFF;
+      color: #5C4E45;
+      border: 1px solid #E5DDD4;
+      transition: all 0.16s ease;
+    }
+    .process-pill:hover {
+      background: #FAF5F0;
+      border-color: #CFC3B6;
+    }
+    .process-pill.active {
+      background: #2C2521;
+      color: #FFFFFF;
+      border-color: #2C2521;
     }
 
     /* Zen Barista Fullscreen HUD Dialog */
@@ -1957,22 +1990,23 @@
   <!-- ========================================== -->
   <!-- 咖啡豆評分庫 彈跳視窗 (Modern Web Guidance: Native <dialog>) -->
   <!-- ========================================== -->
-  <dialog id="recipe-vault-modal" aria-labelledby="vault-modal-title" class="p-0 border-0 bg-transparent rounded-2xl max-w-2xl w-[calc(100%-2rem)] my-auto shadow-2xl z-50">
+  <dialog id="recipe-vault-modal" aria-labelledby="vault-modal-title" class="p-0 border-0 bg-transparent rounded-2xl max-w-4xl w-[calc(100%-1.5rem)] my-auto shadow-2xl z-50">
     <div class="w-full max-h-[92vh] flex flex-col bg-white rounded-3xl shadow-2xl overflow-hidden border border-[#EDE8E2]">
       
-      <!-- 視窗標題 -->
-      <div class="p-4 sm:p-5 border-b border-[#F0EAE3] flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <svg class="w-5 h-5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-            <line x1="6" y1="1" x2="6" y2="4"></line>
-            <line x1="10" y1="1" x2="10" y2="4"></line>
-            <line x1="14" y1="1" x2="14" y2="4"></line>
-          </svg>
-          <h2 id="vault-modal-title" class="text-base font-bold text-[#2C2521]">咖啡豆與多手法風味評分庫</h2>
+      <!-- 視窗標題與緊湊分頁 -->
+      <div class="px-5 py-3.5 border-b border-[#F0EAE3] bg-white flex items-center justify-between gap-3 flex-shrink-0">
+        <div class="flex items-center gap-3 flex-wrap">
+          <h2 id="vault-modal-title" class="text-base sm:text-lg font-bold text-[#2C2521] tracking-tight">咖啡豆評分庫</h2>
+          <div class="flex items-center gap-1 bg-[#F6F2EC] p-1 rounded-xl text-xs font-medium">
+            <button id="tab-btn-beans" onclick="switchVaultTab('beans')" class="px-3 py-1 rounded-lg bg-white text-[#2C2521] font-semibold shadow-2xs transition cursor-pointer whitespace-nowrap">
+              豆單卡片牆 (<span id="beans-tab-count">4</span>)
+            </button>
+            <button id="tab-btn-rate" onclick="switchVaultTab('rate')" class="px-3 py-1 rounded-lg text-[#7D6E65] hover:text-[#2C2521] transition cursor-pointer whitespace-nowrap">
+              ＋ 評分此杯手法
+            </button>
+          </div>
         </div>
-        <button type="button" onclick="closeRecipeVaultModal()" aria-label="關閉視窗" class="w-8 h-8 rounded-full hover:bg-[#FAF9F7] flex items-center justify-center text-stone-400 hover:text-stone-700 transition">
+        <button type="button" onclick="closeRecipeVaultModal()" aria-label="關閉視窗" class="w-8 h-8 rounded-full hover:bg-[#FAF5F0] flex items-center justify-center text-stone-400 hover:text-stone-700 transition cursor-pointer flex-shrink-0">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -1980,152 +2014,225 @@
         </button>
       </div>
 
-      <!-- 分頁切換鈕 -->
-      <div class="flex border-b border-[#F0EAE3] bg-[#FAF9F7] px-4 pt-2 text-xs font-medium">
-        <button id="tab-btn-beans" onclick="switchVaultTab('beans')" class="px-4 py-2.5 border-b-2 border-[#654D3F] text-[#2C2521] font-semibold transition">
-          咖啡豆名錄 (<span id="beans-tab-count">1</span>)
-        </button>
-        <button id="tab-btn-rate" onclick="switchVaultTab('rate')" class="px-4 py-2.5 border-b-2 border-transparent text-[#8C7E75] hover:text-[#2C2521] transition">
-          ＋ 評分此杯手法
-        </button>
-      </div>
-
       <!-- 視窗主內容區 (可滾動) -->
-      <div class="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1">
+      <div class="p-4 sm:p-5 overflow-y-auto space-y-3.5 flex-1 bg-white">
         
-        <!-- 分頁 1: 咖啡豆列表（核心：每顆豆子內部評分不同沖煮法） -->
-        <div id="vault-tab-beans" class="space-y-4">
+        <!-- 分頁 1: 烘豆袋標籤卡片牆（單行搜尋與處理法膠囊 + 按需展開新增表單 + 2欄標籤卡片牆） -->
+        <div id="vault-tab-beans" class="space-y-3.5">
           
-          <!-- 建立新咖啡豆名稱卡片 -->
-          <div class="p-4 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] space-y-3">
-            <div class="text-xs font-semibold text-[#2C2521] flex items-center justify-between">
-              <span class="flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="8" x2="12" y2="16"></line>
-                  <line x1="8" y1="12" x2="16" y2="12"></line>
-                </svg>
-                <span>建立新咖啡豆名稱專區</span>
-              </span>
-              <span class="text-[11px] text-[#8C7E75]">建立後即可在該豆子底下評分不同沖煮法</span>
+          <!-- 單行工具列：搜尋框 + 處理法橫向膠囊 + ＋ 新增咖啡豆按鈕 -->
+          <div id="vault-filter-bar" class="flex flex-wrap items-center justify-between gap-2.5">
+            <div class="relative flex-1 min-w-[180px]">
+              <svg class="w-3.5 h-3.5 text-[#9B8D83] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" id="vault-search-input" oninput="renderBeansList()" placeholder="搜尋豆名、產區、心得..." 
+                     class="w-full bg-white border border-[#E5DDD4] rounded-full pl-9 pr-3 py-1.5 text-xs text-[#2C2521] focus:outline-none focus:border-[#654D3F]">
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
-              <input type="text" id="new-bean-name-input" placeholder="咖啡名稱（例：耶加雪菲 粉紅炸彈、藝伎...）" 
-                     class="sm:col-span-7 bg-white border border-[#E6E0D8] rounded-xl px-3 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]">
-              <input type="text" id="new-bean-note-input" placeholder="產區/處理法（例：水洗 / 淺焙）" 
-                     class="sm:col-span-3 bg-white border border-[#E6E0D8] rounded-xl px-3 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]">
-              <button onclick="createNewBeanFromInput()" class="sm:col-span-2 py-2 px-3 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition whitespace-nowrap">
-                建立咖啡
+
+            <!-- 橫向處理法微膠囊快篩 -->
+            <div id="vault-process-pills" class="flex items-center gap-1.5 flex-wrap">
+              <button type="button" data-proc="" onclick="selectVaultProcessFilter('')" class="process-pill active px-3 py-1 rounded-full text-xs font-semibold cursor-pointer whitespace-nowrap">全部</button>
+              <button type="button" data-proc="水洗" onclick="selectVaultProcessFilter('水洗')" class="process-pill px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap">水洗</button>
+              <button type="button" data-proc="日曬" onclick="selectVaultProcessFilter('日曬')" class="process-pill px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap">日曬</button>
+              <button type="button" data-proc="蜜處理" onclick="selectVaultProcessFilter('蜜處理')" class="process-pill px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap">蜜處理</button>
+              <button type="button" data-proc="厭氧處理" onclick="selectVaultProcessFilter('厭氧處理')" class="process-pill px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap">厭氧</button>
+              <button type="button" data-proc="濕刨法" onclick="selectVaultProcessFilter('濕刨法')" class="process-pill px-3 py-1 rounded-full text-xs font-medium cursor-pointer whitespace-nowrap">濕刨</button>
+            </div>
+            <select id="vault-filter-process" aria-label="篩選處理法" onchange="selectVaultProcessFilter(this.value)" class="hidden">
+              <option value="">全部處理法</option>
+              <option value="水洗">水洗</option>
+              <option value="日曬">日曬</option>
+              <option value="蜜處理">蜜處理</option>
+              <option value="厭氧處理">厭氧處理</option>
+              <option value="濕刨法">濕刨法</option>
+              <option value="其他">其他</option>
+            </select>
+
+            <div class="flex items-center gap-2 ml-auto">
+              <select id="vault-sort-select" aria-label="排序方式" onchange="renderBeansList()" class="vault-select bg-[#FAF8F5] border border-[#E5DDD4] rounded-full pl-3 py-1.5 text-xs text-[#654D3F] font-medium focus:outline-none focus:border-[#654D3F] cursor-pointer">
+                <option value="newest">最新建立</option>
+                <option value="highest_rating">最高評分</option>
+              </select>
+              <button type="button" id="toggle-bean-creator-btn" onclick="toggleBeanCreatorDrawer()" class="px-3.5 py-1.5 rounded-full bg-[#523A2D] hover:bg-[#3F2C22] text-white text-xs font-semibold transition shadow-xs cursor-pointer whitespace-nowrap">
+                ＋ 新增咖啡豆
               </button>
             </div>
           </div>
 
-          <!-- 咖啡豆列表 (動態渲染每支咖啡豆以及該豆底下不同沖煮手法的評分) -->
-          <div id="beans-list-container" class="space-y-4">
-            <!-- 動態插入咖啡豆及其手法評分 -->
+          <!-- 按需展開：新增 / 編輯咖啡豆抽屜（預設隱藏，點擊 ＋ 新增咖啡豆 或編輯時展開） -->
+          <div id="bean-creator-card" class="hidden p-3.5 sm:p-4 rounded-2xl bg-[#FAF8F5] border border-[#E6DFD7] space-y-2.5">
+            <input type="hidden" id="editing-bean-id" value="">
+            <div class="text-xs font-semibold text-[#2C2521] flex items-center justify-between gap-2">
+              <span id="bean-creator-title" class="flex items-center gap-1.5 text-[#2C2521]">
+                <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="16"></line>
+                  <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+                <span>新增咖啡豆</span>
+              </span>
+              <button type="button" id="bean-edit-cancel-btn" onclick="cancelEditBeanProfile()" class="px-2.5 py-0.5 rounded-full bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] hover:text-[#2C2521] transition cursor-pointer">
+                收合
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-12 gap-2">
+              <div class="col-span-2 sm:col-span-4">
+                <input type="text" id="new-bean-name-input" placeholder="咖啡豆名稱（例：耶加雪菲 果丁丁）" 
+                       class="w-full bg-white border border-[#E6E0D8] rounded-xl px-3 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#654D3F]">
+              </div>
+              <div class="col-span-2 sm:col-span-3">
+                <input type="text" id="new-bean-note-input" placeholder="產區或莊園（例：衣索比亞）" 
+                       class="w-full bg-white border border-[#E6E0D8] rounded-xl px-3 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#654D3F]">
+              </div>
+              <div class="col-span-1 sm:col-span-2">
+                <select id="new-bean-process-select" aria-label="處理法" class="w-full vault-select bg-white border border-[#E6E0D8] rounded-xl px-2.5 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#654D3F] cursor-pointer">
+                  <option value="水洗">水洗</option>
+                  <option value="日曬">日曬</option>
+                  <option value="蜜處理">蜜處理</option>
+                  <option value="厭氧處理">厭氧處理</option>
+                  <option value="濕刨法">濕刨法</option>
+                  <option value="其他">其他</option>
+                </select>
+              </div>
+              <div class="col-span-1 sm:col-span-2">
+                <select id="new-bean-roast-select" aria-label="烘焙度" class="w-full vault-select bg-white border border-[#E6E0D8] rounded-xl px-2.5 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#654D3F] cursor-pointer">
+                  <option value="light">淺焙</option>
+                  <option value="medium_light">中淺焙</option>
+                  <option value="medium">中焙</option>
+                  <option value="medium_dark">中深焙</option>
+                  <option value="dark">深焙</option>
+                </select>
+              </div>
+              <div class="col-span-2 sm:col-span-1 flex">
+                <button type="button" id="create-bean-submit-btn" onclick="createNewBeanFromInput()" class="w-full py-2 px-2 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition whitespace-nowrap cursor-pointer">
+                  新增
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2欄「烘豆袋標籤」卡片牆畫布 -->
+          <div class="bg-[#F6F2EC] rounded-2xl p-3 sm:p-4 border border-[#ECE6DE]">
+            <div id="beans-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              <!-- 動態插入烘豆袋標籤咖啡豆卡片 -->
+            </div>
           </div>
 
         </div>
 
-        <!-- 分頁 2: 評分表單 (為指定咖啡豆評分不同沖煮法) -->
+        <!-- 分頁 2: 簡潔評分表單 -->
         <div id="vault-tab-rate" class="hidden space-y-4">
           
-          <div class="p-4 sm:p-5 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] space-y-4">
-            <div class="flex items-center justify-between">
+          <div class="p-4 sm:p-5 rounded-2xl bg-[#FAF8F5] border border-[#EDE8E2] space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-[#EFEAE3]">
               <div class="text-xs font-bold text-[#654D3F] flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <svg class="w-4 h-4 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M12 20h9"></path>
                   <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
                 </svg>
-                <span>沖煮手法評分與風味記錄</span>
+                <span>記錄此杯沖煮表現</span>
               </div>
-              <div class="text-[11px] text-[#8C7E75] font-mono-num" id="rate-form-current-params">
+              <div class="text-[11px] text-[#654D3F] font-mono-num px-2 py-0.5 rounded-lg bg-white border border-[#E6DFD7]" id="rate-form-current-params">
                 15g · 92°C · 1:15 · 225g
               </div>
             </div>
 
-            <!-- 選擇要評分的咖啡豆 -->
-            <div>
-              <label class="text-xs font-semibold text-[#2C2521] block mb-1.5">
-                選擇對應的咖啡豆：
-              </label>
-              <div class="flex gap-2">
-                <select id="rate-target-bean-select" class="flex-1 bg-white border border-[#E6E0D8] rounded-xl px-3 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]">
+            <!-- 選擇咖啡豆與沖煮手法並排 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label for="rate-target-bean-select" class="text-xs font-semibold text-[#2C2521]">對應咖啡豆：</label>
+                  <button type="button" onclick="jumpToCreateBeanInVault()" class="text-[11px] font-medium text-[#654D3F] hover:underline cursor-pointer">
+                    ＋ 新增咖啡豆
+                  </button>
+                </div>
+                <select id="rate-target-bean-select" class="w-full vault-select bg-white border border-[#E6E0D8] rounded-xl px-3 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#654D3F] cursor-pointer">
                   <!-- 動態載入咖啡豆選單 -->
+                </select>
+              </div>
+              <div>
+                <label for="rate-target-method-select" class="text-xs font-semibold text-[#2C2521] block mb-1">沖煮手法：</label>
+                <select id="rate-target-method-select" class="w-full vault-select bg-white border border-[#E6E0D8] rounded-xl px-3 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#654D3F] cursor-pointer">
+                  <option value="four_six">四六法 (粕谷哲)</option>
+                  <option value="single_pour">一刀流 (極致純淨)</option>
+                  <option value="three_stage">經典三段式</option>
+                  <option value="hoffmann">James Hoffmann 旋轉攪拌法</option>
+                  <option value="matsuya">松屋流 (點滴深悶蒸)</option>
+                  <option value="immersion">浸泡法 (Switch / 聰明濾杯)</option>
                 </select>
               </div>
             </div>
 
-            <!-- 沖煮手法確認 -->
-            <div>
-              <label class="text-xs font-semibold text-[#2C2521] block mb-1.5">
-                評分的沖煮手法：
-              </label>
-              <select id="rate-target-method-select" class="w-full bg-white border border-[#E6E0D8] rounded-xl px-3 py-2 text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]">
-                <option value="four_six">四六法 (粕谷哲)</option>
-                <option value="single_pour">一刀流 (極致純淨)</option>
-                <option value="three_stage">經典三段式</option>
-                <option value="hoffmann">James Hoffmann 旋轉攪拌法</option>
-                <option value="matsuya">松屋流 (點滴深悶蒸)</option>
-                <option value="immersion">浸泡法 (Switch / 聰明濾杯)</option>
-              </select>
-            </div>
-
-            <!-- 星等評分 (1-5 星) -->
-            <div class="flex items-center gap-3">
-              <span class="text-xs font-semibold text-[#2C2521]">此手法風味表現評分：</span>
-              <div class="flex items-center gap-1.5 cursor-pointer" id="star-rating-container">
-                <svg onclick="setLogRating(1)" class="w-5 h-5 star-item text-amber-500 fill-current hover:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                <svg onclick="setLogRating(2)" class="w-5 h-5 star-item text-amber-500 fill-current hover:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                <svg onclick="setLogRating(3)" class="w-5 h-5 star-item text-amber-500 fill-current hover:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                <svg onclick="setLogRating(4)" class="w-5 h-5 star-item text-amber-500 fill-current hover:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                <svg onclick="setLogRating(5)" class="w-5 h-5 star-item text-stone-300 fill-current hover:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            <!-- 星等評分 (支援 0.5 半星微調) -->
+            <div class="p-3 rounded-xl bg-white border border-[#EAE2D8] flex flex-wrap items-center justify-between gap-3">
+              <span class="text-xs font-semibold text-[#2C2521]">風味評分：</span>
+              <div class="flex items-center gap-3 flex-wrap">
+                <div class="flex items-center gap-1 cursor-pointer" id="star-rating-container">
+                  <svg onclick="setLogRating(1)" class="w-5 h-5 star-item text-amber-500 fill-current hover:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <svg onclick="setLogRating(2)" class="w-5 h-5 star-item text-amber-500 fill-current hover:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <svg onclick="setLogRating(3)" class="w-5 h-5 star-item text-amber-500 fill-current hover:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <svg onclick="setLogRating(4)" class="w-5 h-5 star-item text-amber-500 fill-current hover:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <svg onclick="setLogRating(5)" class="w-5 h-5 star-item text-stone-300 fill-current hover:scale-110 transition-transform" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button type="button" onclick="adjustLogRatingStep(-0.5)" class="w-6 h-6 rounded-md bg-[#FAF8F5] hover:bg-[#EFE8DF] border border-[#E6E0D8] text-xs font-bold text-[#654D3F] cursor-pointer" title="減少 0.5 分">-</button>
+                  <span id="star-rating-label" class="px-1.5 text-xs font-bold text-[#654D3F] font-mono-num">4.0 分</span>
+                  <button type="button" onclick="adjustLogRatingStep(0.5)" class="w-6 h-6 rounded-md bg-[#FAF8F5] hover:bg-[#EFE8DF] border border-[#E6E0D8] text-xs font-bold text-[#654D3F] cursor-pointer" title="增加 0.5 分">+</button>
+                </div>
               </div>
-              <span id="star-rating-label" class="text-xs font-bold text-[#654D3F]">4.0 分</span>
             </div>
 
-            <!-- 風味標籤快速點選 (自製向量小圖示) -->
+            <!-- 8 個精選風味標籤 -->
             <div>
-              <span class="text-[11px] text-[#8C7E75] block mb-1.5">此手法呈現之主要風味（可複選）：</span>
+              <span class="text-xs font-semibold text-[#2C2521] block mb-1.5">主要風味特徵（可複選）：</span>
               <div class="flex flex-wrap gap-1.5" id="flavor-tag-picker">
-                <button type="button" onclick="toggleLogTag(this, '明亮果酸')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition">
+                <button type="button" onclick="toggleLogTag(this, '明亮果酸')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition cursor-pointer">
                   <svg class="w-3.5 h-3.5 text-amber-500 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 12 7.5 4.5"></path><path d="M12 12 16.5 4.5"></path><path d="M12 12 21 10.5"></path><path d="M12 12 19 16.5"></path><path d="M12 12 12 21"></path><path d="M12 12 5 16.5"></path><path d="M12 12 3 10.5"></path></svg>
                   <span>明亮果酸</span>
                 </button>
-                <button type="button" onclick="toggleLogTag(this, '柑橘清香')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition">
+                <button type="button" onclick="toggleLogTag(this, '柑橘清香')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition cursor-pointer">
                   <svg class="w-3.5 h-3.5 text-rose-400 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 1 3 3c0 1.5-1.5 3-3 4-1.5-1-3-2.5-3-4a3 3 0 0 1 3-3z"></path><path d="M22 12a3 3 0 0 1-3 3c-1.5 0-3-1.5-4-3 1-1.5 2.5-3 4-3a3 3 0 0 1 3 3z"></path><path d="M12 22a3 3 0 0 1-3-3c0-1.5 1.5-3 3-4 1.5 1 3 2.5 3 4a3 3 0 0 1-3 3z"></path><path d="M2 12a3 3 0 0 1 3-3c1.5 0 3 1.5 4 3-1 1.5-2.5 3-4 3a3 3 0 0 1-3-3z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
                   <span>柑橘清香</span>
                 </button>
-                <button type="button" onclick="toggleLogTag(this, '焦糖甜感')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition">
+                <button type="button" onclick="toggleLogTag(this, '茉莉花香')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition cursor-pointer">
+                  <svg class="w-3.5 h-3.5 text-pink-400 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+                  <span>茉莉花香</span>
+                </button>
+                <button type="button" onclick="toggleLogTag(this, '莓果熟果')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition cursor-pointer">
+                  <svg class="w-3.5 h-3.5 text-fuchsia-600 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="14" r="6"></circle><path d="M12 8V4M9 5l3 2 3-2"></path></svg>
+                  <span>莓果熟果</span>
+                </button>
+                <button type="button" onclick="toggleLogTag(this, '焦糖甜感')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition cursor-pointer">
                   <svg class="w-3.5 h-3.5 text-amber-600 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path><circle cx="12" cy="14" r="2"></circle></svg>
                   <span>焦糖甜感</span>
                 </button>
-                <button type="button" onclick="toggleLogTag(this, '堅果可可')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition">
+                <button type="button" onclick="toggleLogTag(this, '高山茶韻')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition cursor-pointer">
+                  <svg class="w-3.5 h-3.5 text-teal-600 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 20A7 7 0 0 1 4 13c0-6 7-10 16-10 0 9-4 17-9 17Z"></path></svg>
+                  <span>高山茶韻</span>
+                </button>
+                <button type="button" onclick="toggleLogTag(this, '堅果可可')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition cursor-pointer">
                   <svg class="w-3.5 h-3.5 text-amber-800 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v3"></path><path d="M6 8a6 6 0 0 0 12 0c0-1.5-2.5-3-6-3s-6 1.5-6 3z"></path><path d="M6 8c0 5 3 11 6 13 3-2 6-8 6-13"></path></svg>
                   <span>堅果可可</span>
                 </button>
-                <button type="button" onclick="toggleLogTag(this, '厚實濃郁')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition">
-                  <svg class="w-3.5 h-3.5 text-[#654D3F] inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
-                  <span>厚實濃郁</span>
-                </button>
-                <button type="button" onclick="toggleLogTag(this, '乾淨清爽')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition">
+                <button type="button" onclick="toggleLogTag(this, '乾淨清爽')" class="log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition cursor-pointer">
                   <svg class="w-3.5 h-3.5 text-emerald-600 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 4 13c0-6 7-10 16-10 0 9-4 17-9 17Z"></path><path d="M11 13c2.5-2.5 5.5-4 9-4"></path></svg>
                   <span>乾淨清爽</span>
                 </button>
               </div>
             </div>
 
-            <!-- 自訂文字心得 -->
+            <!-- 文字心得 -->
             <div>
-              <textarea id="rate-comment-input" rows="2.5" class="w-full bg-white border border-[#E6E0D8] rounded-xl p-3 text-base sm:text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]" placeholder="此手法的風味口感簡記（例：前段酸甜對比強烈，果香非常炸裂，甜感表現優於一刀流...）" 
-                        class="w-full bg-white border border-[#E6E0D8] rounded-xl p-2.5 text-xs text-[#2C2521] focus:outline-none focus:border-[#CFC2B7]"></textarea>
+              <label for="rate-comment-input" class="text-xs font-semibold text-[#2C2521] block mb-1.5">風味心得備忘：</label>
+              <textarea id="rate-comment-input" rows="2.5" placeholder="記錄這杯的酸甜平衡、香氣表現或下次調整方向..." 
+                        class="w-full bg-white border border-[#E6E0D8] rounded-xl p-3 text-base sm:text-xs text-[#2C2521] focus:outline-none focus:border-[#654D3F]"></textarea>
             </div>
 
             <div class="flex gap-2">
-              <button onclick="submitMethodRating()" class="flex-1 py-2.5 px-4 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition">
-                儲存評分至此咖啡豆
+              <button type="button" onclick="submitMethodRating()" class="flex-1 py-2.5 px-4 rounded-xl bg-[#654D3F] hover:bg-[#523D32] text-white text-xs font-semibold transition cursor-pointer">
+                儲存評分
               </button>
-              <button onclick="switchVaultTab('beans')" class="py-2.5 px-4 rounded-xl bg-white border border-[#E6E0D8] text-xs text-[#685B52] transition">
+              <button type="button" onclick="switchVaultTab('beans')" class="py-2.5 px-4 rounded-xl bg-white hover:bg-[#FAF5F0] border border-[#E6E0D8] text-xs text-[#685B52] transition cursor-pointer">
                 取消
               </button>
             </div>
@@ -2137,8 +2244,8 @@
       </div>
 
       <!-- 視窗底端關閉 -->
-      <div class="p-3 border-t border-[#F0EAE3] bg-[#FAF9F7] text-right">
-        <button onclick="closeRecipeVaultModal()" class="px-4 py-1.5 rounded-lg bg-white border border-[#E6E0D8] hover:border-[#CFC2B7] text-xs text-[#685B52] transition">
+      <div class="p-3 sm:px-6 border-t border-[#F0EAE3] bg-[#FAF9F7] flex items-center justify-end flex-shrink-0">
+        <button type="button" onclick="closeRecipeVaultModal()" class="px-4 py-1.5 rounded-lg bg-white border border-[#E6E0D8] hover:border-[#CFC2B7] text-xs font-medium text-[#685B52] transition cursor-pointer whitespace-nowrap">
           關閉
         </button>
       </div>
@@ -6389,16 +6496,29 @@
     }
 
     // ==========================================
-    // 咖啡豆與多手法風味評分庫 (Beans & Multi-Method Ratings)
+    // 咖啡豆與沖煮評分庫 (點子 2：烘豆袋標籤咖啡豆卡片牆)
     // ==========================================
     const STORAGE_KEY_BEANS = 'brewcraft_coffee_beans_v2';
 
-    // 預載範例資料：耶加雪菲 粉紅炸彈
+    const ROAST_STRIPE_COLORS = {
+      light: '#F59E0B',
+      medium_light: '#D97706',
+      medium: '#8C583A',
+      medium_dark: '#4A3327',
+      dark: '#241914'
+    };
+
+    const expandedBeanIds = new Set();
+
+    // 預載 4 支對應不同烘焙度色帶的經典豆款
     const DEFAULT_BEANS_DATA = [
       {
         id: 'bean_default_pink_bomb',
         name: '耶加雪菲 粉紅炸彈',
-        origin: '衣索比亞 · 日曬處理 · 淺焙',
+        country: '衣索比亞',
+        process: '日曬',
+        roastLevel: 'light',
+        origin: '衣索比亞 · 日曬 · 淺焙',
         createdAt: '2026/11/08',
         methodRatings: [
           {
@@ -6408,14 +6528,18 @@
             rating: 4.5,
             date: '2026/11/08 10:20',
             params: {
+              dripper: 'conical',
+              brewMode: 'hot',
+              roast: 'light',
+              flavor: 'acid',
               dose: 15,
-              temp: '92°C',
-              ratio: '1:15',
-              water: '225g',
+              temp: '94°C',
+              ratio: '1:16',
+              water: '240g',
               grind: '偏粗研磨'
             },
             tags: ['明亮果酸', '柑橘清香', '焦糖甜感'],
-            comment: '前段果酸炸裂，帶有濃郁草莓與柑橘甜感，層次非常分明！'
+            comment: '前段果酸炸裂，帶有草莓與柑橘甜感，層次分明。'
           },
           {
             id: 'rate_sample_2',
@@ -6424,41 +6548,149 @@
             rating: 4.0,
             date: '2026/11/08 14:30',
             params: {
+              dripper: 'conical',
+              brewMode: 'hot',
+              roast: 'light',
+              flavor: 'balance',
               dose: 15,
-              temp: '92°C',
-              ratio: '1:14.7',
-              water: '220g',
-              grind: '中細研磨'
+              temp: '93°C',
+              ratio: '1:15.7',
+              water: '236g',
+              grind: '細研磨'
             },
             tags: ['柑橘清香', '乾淨清爽'],
-            comment: '花香清雅純淨無雜質，但尾韻焦糖甜度略微少於四六法。'
+            comment: '花香清雅純淨無雜質，尾韻焦糖甜度略少於四六法。'
+          }
+        ]
+      },
+      {
+        id: 'bean_default_alishan',
+        name: '阿里山 鄒築園',
+        country: '台灣',
+        process: '水洗',
+        roastLevel: 'medium_light',
+        origin: '台灣 · 水洗 · 中淺焙',
+        createdAt: '2026/11/12',
+        methodRatings: [
+          {
+            id: 'rate_sample_alishan_1',
+            methodKey: 'hoffmann',
+            methodName: 'James Hoffmann V60',
+            rating: 4.8,
+            date: '2026/11/12 10:15',
+            params: {
+              dripper: 'conical',
+              brewMode: 'hot',
+              roast: 'medium_light',
+              flavor: 'sweet',
+              dose: 15,
+              temp: '92°C',
+              ratio: '1:16.5',
+              water: '248g',
+              grind: '中細研磨'
+            },
+            tags: ['茉莉花香', '高山茶韻', '乾淨清爽'],
+            comment: '旋轉攪拌萃出清透高山烏龍茶韻與甘蔗清甜，餘韻悠長。'
+          }
+        ]
+      },
+      {
+        id: 'bean_default_antigua',
+        name: '瓜地馬拉 花神',
+        country: '安提瓜',
+        process: '水洗',
+        roastLevel: 'medium',
+        origin: '安提瓜 · 水洗 · 中焙',
+        createdAt: '2026/11/14',
+        methodRatings: [
+          {
+            id: 'rate_sample_antigua_1',
+            methodKey: 'three_stage',
+            methodName: '經典三段式',
+            rating: 4.2,
+            date: '2026/11/14 14:20',
+            params: {
+              dripper: 'conical',
+              brewMode: 'hot',
+              roast: 'medium',
+              flavor: 'balance',
+              dose: 15,
+              temp: '90°C',
+              ratio: '1:15',
+              water: '225g',
+              grind: '中度研磨'
+            },
+            tags: ['焦糖甜感', '堅果可可'],
+            comment: '花果香氣優雅與牛奶巧克力甘醇感完美平衡。'
+          }
+        ]
+      },
+      {
+        id: 'bean_default_mandheling',
+        name: '黃金曼特寧 G1',
+        country: '蘇門答臘',
+        process: '濕刨法',
+        roastLevel: 'medium_dark',
+        origin: '蘇門答臘 · 濕刨法 · 中深焙',
+        createdAt: '2026/11/15',
+        methodRatings: [
+          {
+            id: 'rate_sample_mandheling_1',
+            methodKey: 'matsuya',
+            methodName: '松屋流 (點滴深悶蒸)',
+            rating: 4.4,
+            date: '2026/11/15 16:00',
+            params: {
+              dripper: 'trapezoid',
+              brewMode: 'hot',
+              roast: 'medium_dark',
+              flavor: 'body',
+              dose: 18,
+              temp: '86°C',
+              ratio: '1:13.8',
+              water: '248g',
+              grind: '粗研磨'
+            },
+            tags: ['堅果可可', '焦糖甜感'],
+            comment: '松屋點滴深悶蒸配熱水 Bypass，厚實奶油黑巧克力感完全不焦苦。'
           }
         ]
       }
     ];
 
-    // 自製專屬風味標籤向量圖示 (Minimalist Vector Flavor Icons)
+    // 精選 8 款風味標籤向量圖示
     const FLAVOR_TAG_ICONS = {
       '明亮果酸': `<svg class="w-3.5 h-3.5 text-amber-500 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 12 7.5 4.5"></path><path d="M12 12 16.5 4.5"></path><path d="M12 12 21 10.5"></path><path d="M12 12 19 16.5"></path><path d="M12 12 12 21"></path><path d="M12 12 5 16.5"></path><path d="M12 12 3 10.5"></path></svg>`,
       '柑橘清香': `<svg class="w-3.5 h-3.5 text-rose-400 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 1 3 3c0 1.5-1.5 3-3 4-1.5-1-3-2.5-3-4a3 3 0 0 1 3-3z"></path><path d="M22 12a3 3 0 0 1-3 3c-1.5 0-3-1.5-4-3 1-1.5 2.5-3 4-3a3 3 0 0 1 3 3z"></path><path d="M12 22a3 3 0 0 1-3-3c0-1.5 1.5-3 3-4 1.5 1 3 2.5 3 4a3 3 0 0 1-3 3z"></path><path d="M2 12a3 3 0 0 1 3-3c1.5 0 3 1.5 4 3-1 1.5-2.5 3-4 3a3 3 0 0 1-3-3z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>`,
+      '茉莉花香': `<svg class="w-3.5 h-3.5 text-pink-400 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>`,
+      '莓果熟果': `<svg class="w-3.5 h-3.5 text-fuchsia-600 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="14" r="6"></circle><path d="M12 8V4M9 5l3 2 3-2"></path></svg>`,
       '焦糖甜感': `<svg class="w-3.5 h-3.5 text-amber-600 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path><circle cx="12" cy="14" r="2"></circle></svg>`,
+      '高山茶韻': `<svg class="w-3.5 h-3.5 text-teal-600 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 20A7 7 0 0 1 4 13c0-6 7-10 16-10 0 9-4 17-9 17Z"></path></svg>`,
       '堅果可可': `<svg class="w-3.5 h-3.5 text-amber-800 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v3"></path><path d="M6 8a6 6 0 0 0 12 0c0-1.5-2.5-3-6-3s-6 1.5-6 3z"></path><path d="M6 8c0 5 3 11 6 13 3-2 6-8 6-13"></path></svg>`,
-      '厚實濃郁': `<svg class="w-3.5 h-3.5 text-[#654D3F] inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>`,
       '乾淨清爽': `<svg class="w-3.5 h-3.5 text-emerald-600 inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 4 13c0-6 7-10 16-10 0 9-4 17-9 17Z"></path><path d="M11 13c2.5-2.5 5.5-4 9-4"></path></svg>`
     };
 
     function renderFlavorTag(rawTag) {
-      const cleanName = rawTag.replace(/^[^\w\u4e00-\u9fa5]+\s*/, '');
+      const cleanName = String(rawTag || '').replace(/^[^\w\u4e00-\u9fa5]+\s*/, '');
       const iconSvg = FLAVOR_TAG_ICONS[cleanName] || `<svg class="w-3.5 h-3.5 text-[#8C7E75] inline-block flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle></svg>`;
       return `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white border border-[#E6E0D8] text-[#685B52] text-[10px] font-medium">${iconSvg}<span>${escapeHtml(cleanName)}</span></span>`;
     }
 
+    let starUidCounter = 0;
     function renderStarRating(rating, max = 5) {
-      const safeRating = Math.min(Math.max(Math.round(rating || 5), 1), max);
+      const val = Math.min(Math.max(Number(rating) || 4, 1), max);
+      const fullCount = Math.floor(val);
+      const hasHalf = (val - fullCount) >= 0.4;
       let html = '<div class="inline-flex items-center gap-0.5">';
       for (let i = 1; i <= max; i++) {
-        const isFilled = i <= safeRating;
-        html += `<svg class="w-3.5 h-3.5 inline-block ${isFilled ? 'text-amber-500' : 'text-stone-300'} fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+        if (i <= fullCount) {
+          html += `<svg class="w-3.5 h-3.5 inline-block text-amber-500 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+        } else if (i === fullCount + 1 && hasHalf) {
+          const gid = 'halfStar_' + (++starUidCounter);
+          html += `<svg class="w-3.5 h-3.5 inline-block" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="${gid}"><stop offset="50%" stop-color="#f59e0b"/><stop offset="50%" stop-color="#d6d3d1"/></linearGradient></defs><polygon fill="url(#${gid})" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+        } else {
+          html += `<svg class="w-3.5 h-3.5 inline-block text-stone-300 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+        }
       }
       html += '</div>';
       return html;
@@ -6467,28 +6699,50 @@
     let currentLogRating = 4;
     let currentLogTags = [];
 
+    function normalizeBeanRecord(bean) {
+      if (!bean) return null;
+      const b = Object.assign({}, bean);
+      if (!b.country) {
+        const org = String(b.origin || '');
+        b.country = org.split('·')[0].trim() || '自訂產區';
+      }
+      const rawProc = String(b.process || b.origin || '');
+      if (!b.process || rawProc.includes('(')) {
+        if (rawProc.includes('厭氧')) b.process = '厭氧處理';
+        else if (rawProc.includes('日曬')) b.process = '日曬';
+        else if (rawProc.includes('水洗')) b.process = '水洗';
+        else if (rawProc.includes('蜜處理')) b.process = '蜜處理';
+        else if (rawProc.includes('濕刨')) b.process = '濕刨法';
+        else if (!b.process) b.process = '其他';
+      }
+      if (!b.roastLevel || !ROAST_CONFIGS[b.roastLevel]) {
+        const org = String(b.origin || '');
+        if (org.includes('中淺')) b.roastLevel = 'medium_light';
+        else if (org.includes('中深')) b.roastLevel = 'medium_dark';
+        else if (org.includes('淺焙')) b.roastLevel = 'light';
+        else if (org.includes('深焙')) b.roastLevel = 'dark';
+        else b.roastLevel = 'medium';
+      }
+      if (!Array.isArray(b.methodRatings)) b.methodRatings = [];
+      b.methodRatings.forEach(rate => {
+        if (rate.tags) {
+          rate.tags = rate.tags.map(t => String(t).replace(/^[^\w\u4e00-\u9fa5]+\s*/, ''));
+        }
+      });
+      return b;
+    }
+
     function getSavedBeans() {
       try {
         const stored = localStorage.getItem(STORAGE_KEY_BEANS);
         if (!stored) {
-          // 初始化預載範例咖啡豆
           localStorage.setItem(STORAGE_KEY_BEANS, JSON.stringify(DEFAULT_BEANS_DATA));
-          return DEFAULT_BEANS_DATA;
+          return JSON.parse(JSON.stringify(DEFAULT_BEANS_DATA));
         }
         const parsed = JSON.parse(stored) || [];
-        // 清理任何既有歷史舊資料中殘留的 emoji 前綴
-        parsed.forEach(bean => {
-          if (bean.methodRatings) {
-            bean.methodRatings.forEach(rate => {
-              if (rate.tags) {
-                rate.tags = rate.tags.map(t => t.replace(/^[^\w\u4e00-\u9fa5]+\s*/, ''));
-              }
-            });
-          }
-        });
-        return parsed;
+        return parsed.map(normalizeBeanRecord).filter(Boolean);
       } catch (e) {
-        return DEFAULT_BEANS_DATA;
+        return JSON.parse(JSON.stringify(DEFAULT_BEANS_DATA));
       }
     }
 
@@ -6501,8 +6755,10 @@
 
     function updateVaultBadges() {
       const beans = getSavedBeans();
-      document.getElementById('saved-beans-badge').textContent = beans.length;
-      document.getElementById('beans-tab-count').textContent = beans.length;
+      const badgeEl = document.getElementById('saved-beans-badge');
+      const tabCountEl = document.getElementById('beans-tab-count');
+      if (badgeEl) badgeEl.textContent = beans.length;
+      if (tabCountEl) tabCountEl.textContent = beans.length;
     }
 
     function openRecipeVaultModal() {
@@ -6556,50 +6812,165 @@
 
     function switchVaultTab(tab) {
       const isBeans = tab === 'beans';
-      document.getElementById('vault-tab-beans').classList.toggle('hidden', !isBeans);
-      document.getElementById('vault-tab-rate').classList.toggle('hidden', isBeans);
+      const tabBeans = document.getElementById('vault-tab-beans');
+      const tabRate = document.getElementById('vault-tab-rate');
+      if (tabBeans) tabBeans.classList.toggle('hidden', !isBeans);
+      if (tabRate) tabRate.classList.toggle('hidden', isBeans);
 
       const btnBeans = document.getElementById('tab-btn-beans');
       const btnRate = document.getElementById('tab-btn-rate');
-      if (isBeans) {
-        btnBeans.className = 'px-4 py-2.5 border-b-2 border-[#654D3F] text-[#2C2521] font-semibold transition';
-        btnRate.className = 'px-4 py-2.5 border-b-2 border-transparent text-[#8C7E75] hover:text-[#2C2521] transition';
-      } else {
-        btnRate.className = 'px-4 py-2.5 border-b-2 border-[#654D3F] text-[#2C2521] font-semibold transition';
-        btnBeans.className = 'px-4 py-2.5 border-b-2 border-transparent text-[#8C7E75] hover:text-[#2C2521] transition';
+      if (btnBeans && btnRate) {
+        if (isBeans) {
+          btnBeans.className = 'px-3 py-1 rounded-lg bg-white text-[#2C2521] font-semibold shadow-2xs transition cursor-pointer whitespace-nowrap';
+          btnRate.className = 'px-3 py-1 rounded-lg text-[#7D6E65] hover:text-[#2C2521] transition cursor-pointer whitespace-nowrap';
+        } else {
+          btnRate.className = 'px-3 py-1 rounded-lg bg-white text-[#2C2521] font-semibold shadow-2xs transition cursor-pointer whitespace-nowrap';
+          btnBeans.className = 'px-3 py-1 rounded-lg text-[#7D6E65] hover:text-[#2C2521] transition cursor-pointer whitespace-nowrap';
+        }
+      }
+      if (!isBeans) {
+        syncRateFormWithCurrentState();
       }
     }
 
-    // 建立新咖啡豆
+    function toggleBeanCreatorDrawer(forceOpen) {
+      const card = document.getElementById('bean-creator-card');
+      if (!card) return;
+      const shouldOpen = (typeof forceOpen === 'boolean') ? forceOpen : card.classList.contains('hidden');
+      card.classList.toggle('hidden', !shouldOpen);
+      if (shouldOpen) {
+        const nameEl = document.getElementById('new-bean-name-input');
+        if (nameEl && typeof nameEl.focus === 'function') nameEl.focus();
+      }
+    }
+
+    function selectVaultProcessFilter(procVal) {
+      const sel = document.getElementById('vault-filter-process');
+      if (sel) sel.value = procVal || '';
+      document.querySelectorAll('#vault-process-pills .process-pill').forEach(btn => {
+        const isMatch = (btn.dataset.proc || '') === (procVal || '');
+        btn.classList.toggle('active', isMatch);
+        btn.classList.toggle('font-semibold', isMatch);
+        btn.classList.toggle('font-medium', !isMatch);
+      });
+      renderBeansList();
+    }
+
+    function toggleBeanCardExpand(beanId) {
+      if (expandedBeanIds.has(beanId)) {
+        expandedBeanIds.delete(beanId);
+      } else {
+        expandedBeanIds.add(beanId);
+      }
+      renderBeansList();
+    }
+
+    function resetBeanCreatorForm() {
+      const editIdEl = document.getElementById('editing-bean-id');
+      const nameEl = document.getElementById('new-bean-name-input');
+      const noteEl = document.getElementById('new-bean-note-input');
+      const procEl = document.getElementById('new-bean-process-select');
+      const roastEl = document.getElementById('new-bean-roast-select');
+      const titleEl = document.getElementById('bean-creator-title');
+      const btnEl = document.getElementById('create-bean-submit-btn');
+
+      if (editIdEl) editIdEl.value = '';
+      if (nameEl) nameEl.value = '';
+      if (noteEl) noteEl.value = '';
+      if (procEl) procEl.value = '水洗';
+      if (roastEl) roastEl.value = 'light';
+      if (titleEl) {
+        titleEl.innerHTML = `<svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg><span>新增咖啡豆</span>`;
+      }
+      if (btnEl) btnEl.textContent = '新增';
+    }
+
+    function cancelEditBeanProfile() {
+      resetBeanCreatorForm();
+      toggleBeanCreatorDrawer(false);
+    }
+
+    function editBeanProfile(beanId) {
+      const beans = getSavedBeans();
+      const bean = beans.find(b => b.id === beanId);
+      if (!bean) return;
+
+      const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val !== undefined) el.value = val;
+      };
+      setVal('editing-bean-id', bean.id);
+      setVal('new-bean-name-input', bean.name);
+      setVal('new-bean-note-input', bean.country || '');
+      setVal('new-bean-process-select', bean.process || '水洗');
+      setVal('new-bean-roast-select', bean.roastLevel || 'medium');
+
+      const titleEl = document.getElementById('bean-creator-title');
+      const btnEl = document.getElementById('create-bean-submit-btn');
+      if (titleEl) titleEl.textContent = `編輯咖啡豆：【${bean.name}】`;
+      if (btnEl) btnEl.textContent = '儲存';
+
+      toggleBeanCreatorDrawer(true);
+    }
+
+    // 建立或更新咖啡豆（完成後自動收合抽屜，保持卡片牆乾淨）
     function createNewBeanFromInput() {
       const nameInput = document.getElementById('new-bean-name-input');
       const noteInput = document.getElementById('new-bean-note-input');
-      const name = nameInput.value.trim();
+      const name = (nameInput ? nameInput.value : '').trim();
       if (!name) {
-        nameInput.classList.add('ring-2', 'ring-red-400');
-        nameInput.focus();
-        setTimeout(() => nameInput.classList.remove('ring-2', 'ring-red-400'), 2500);
-        showCustomStepToast('請先輸入咖啡豆名稱（例：耶加雪菲 粉紅炸彈）');
+        if (nameInput) {
+          nameInput.classList.add('ring-2', 'ring-red-400');
+          if (typeof nameInput.focus === 'function') nameInput.focus();
+          setTimeout(() => nameInput.classList.remove('ring-2', 'ring-red-400'), 2500);
+        }
+        showCustomStepToast('請輸入咖啡豆名稱（例：耶加雪菲 果丁丁）');
         return;
       }
 
-      const note = noteInput.value.trim() || '自訂精品咖啡豆';
+      const country = (noteInput ? noteInput.value : '').trim() || '自訂產區';
+      const process = (document.getElementById('new-bean-process-select') || {}).value || '水洗';
+      const roastLevel = (document.getElementById('new-bean-roast-select') || {}).value || 'medium';
+      const roastName = (ROAST_CONFIGS[roastLevel] && ROAST_CONFIGS[roastLevel].name) || '中焙';
+      const originSummary = `${country} · ${process} · ${roastName}`;
+
+      const editId = (document.getElementById('editing-bean-id') || {}).value || '';
+      const beans = getSavedBeans();
+
+      if (editId) {
+        const idx = beans.findIndex(b => b.id === editId);
+        if (idx !== -1) {
+          beans[idx] = Object.assign({}, beans[idx], {
+            name,
+            country,
+            process,
+            roastLevel,
+            origin: originSummary
+          });
+          saveBeansToStorage(beans);
+          resetBeanCreatorForm();
+          toggleBeanCreatorDrawer(false);
+          showCustomStepToast(`已更新【${name}】`);
+          return;
+        }
+      }
 
       const newBean = {
         id: 'bean_' + Date.now(),
-        name: name,
-        origin: note,
+        name,
+        country,
+        process,
+        roastLevel,
+        origin: originSummary,
         createdAt: new Date().toLocaleDateString(),
         methodRatings: []
       };
 
-      const beans = getSavedBeans();
       beans.unshift(newBean);
       saveBeansToStorage(beans);
-
-      nameInput.value = '';
-      noteInput.value = '';
-      showCustomStepToast('已建立新咖啡豆專區');
+      resetBeanCreatorForm();
+      toggleBeanCreatorDrawer(false);
+      showCustomStepToast(`已新增咖啡豆：【${name}】`);
     }
 
     function deleteBean(beanId, btnElem) {
@@ -6607,8 +6978,13 @@
         if (btnElem._resetTimer) clearTimeout(btnElem._resetTimer);
         let beans = getSavedBeans();
         beans = beans.filter(b => b.id !== beanId);
+        expandedBeanIds.delete(beanId);
         saveBeansToStorage(beans);
-        showCustomStepToast('已刪除咖啡豆專區及其所有評分');
+        if ((document.getElementById('editing-bean-id') || {}).value === beanId) {
+          resetBeanCreatorForm();
+          toggleBeanCreatorDrawer(false);
+        }
+        showCustomStepToast('已刪除咖啡豆及相關評分');
         return;
       }
 
@@ -6616,7 +6992,7 @@
         btnElem.dataset.confirming = 'true';
         btnElem._origHtml = btnElem.innerHTML;
         btnElem._origClass = btnElem.className;
-        btnElem.className = 'px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold shadow-xs hover:bg-red-700 transition flex items-center gap-1';
+        btnElem.className = 'px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold shadow-xs hover:bg-red-700 transition flex items-center gap-1 cursor-pointer';
         btnElem.innerHTML = '<span>確認刪除？</span>';
         btnElem._resetTimer = setTimeout(() => {
           btnElem.dataset.confirming = 'false';
@@ -6626,178 +7002,253 @@
       } else {
         let beans = getSavedBeans();
         beans = beans.filter(b => b.id !== beanId);
+        expandedBeanIds.delete(beanId);
         saveBeansToStorage(beans);
-        showCustomStepToast('已刪除咖啡豆專區');
+        showCustomStepToast('已刪除咖啡豆');
       }
     }
 
-    // 渲染咖啡豆與多手法評分清單
+    function resetVaultFilters() {
+      const searchEl = document.getElementById('vault-search-input');
+      const sortEl = document.getElementById('vault-sort-select');
+      if (searchEl) searchEl.value = '';
+      if (sortEl) sortEl.value = 'newest';
+      selectVaultProcessFilter('');
+    }
+
+    // 渲染點子 2：2 欄「烘豆袋標籤」咖啡豆卡片牆
     function renderBeansList() {
       const container = document.getElementById('beans-list-container');
-      const beans = getSavedBeans();
+      if (!container) return;
+      const allBeans = getSavedBeans();
+
+      if (allBeans.length === 0) {
+        container.innerHTML = `
+          <div class="md:col-span-2 p-8 text-center text-xs text-[#9B8D83] bg-white rounded-2xl border border-dashed border-[#E5DDD4] space-y-2.5">
+            <div>目前尚未建立任何咖啡豆。</div>
+            <button type="button" onclick="toggleBeanCreatorDrawer(true)" class="px-3.5 py-1.5 rounded-full bg-[#523A2D] text-white text-xs font-semibold hover:bg-[#3F2C22] transition cursor-pointer">
+              ＋ 建立第一支咖啡豆
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const query = ((document.getElementById('vault-search-input') || {}).value || '').trim().toLowerCase();
+      const filterProc = (document.getElementById('vault-filter-process') || {}).value || '';
+      const sortMode = (document.getElementById('vault-sort-select') || {}).value || 'newest';
+
+      let beans = allBeans.filter(b => {
+        if (filterProc && b.process !== filterProc) return false;
+        if (query) {
+          const roastLabel = (ROAST_CONFIGS[b.roastLevel] && ROAST_CONFIGS[b.roastLevel].name) || '';
+          const ratingText = (b.methodRatings || []).map(r => `${r.methodName} ${r.comment || ''} ${(r.tags || []).join(' ')}`).join(' ');
+          const haystack = `${b.name} ${b.country || ''} ${b.process || ''} ${roastLabel} ${b.origin || ''} ${ratingText}`.toLowerCase();
+          if (!haystack.includes(query)) return false;
+        }
+        return true;
+      });
+
+      const getAvg = (b) => {
+        const list = b.methodRatings || [];
+        return list.length ? list.reduce((s, r) => s + (Number(r.rating) || 0), 0) / list.length : 0;
+      };
+
+      if (sortMode === 'highest_rating') {
+        beans.sort((a, b) => getAvg(b) - getAvg(a));
+      }
 
       if (beans.length === 0) {
         container.innerHTML = `
-          <div class="p-8 text-center text-xs text-[#9B8D83] bg-[#FAF9F7] rounded-xl border border-dashed border-[#EDE8E2]">
-            目前尚未建立任何咖啡豆。請在上方輸入咖啡名稱（如：耶加雪菲 粉紅炸彈）建立第一支專屬咖啡豆！
+          <div class="md:col-span-2 p-6 text-center text-xs text-[#8C7E75] bg-white rounded-2xl border border-dashed border-[#E5DDD4] space-y-2">
+            <div>找不到符合搜尋條件的咖啡豆。</div>
+            <button type="button" onclick="resetVaultFilters()" class="px-3 py-1 rounded-full bg-[#FAF5F0] border border-[#E6E0D8] text-[#654D3F] font-semibold hover:bg-[#F1E8DF] transition cursor-pointer">
+              顯示全部咖啡豆
+            </button>
           </div>
         `;
         return;
       }
 
       container.innerHTML = beans.map(bean => {
-        const ratingsCount = bean.methodRatings ? bean.methodRatings.length : 0;
-        let avgRating = 0;
-        if (ratingsCount > 0) {
-          avgRating = (bean.methodRatings.reduce((sum, r) => sum + (r.rating || 0), 0) / ratingsCount).toFixed(1);
-        }
+        const ratings = bean.methodRatings || [];
+        const ratingsCount = ratings.length;
+        const avgRating = ratingsCount > 0 ? getAvg(bean).toFixed(1) : null;
+        const bestRating = ratingsCount > 0
+          ? ratings.reduce((best, r) => ((Number(r.rating) || 0) > (Number(best.rating) || 0) ? r : best), ratings[0])
+          : null;
 
+        const roastKey = bean.roastLevel || 'medium';
+        const roastLabel = (ROAST_CONFIGS[roastKey] && ROAST_CONFIGS[roastKey].name) || '中焙';
+        const stripeColor = ROAST_STRIPE_COLORS[roastKey] || '#8C583A';
+        const isExpanded = expandedBeanIds.has(bean.id);
         const escapedBeanName = escapeHtml(bean.name);
-        const escapedBeanOrigin = escapeHtml(bean.origin || '自訂精品咖啡豆');
+        const escapedCountry = escapeHtml(bean.country || '自訂產區');
+        const escapedProcess = escapeHtml(bean.process || '水洗');
+
+        const bestMethodShort = bestRating ? bestRating.methodName.split(' ')[0] : '';
+        const bestTemp = (bestRating && bestRating.params && bestRating.params.temp) ? bestRating.params.temp : '92°C';
 
         return `
-          <div class="rounded-2xl p-4 sm:p-5 bg-white space-y-3.5 border border-[#EDE8E2] shadow-xs">
-            
-            <!-- 咖啡豆頭部資訊 -->
-            <div class="flex items-start justify-between gap-3 border-b border-[#F0EAE3] pb-3">
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="w-4 h-4 text-[#654D3F] flex items-center justify-center">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M12 3C7.2 3 4 7 4 12s3.2 9 8 9 8-4 8-9-3.2-9-8-9z" fill="currentColor"/>
-                      <path d="M12 5c-1 3.5 1.5 6.5 0 10-0.8 2-0.2 4 0 4" stroke="#FFF" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.85"/>
-                    </svg>
-                  </span>
-                  <h3 class="text-sm font-bold text-[#2C2521]">${escapedBeanName}</h3>
-                  ${ratingsCount > 0 ? `
-                    <span class="px-2 py-0.5 rounded-full bg-[#FAF9F7] border border-[#E6E0D8] text-[11px] font-bold text-amber-600 flex items-center gap-1 font-mono-num">
-                      <svg class="w-3 h-3 text-amber-500 fill-current inline-block" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <article class="tasting-card rounded-2xl overflow-hidden flex ${isExpanded ? 'md:col-span-2' : ''}">
+            <!-- 左側烘焙度專屬色帶 -->
+            <div class="w-2.5 flex-shrink-0" style="background-color: ${stripeColor}" title="烘焙度：${escapeHtml(roastLabel)}"></div>
+
+            <!-- 標籤卡主體 -->
+            <div class="flex-1 p-4 flex flex-col justify-between gap-3 min-w-0">
+              
+              <!-- 上半部：豆名 + 星等 + 3 枚印章徽章 + 最佳配方膠囊 -->
+              <div class="space-y-2.5">
+                <div class="flex items-start justify-between gap-2">
+                  <h3 class="text-base font-bold text-[#2C2521] leading-snug truncate" title="${escapedBeanName}">${escapedBeanName}</h3>
+                  ${avgRating ? `
+                    <span class="inline-flex items-center gap-1 text-sm font-bold text-[#2C2521] font-mono-num flex-shrink-0">
+                      <svg class="w-4 h-4 text-amber-500 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                       <span>${avgRating}</span>
                     </span>
-                  ` : ''}
+                  ` : `
+                    <span class="text-[11px] text-[#A3958B] flex-shrink-0">尚無評分</span>
+                  `}
                 </div>
-                <div class="text-xs text-[#8C7E75] mt-1">
-                  ${escapedBeanOrigin} · 已評分 ${ratingsCount} 種沖煮手法
+
+                <!-- 三枚烘豆袋復古印章標籤 -->
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <span class="px-2.5 py-0.5 rounded-full border border-[#CFC5B9] bg-white text-[11px] font-medium text-[#3D3028]">${escapedCountry}</span>
+                  <span class="px-2.5 py-0.5 rounded-full border border-[#CFC5B9] bg-white text-[11px] font-medium text-[#3D3028]">${escapedProcess}</span>
+                  <span class="px-2.5 py-0.5 rounded-full border border-[#CFC5B9] bg-white text-[11px] font-medium text-[#3D3028]">${escapeHtml(roastLabel)}</span>
                 </div>
-              </div>
 
-              <!-- 評分新手沖手法按鈕 -->
-              <div class="flex items-center gap-1.5">
-                <button onclick="openRateModalForSpecificBean('${bean.id}')" class="px-2.5 py-1.5 rounded-lg bg-[#FAF9F7] border border-[#E6E0D8] hover:border-[#CFC2B7] text-[#654D3F] text-xs font-semibold transition flex items-center gap-1 shadow-2xs">
-                  <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                  <span>評分新手沖法</span>
-                </button>
-                <button onclick="deleteBean('${bean.id}', this)" class="text-stone-300 hover:text-red-500 text-xs transition p-1" title="刪除咖啡豆">
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-              </div>
-            </div>
-
-            <!-- 此咖啡豆內部的手法評分列表 -->
-            <div class="space-y-2.5">
-              ${ratingsCount === 0 ? `
-                <div class="p-3 rounded-lg bg-[#FAF9F7] text-[11px] text-[#9B8D83] text-center">
-                  這支咖啡豆尚未記錄任何沖煮法評分。點擊上方「+ 評分新手沖法」為它記錄第一杯風味！
-                </div>
-              ` : bean.methodRatings.map(rate => {
-                const dose = (rate.params && rate.params.dose) !== undefined ? rate.params.dose : 15;
-                const temp = (rate.params && rate.params.temp) || '92°C';
-                const ratio = (rate.params && rate.params.ratio) || '1:15';
-                const water = (rate.params && rate.params.water) || '225g';
-                const grind = (rate.params && rate.params.grind) || '標準研磨';
-                const stepsList = (rate.params && rate.params.customSteps) || rate.steps || null;
-                const isCustom = rate.isCustom || (rate.params && rate.params.isCustomSteps);
-                const dripperName = (rate.params && rate.params.dripper && DRIPPER_CONFIGS[rate.params.dripper])
-                  ? DRIPPER_CONFIGS[rate.params.dripper].shortName
-                  : '';
-                const isIcedRating = rate.params && rate.params.brewMode === 'iced';
-
-                return `
-                  <div class="p-3 rounded-xl bg-[#FAF9F7] border border-[#EDE8E2] space-y-2">
-                    
-                    <div class="flex items-center justify-between gap-2">
-                      <div class="flex items-center gap-1.5 flex-wrap">
-                        <span class="px-2.5 py-0.5 rounded-md bg-[#E8E4DF] text-[#3D3028] text-xs font-bold">
-                          ${escapeHtml(rate.methodName)}
-                        </span>
-                        ${dripperName ? `<span class="px-1.5 py-0.5 rounded bg-[#EDE7DF] text-[#654D3F] text-[10px] font-semibold">${escapeHtml(dripperName)}</span>` : ''}
-                        ${isIcedRating ? `<span class="px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 text-[10px] font-semibold">🧊 冰手沖</span>` : ''}
-                        ${isCustom ? `<span class="px-1.5 py-0.5 rounded bg-[#E6E0D8] text-[#654D3F] text-[10px] font-semibold">自訂步驟與參數</span>` : ''}
-                        ${renderStarRating(rate.rating)}
-                        <span class="text-xs font-bold text-[#2C2521]">${rate.rating}.0 分</span>
-                      </div>
-                      
-                      <div class="flex items-center gap-2">
-                        <span class="text-[10px] text-[#9B8D83]">${escapeHtml(rate.date)}</span>
-                        <button onclick="deleteMethodRating('${bean.id}', '${rate.id}', this)" class="text-stone-300 hover:text-red-500 text-xs transition p-1" title="刪除評分">
-                          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>
-                      </div>
+                <!-- 暖琥珀最佳配方推薦膠囊 -->
+                ${bestRating ? `
+                  <div>
+                    <div class="inline-flex items-center px-3 py-1 rounded-xl bg-[#FBF0D9] text-[#5C3D18] text-xs font-semibold max-w-full truncate">
+                      最佳配方：${escapeHtml(bestMethodShort)} · ${escapeHtml(bestTemp)}
                     </div>
-
-                    <!-- 當時參數快照 -->
-                    <div class="text-[11px] text-[#685B52] font-mono-num flex items-center justify-between flex-wrap gap-2 pt-0.5">
-                      <div class="flex gap-2.5 flex-wrap">
-                        <span>粉量: <strong>${dose}g</strong></span>
-                        <span>水溫: <strong>${escapeHtml(temp)}</strong></span>
-                        <span>研磨: <strong>${escapeHtml(grind)}</strong></span>
-                        <span>比例: <strong>${escapeHtml(ratio)}</strong></span>
-                        <span>總水: <strong>${escapeHtml(water)}</strong></span>
-                      </div>
-                      <button onclick="applyMethodRatingParams('${bean.id}', '${rate.id}')" class="text-[11px] text-[#654D3F] hover:underline font-semibold flex items-center gap-1">
-                        <span>套用此參數</span>
-                        <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
-                      </button>
-                    </div>
-
-                    <!-- 沖煮步驟列表 (含注水量、累積水量、注水秒數、注水操作簡記) -->
-                    ${stepsList && stepsList.length > 0 ? `
-                      <details class="text-[11px] bg-white rounded-lg border border-[#E6E0D8] p-2 select-none group">
-                        <summary class="font-semibold text-[#654D3F] flex items-center justify-between cursor-pointer outline-none text-xs">
-                          <span class="flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-[#654D3F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            <span>沖煮步驟細節 (${stepsList.length} 段${isCustom ? ' · 已自訂' : ''})</span>
-                          </span>
-                          <svg class="w-3.5 h-3.5 text-[#8C7E75] group-open:rotate-180 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                        </summary>
-                        <div class="mt-2 space-y-1.5 pt-2 border-t border-[#F0EAE3]">
-                          ${stepsList.map(st => `
-                            <div class="flex items-start justify-between gap-2 text-[10px] leading-relaxed">
-                              <div class="flex items-center gap-1.5 flex-shrink-0 font-mono-num">
-                                <span class="font-bold text-[#2C2521]">${escapeHtml(st.name)}</span>
-                                <span class="text-[#3D3028]">${st.amount > 0 ? '+' + st.amount + 'g' : '-'}</span>
-                                <span class="text-[#8C7E75]">(${st.cumulative}g)</span>
-                                <span class="text-[#654D3F] font-semibold">${st.durationSec}秒</span>
-                              </div>
-                              <div class="text-[#685B52] text-right flex-1 truncate" title="${escapeHtml(st.note || '')}">
-                                ${escapeHtml(st.note || '')}
-                              </div>
-                            </div>
-                          `).join('')}
-                        </div>
-                      </details>
-                    ` : ''}
-
-                    <!-- 風味標籤 (自製向量小圖示) -->
-                    ${rate.tags && rate.tags.length > 0 ? `
-                      <div class="flex flex-wrap gap-1.5">
-                        ${rate.tags.map(t => renderFlavorTag(t)).join('')}
-                      </div>
-                    ` : ''}
-
-                    <!-- 心得備註 -->
-                    ${rate.comment ? `
-                      <div class="text-xs text-[#2C2521] leading-relaxed border-t border-[#F0EAE3] pt-1.5 mt-1">
-                        ${escapeHtml(rate.comment)}
-                      </div>
-                    ` : ''}
-
                   </div>
-                `;
-              }).join('')}
-            </div>
+                ` : `
+                  <div>
+                    <div class="inline-flex items-center px-3 py-1 rounded-xl bg-[#F6F2EC] text-[#8C7E75] text-xs font-medium">
+                      尚未記錄手沖配方
+                    </div>
+                  </div>
+                `}
+              </div>
 
-          </div>
+              <!-- 底部操作列：左側一鍵套用，右側展開詳情與編輯/刪除 -->
+              <div class="flex items-center justify-between gap-2 pt-1 flex-wrap">
+                <div>
+                  ${bestRating ? `
+                    <button type="button" onclick="applyMethodRatingParams('${bean.id}', '${bestRating.id}')" class="text-xs font-bold text-[#2C2521] hover:text-[#654D3F] inline-flex items-center gap-1 transition cursor-pointer">
+                      <span>套用配方</span>
+                      <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+                    </button>
+                  ` : `
+                    <button type="button" onclick="openRateModalForSpecificBean('${bean.id}')" class="text-xs font-bold text-[#654D3F] hover:underline cursor-pointer">
+                      ＋ 記錄第一筆配方
+                    </button>
+                  `}
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                  ${ratingsCount > 0 ? `
+                    <button type="button" onclick="toggleBeanCardExpand('${bean.id}')" class="px-2 py-0.5 rounded-lg hover:bg-[#FAF5F0] text-xs font-medium text-[#7A6B61] hover:text-[#2C2521] transition cursor-pointer whitespace-nowrap">
+                      ${isExpanded ? '收合評分 ▲' : `展開 ${ratingsCount} 筆評分`}
+                    </button>
+                  ` : ''}
+                  <button type="button" onclick="openRateModalForSpecificBean('${bean.id}')" class="p-1.5 rounded-lg hover:bg-[#FAF5F0] text-[#7A6B61] hover:text-[#654D3F] transition cursor-pointer" title="＋ 新增評分紀錄">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  </button>
+                  <button type="button" onclick="editBeanProfile('${bean.id}')" class="p-1.5 rounded-lg hover:bg-[#FAF5F0] text-[#9B8D83] hover:text-[#654D3F] transition cursor-pointer" title="編輯咖啡豆">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                  </button>
+                  <button type="button" onclick="deleteBean('${bean.id}', this)" class="p-1.5 rounded-lg hover:bg-red-50 text-stone-300 hover:text-red-500 transition cursor-pointer" title="刪除咖啡豆">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 展開後的全部手法評分清單（跨 2 欄舒適視讀） -->
+              ${isExpanded && ratingsCount > 0 ? `
+                <div class="pt-3 mt-1 border-t border-[#EFE9E1] grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  ${ratings.map(rate => {
+                    const dose = (rate.params && rate.params.dose) !== undefined ? rate.params.dose : 15;
+                    const temp = (rate.params && rate.params.temp) || '92°C';
+                    const ratio = (rate.params && rate.params.ratio) || '1:15';
+                    const water = (rate.params && rate.params.water) || '225g';
+                    const grind = (rate.params && rate.params.grind) || '標準研磨';
+                    const stepsList = (rate.params && rate.params.customSteps) || rate.steps || null;
+                    const isCustom = rate.isCustom || (rate.params && rate.params.isCustomSteps);
+                    const dripperName = (rate.params && rate.params.dripper && DRIPPER_CONFIGS[rate.params.dripper])
+                      ? DRIPPER_CONFIGS[rate.params.dripper].shortName
+                      : '';
+                    const isIcedRating = rate.params && rate.params.brewMode === 'iced';
+                    const scoreNum = Number(rate.rating) || 4;
+                    const isBestCard = bestRating && bestRating.id === rate.id;
+
+                    return `
+                      <div class="p-3 rounded-xl bg-[#FAF8F5] border ${isBestCard ? 'border-amber-300/90' : 'border-[#EAE2D8]'} space-y-2">
+                        <div class="flex items-center justify-between gap-2 flex-wrap">
+                          <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="px-2 py-0.5 rounded-md bg-[#E8E4DF] text-[#3D3028] text-xs font-bold">${escapeHtml(rate.methodName)}</span>
+                            ${dripperName ? `<span class="px-1.5 py-0.5 rounded bg-[#EDE7DF] text-[#654D3F] text-[10px] font-semibold">${escapeHtml(dripperName)}</span>` : ''}
+                            ${isIcedRating ? `<span class="px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 text-[10px] font-semibold">急冷冰手沖</span>` : ''}
+                            ${isCustom ? `<span class="px-1.5 py-0.5 rounded bg-[#E6E0D8] text-[#654D3F] text-[10px] font-semibold">自訂步驟</span>` : ''}
+                            ${renderStarRating(scoreNum)}
+                            <span class="text-xs font-bold text-[#2C2521] font-mono-num">${scoreNum.toFixed(1)}</span>
+                          </div>
+                          <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] text-[#9B8D83] font-mono-num">${escapeHtml(rate.date)}</span>
+                            <button type="button" onclick="deleteMethodRating('${bean.id}', '${rate.id}', this)" class="text-stone-300 hover:text-red-500 transition p-0.5 cursor-pointer" title="刪除評分">
+                              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                          </div>
+                        </div>
+
+                        <div class="text-[11px] text-[#685B52] font-mono-num flex items-center justify-between flex-wrap gap-2">
+                          <span>${dose}g · ${escapeHtml(temp)} · ${escapeHtml(grind)} · ${escapeHtml(ratio)} · ${escapeHtml(water)}</span>
+                          <button type="button" onclick="applyMethodRatingParams('${bean.id}', '${rate.id}')" class="text-[11px] text-[#654D3F] hover:underline font-semibold inline-flex items-center gap-1 cursor-pointer">
+                            <span>套用</span>
+                            <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+                          </button>
+                        </div>
+
+                        ${stepsList && stepsList.length > 0 ? `
+                          <details class="text-[11px] bg-white rounded-lg border border-[#E6E0D8] p-2 select-none group">
+                            <summary class="font-semibold text-[#654D3F] flex items-center justify-between cursor-pointer outline-none text-[11px]">
+                              <span>沖煮步驟 (${stepsList.length} 段)</span>
+                              <svg class="w-3 h-3 text-[#8C7E75] group-open:rotate-180 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </summary>
+                            <div class="mt-1.5 space-y-1 pt-1.5 border-t border-[#F0EAE3]">
+                              ${stepsList.map(st => `
+                                <div class="flex items-start justify-between gap-2 text-[10px]">
+                                  <div class="flex items-center gap-1.5 flex-shrink-0 font-mono-num">
+                                    <span class="font-bold text-[#2C2521]">${escapeHtml(st.name)}</span>
+                                    <span>${st.amount > 0 ? '+' + st.amount + 'g' : '-'}</span>
+                                    <span class="text-[#8C7E75]">(${st.cumulative}g)</span>
+                                    <span class="text-[#654D3F] font-semibold">${st.durationSec}秒</span>
+                                  </div>
+                                  <div class="text-[#685B52] text-right flex-1 truncate" title="${escapeHtml(st.note || '')}">${escapeHtml(st.note || '')}</div>
+                                </div>
+                              `).join('')}
+                            </div>
+                          </details>
+                        ` : ''}
+
+                        ${rate.tags && rate.tags.length > 0 ? `
+                          <div class="flex flex-wrap gap-1">${rate.tags.map(t => renderFlavorTag(t)).join('')}</div>
+                        ` : ''}
+
+                        ${rate.comment ? `
+                          <div class="text-xs text-[#2C2521] leading-relaxed border-t border-[#EAE2D8]/80 pt-1.5">${escapeHtml(rate.comment)}</div>
+                        ` : ''}
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              ` : ''}
+
+            </div>
+          </article>
         `;
       }).join('');
     }
@@ -6805,25 +7256,45 @@
     // 填充咖啡豆下拉選單
     function populateBeanDropdown(selectedBeanId = null) {
       const select = document.getElementById('rate-target-bean-select');
+      if (!select) return;
       const beans = getSavedBeans();
 
       if (beans.length === 0) {
-        select.innerHTML = `<option value="">尚未建立咖啡豆（請先至第一頁建立）</option>`;
+        select.innerHTML = `<option value="">尚未建立咖啡豆（請先至豆單卡片牆建立）</option>`;
+        select.value = '';
         return;
       }
 
       select.innerHTML = beans.map(b => `
         <option value="${b.id}" ${b.id === selectedBeanId ? 'selected' : ''}>
-          ${b.name} (${b.origin || '無備註'})
+          ${escapeHtml(b.name)} (${escapeHtml(b.country || '自訂產區')} · ${escapeHtml(b.process || '水洗')})
         </option>
       `).join('');
+      select.value = (selectedBeanId && beans.some(b => b.id === selectedBeanId)) ? selectedBeanId : beans[0].id;
+    }
+
+    function jumpToCreateBeanInVault() {
+      switchVaultTab('beans');
+      toggleBeanCreatorDrawer(true);
+    }
+
+    function syncRateFormWithCurrentState() {
+      const methodSel = document.getElementById('rate-target-method-select');
+      if (methodSel) methodSel.value = state.method;
+
+      const snapshotEl = document.getElementById('rate-form-current-params');
+      if (snapshotEl) {
+        const tempStr = (document.getElementById('param-temp') || {}).textContent || '92°C';
+        const ratioStr = (document.getElementById('param-ratio') || {}).textContent || '1:15';
+        const waterStr = (document.getElementById('param-water') || {}).textContent || '225g';
+        snapshotEl.textContent = `${state.dose}g · ${tempStr} · ${ratioStr} · ${waterStr}`;
+      }
     }
 
     // 開啟評分特定咖啡豆表單
     function openRateModalForSpecificBean(beanId) {
       openRecipeVaultModal();
       populateBeanDropdown(beanId);
-      document.getElementById('rate-target-method-select').value = state.method;
       switchVaultTab('rate');
     }
 
@@ -6831,7 +7302,6 @@
     function openRatingModalForCurrentBrew() {
       openRecipeVaultModal();
       populateBeanDropdown();
-      document.getElementById('rate-target-method-select').value = state.method;
       switchVaultTab('rate');
     }
 
@@ -6852,7 +7322,9 @@
           btn.classList.toggle('active', btn.dataset.method === rate.methodKey);
         });
         const methodLbl = document.getElementById('selected-method-label');
-        if (methodLbl) methodLbl.textContent = METHOD_CONFIGS[rate.methodKey].name.split(' ')[0];
+        if (methodLbl && METHOD_CONFIGS[rate.methodKey]) {
+          methodLbl.textContent = METHOD_CONFIGS[rate.methodKey].name.split(' ')[0];
+        }
       }
 
       if (rate.params) {
@@ -6865,7 +7337,7 @@
           updateBrewModeUI();
         }
 
-        if (rate.params.roast) {
+        if (rate.params.roast && ROAST_CONFIGS[rate.params.roast]) {
           state.roast = rate.params.roast;
           document.querySelectorAll('[data-roast]').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.roast === rate.params.roast);
@@ -6874,7 +7346,7 @@
           if (roastLbl) roastLbl.textContent = ROAST_CONFIGS[rate.params.roast].name;
         }
 
-        if (rate.params.flavor) {
+        if (rate.params.flavor && FLAVOR_CONFIGS[rate.params.flavor]) {
           state.flavor = rate.params.flavor;
           document.querySelectorAll('[data-flavor]').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.flavor === rate.params.flavor);
@@ -6909,49 +7381,61 @@
       calculateAndRender();
       if (timerRunning) resetTimer();
       closeRecipeVaultModal();
-      showCustomStepToast(`已成功套用【${rate.methodName}】沖煮參數`);
+      showCustomStepToast(`已成功套用【${bean.name} · ${rate.methodName}】沖煮參數`);
     }
 
-    // 評分星等與標籤互動
+    // 評分星等與標籤互動（支援 0.5 半星精準評分）
     function setLogRating(rating) {
-      currentLogRating = rating;
+      const clamped = Math.min(Math.max(Math.round((Number(rating) || 4) * 2) / 2, 1), 5);
+      currentLogRating = clamped;
       const stars = document.querySelectorAll('#star-rating-container .star-item');
       stars.forEach((star, idx) => {
-        star.classList.toggle('text-amber-500', idx < rating);
-        star.classList.toggle('text-stone-300', idx >= rating);
+        const starPos = idx + 1;
+        star.classList.toggle('text-amber-500', starPos <= Math.ceil(clamped) && !(clamped < starPos && clamped >= starPos - 0.5));
+        star.classList.toggle('text-amber-400', clamped < starPos && clamped >= starPos - 0.5);
+        star.classList.toggle('text-stone-300', starPos > Math.ceil(clamped));
+        star.style.opacity = (clamped < starPos && clamped >= starPos - 0.5) ? '0.65' : '1';
       });
-      document.getElementById('star-rating-label').textContent = `${rating}.0 分`;
+      const lbl = document.getElementById('star-rating-label');
+      if (lbl) lbl.textContent = `${clamped.toFixed(1)} 分`;
+    }
+
+    function adjustLogRatingStep(delta) {
+      setLogRating(currentLogRating + delta);
     }
 
     function toggleLogTag(btn, tag) {
       if (currentLogTags.includes(tag)) {
         currentLogTags = currentLogTags.filter(t => t !== tag);
-        btn.classList.remove('bg-[#E8E4DF]', 'text-[#3D3028]', 'border-[#CFC2B7]', 'font-semibold');
-        btn.classList.add('bg-white', 'text-[#685B52]', 'border-[#E6E0D8]');
+        if (btn) {
+          btn.classList.remove('bg-[#E8E4DF]', 'text-[#3D3028]', 'border-[#CFC2B7]', 'font-semibold');
+          btn.classList.add('bg-white', 'text-[#685B52]', 'border-[#E6E0D8]');
+        }
       } else {
         currentLogTags.push(tag);
-        btn.classList.add('bg-[#E8E4DF]', 'text-[#3D3028]', 'border-[#CFC2B7]', 'font-semibold');
-        btn.classList.remove('bg-white', 'text-[#685B52]', 'border-[#E6E0D8]');
+        if (btn) {
+          btn.classList.add('bg-[#E8E4DF]', 'text-[#3D3028]', 'border-[#CFC2B7]', 'font-semibold');
+          btn.classList.remove('bg-white', 'text-[#685B52]', 'border-[#E6E0D8]');
+        }
       }
     }
 
-    // 儲存手法評分到指定咖啡豆 (支援保存自訂參數與各階段步驟)
+    // 儲存手法評分到指定咖啡豆（自動展開該豆卡片以便立即查看）
     function submitMethodRating() {
       const beanSelect = document.getElementById('rate-target-bean-select');
-      const beanId = beanSelect.value;
+      const beanId = beanSelect ? beanSelect.value : '';
       if (!beanId) {
         showCustomStepToast('請先選擇或建立要評分的咖啡豆！');
         return;
       }
 
       const methodSelect = document.getElementById('rate-target-method-select');
-      const methodKey = methodSelect.value;
-      const methodName = METHOD_CONFIGS[methodKey].name;
+      const methodKey = (methodSelect && methodSelect.value) || state.method;
+      const methodName = (METHOD_CONFIGS[methodKey] && METHOD_CONFIGS[methodKey].name) || '自訂手法';
 
       const commentInput = document.getElementById('rate-comment-input');
-      const comment = commentInput.value.trim();
+      const comment = commentInput ? commentInput.value.trim() : '';
 
-      // 取得完整的步驟清單（包含每段名稱、注水量、累積水量、注水秒數、注水操作簡記）
       const stepsToSave = (state.isCustomSteps && state.customStepsData && state.customStepsData.length > 0)
         ? JSON.parse(JSON.stringify(state.customStepsData))
         : JSON.parse(JSON.stringify(currentStepsCache));
@@ -6969,9 +7453,9 @@
           dripper: state.dripper,
           brewMode: state.brewMode,
           dose: state.dose,
-          temp: document.getElementById('param-temp').textContent,
-          ratio: document.getElementById('param-ratio').textContent,
-          water: document.getElementById('param-water').textContent,
+          temp: (document.getElementById('param-temp') || {}).textContent || '92°C',
+          ratio: (document.getElementById('param-ratio') || {}).textContent || '1:15',
+          water: (document.getElementById('param-water') || {}).textContent || '225g',
           grind: document.getElementById('param-grind-select') ? document.getElementById('param-grind-select').value : (state.customGrind || '標準研磨'),
           tempAdjust: state.tempAdjust,
           ratioAdjust: state.ratioAdjust,
@@ -6995,15 +7479,15 @@
 
       if (!targetBean.methodRatings) targetBean.methodRatings = [];
       targetBean.methodRatings.unshift(newRating);
+      expandedBeanIds.add(beanId);
       saveBeansToStorage(beans);
 
-      // 清空表單
-      commentInput.value = '';
+      if (commentInput) commentInput.value = '';
       currentLogTags = [];
       document.querySelectorAll('#flavor-tag-picker button').forEach(b => {
-        b.className = 'log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52]';
+        b.className = 'log-tag-btn px-2.5 py-1 rounded-lg bg-white border border-[#E6E0D8] text-[11px] text-[#685B52] inline-flex items-center gap-1.5 transition cursor-pointer';
       });
-      setLogRating(5);
+      setLogRating(4.5);
 
       updateVaultBadges();
       renderBeansList();
@@ -7028,7 +7512,7 @@
         btnElem.dataset.confirming = 'true';
         btnElem._origHtml = btnElem.innerHTML;
         btnElem._origClass = btnElem.className;
-        btnElem.className = 'px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold shadow-xs hover:bg-red-700 transition flex items-center gap-1';
+        btnElem.className = 'px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold shadow-xs hover:bg-red-700 transition flex items-center gap-1 cursor-pointer';
         btnElem.innerHTML = '<span>確認刪除？</span>';
         btnElem._resetTimer = setTimeout(() => {
           btnElem.dataset.confirming = 'false';
