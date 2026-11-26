@@ -1,6 +1,6 @@
 {
   "name": "brewcraft-pour-over-calculator",
-  "version": "1.0.0",
+  "version": "2.8.0",
   "description": "極簡手沖咖啡參數調配系統 - 支援6大沖煮手法與5階烘焙度",
   "main": "index.html",
   "scripts": {
